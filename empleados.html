@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empleados SES</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="navbar.js"></script>
+</head>
+<body>
+    <div class="flex flex-col items-center justify-center mt-24 dark">
+  <div class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7">
+    <h2 class="text-2xl font-bold text-gray-200 mb-4">Registro de empleado</h2>
+    <form class="flex flex-col">
+      <div class="flex space-x-4 mb-4">
+        <input
+          placeholder="Nombre"
+          class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+          type="text"
+        />
+        <input
+          placeholder="Apellido"
+          class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+          type="text"
+        />
+      </div>
+      <input
+        placeholder="Correo Electronico"
+        class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 mb-4 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+        type="email"
+      />
+      <div class="flex space-x-4 mb-4">
+        <input
+          placeholder="Cedula"
+          class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+          type="text"
+        />
+        <input
+          placeholder="Telefono"
+          class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+          type="text"
+        />
+      </div>
+      <input
+        placeholder="Direccion"
+        class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 mb-4 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+        type="text"
+      />
+      <label class="text-sm mb-2 text-gray-200 cursor-pointer" for="age">
+        Fecha de Contratacion
+      </label>
+      <input
+        class="bg-gray-700 text-gray-200 border-0 rounded-md p-2"
+        id="age"
+        type="date"
+      />
+
+      <button
+        class="bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-bold py-2 px-4 rounded-md mt-4 hover:bg-indigo-600 hover:to-blue-600 transition ease-in-out duration-150"
+        type="submit"
+      >
+        Registrar
+      </button>
+    </form>
+  </div>
+</div>
+
+
+
+<div class="flex flex-col items-center justify-center mt-24 dark">
+  <div class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7 mb-24">
+    <h2 class="text-2xl font-bold text-gray-200 mb-4">Busqueda de empleado</h2>
+    <form class="flex flex-col">
+      
+      <input
+        placeholder="Cedula del empleado que desea buscar"
+        class="bg-gray-500 text-gray-200 border-0 rounded-md p-2 mb-4 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+        type="text"
+      />
+
+    <div class="flex space-x-4 mb-4">
+        <input
+          placeholder="Nombre"
+          class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+          type="text" disabled
+        />
+        <input
+          placeholder="Apellido"
+          class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+          type="text" disabled
+        />
+      </div>
+      <input
+        placeholder="Correo Electronico"
+        class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 mb-4 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+        type="email" disabled
+      />
+      <div class="flex space-x-4 mb-4">
+        <input
+          placeholder="Telefono"
+          class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+          type="text" disabled
+        />
+      </div>
+      <input
+        placeholder="Direccion"
+        class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 mb-4 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+        type="text" disabled
+      />
+      <label class="text-sm mb-2 text-gray-200 cursor-pointer" for="age">
+        Fecha de Contratacion
+      </label>
+      <input
+        class="bg-gray-700 text-gray-200 border-0 rounded-md p-2"
+        id="age"
+        type="date" disabled
+      />
+
+      <button
+        class="bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-bold py-2 px-4 rounded-md mt-4 hover:bg-indigo-600 hover:to-blue-600 transition ease-in-out duration-150"
+        type="submit"
+      >
+        Buscar
+
+      <button
+        class="bg-gradient-to-r from-green-500 to-green-300 text-white font-bold py-2 px-4 rounded-md mt-4 hover:bg-indigo-600 hover:to-blue-600 transition ease-in-out duration-150"
+        type="submit" hidden
+      >
+        Editar
+
+      
+      <button
+        class="bg-gradient-to-r from-red-500 to-red-300 text-white font-bold py-2 px-4 rounded-md mt-4 hover:bg-indigo-600 hover:to-blue-600 transition ease-in-out duration-150"
+        type="submit" hidden
+      >
+        Eliminar
+      </button>
+    </form>
+  </div>
+</div>
+</body>
+</html>
