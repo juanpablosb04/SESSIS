@@ -5,10 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clientes SES</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="navbar.js"></script>
+    <script src="/JS/navbar.js"></script>
+    <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
+    .fondo {
+      background-image: url("Img/clientesFondo.png");
+      background-size: cover;
+      height: auto;
+    }
+  </style>
 </head>
 <body>
-    <div class="flex flex-col items-center justify-center mt-24 dark">
+  <div class="fondo">
+    <div class="flex flex-col items-center justify-center mt-8 dark">
   <div class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7">
     <h2 class="text-2xl font-bold text-gray-200 mb-4">Registro de Clientes</h2>
     <form class="flex flex-col">
@@ -59,8 +74,8 @@
 
 
 
-<div class="flex flex-col items-center justify-center mt-24 dark">
-  <div class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7 mb-24">
+<div class="flex flex-col items-center justify-center mt-8 dark">
+  <div class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7 mb-8">
     <h2 class="text-2xl font-bold text-gray-200 mb-4">Busqueda de Clientes</h2>
     <form class="flex flex-col">
       
@@ -144,6 +159,6 @@
 </script>
 
 -->
-
+</div>
 </body>
 </html>
