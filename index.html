@@ -6,25 +6,51 @@
     <title>Inicio</title>
     <link rel="stylesheet" href="/styles/index.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="/JS/navbar.js"></script>
 </head>
+<style>
+  *{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Open sans', sans-serif;
+}
+
+body{
+  height: 100vh;
+  background-color: black;
+  background-image: url('https://images.unsplash.com/photo-1485230405346-71acb9518d9c?q=80&w=1494&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+  background-size: cover;
+}
+</style>
 <body>
 
 
-<div id="infoInicio">
-  <div id="cuadroInicio">
-    <h2>Bienvenido al sistema de SES</h2>
-    <h3>“La seguridad no es solo nuestro trabajo, es nuestra vocación.”</h3>
-    <p>En el mundo cambiante de hoy, ser parte de la seguridad privada no significa solo custodiar un lugar, sino proteger lo más valioso: la tranquilidad, la confianza y la vida de las personas.
+<div id="infoInicio" class="flex justify-center">
+  <div id="cuadroInicio" class="h-[auto] w-[1050px] bg-white/10 backdrop-blur-[10px] rounded-[10px] border border-white/20 p-[45px] text-center mt-[95px] overflow-y-auto">
+    
+    <h2 class="text-[30px] font-bold text-[#621729] mb-2">Bienvenido al sistema de SES</h2>
 
-Cada turno que comienzas, cada reporte que completas, cada decisión que tomas, es parte de un propósito mayor. Aquí, no solo vigilamos — brindamos paz. No solo respondemos — prevenimos, actuamos y protegemos.
+    <h3 class="text-[20px] italic mb-2 text-white">“La seguridad no es solo nuestro trabajo, es nuestra vocación.”</h3>
 
-Este sistema fue creado para que tu labor sea más ágil, más clara, más fuerte. Porque tú eres parte esencial del engranaje que sostiene la confianza de quienes confían en nosotros.
+    <p class="text-[18px] leading-relaxed text-white">
+      En el mundo cambiante de hoy, ser parte de la seguridad privada no significa solo custodiar un lugar, sino proteger lo más valioso: la tranquilidad, la confianza y la vida de las personas.
+      <br><br>
+      Cada turno que comienzas, cada reporte que completas, cada decisión que tomas, es parte de un propósito mayor. Aquí, no solo vigilamos — brindamos paz. No solo respondemos — prevenimos, actuamos y protegemos.
+      <br><br>
+      Este sistema fue creado para que tu labor sea más ágil, más clara, más fuerte. Porque tú eres parte esencial del engranaje que sostiene la confianza de quienes confían en nosotros.
+      <br><br>
+      Gracias por tu compromiso. Gracias por tu servicio.
+    </p>
 
-Gracias por tu compromiso. Gracias por tu servicio.</p>
-  <h4><i class="fa-solid fa-globe" style="color: #555553;"></i></h4>
+        <h4 class="text-[100px] text-[#621729]">
+      <i class="fa-solid fa-globe"></i>
+    </h4>
+    
   </div>
 </div>
+
 
 </body>
 </html>
