@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Generar Reportes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/JS/navbar.js"></script>
+    <style>
+    
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
+    .fondo {
+      background-image: url("Img/empleadosFondo.png");
+      background-size: cover;
+      height: auto;
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-8">
+  <div class="w-full max-w-4xl bg-gray-800 p-6 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-6">Generación de Reportes de Incidentes</h2>
+
+    <form class="space-y-6">
+      <!-- Reporte Diario -->
+      <div class="bg-gray-700 p-4 rounded-lg">
+        <h3 class="text-lg font-semibold mb-2">Reporte Diario de Asistencia</h3>
+        <div class="flex items-center space-x-4">
+          <input type="date" class="p-2 rounded bg-gray-600 text-white w-full" placeholder="Selecciona una fecha" />
+          <button type="button" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white">
+            Generar reporte diario
+          </button>
+        </div>
+      </div>
+
+      <!-- Reporte Mensual -->
+      <div class="bg-gray-700 p-4 rounded-lg">
+        <h3 class="text-lg font-semibold mb-2">Reporte Mensual por Empleado</h3>
+        <div class="grid grid-cols-2 gap-4">
+          <input type="month" class="p-2 rounded bg-gray-600 text-white" />
+          <input type="text" class="p-2 rounded bg-gray-600 text-white" placeholder="Código del empleado" />
+          <button type="button" class="col-span-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white">
+            Generar reporte mensual
+          </button>
+        </div>
+      </div>
+
+      <!-- Reporte de Ausencias -->
+      <div class="bg-gray-700 p-4 rounded-lg">
+        <h3 class="text-lg font-semibold mb-2">Reporte de Ausencias</h3>
+        <button type="button" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white">
+          Generar reporte de ausencias
+        </button>
+      </div>
+
+      <!-- Exportar a PDF -->
+      <div class="bg-gray-700 p-4 rounded-lg">
+        <h3 class="text-lg font-semibold mb-2">Exportar Reporte a PDF</h3>
+        <button type="button" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white">
+          Exportar a PDF
+        </button>
+      </div>
+
+      <!-- Programar Envío -->
+      <div class="bg-gray-700 p-4 rounded-lg">
+        <h3 class="text-lg font-semibold mb-2">Programar Envío Semanal</h3>
+        <div class="grid grid-cols-3 gap-4">
+          <input type="time" class="p-2 rounded bg-gray-600 text-white" />
+          <input type="date" class="p-2 rounded bg-gray-600 text-white" />
+          <input type="email" class="p-2 rounded bg-gray-600 text-white" placeholder="Correo destinatario" />
+        </div>
+        <button type="button" class="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white">
+          Guardar programación
+        </button>
+      </div>
+
+      <!-- Mis Reportes -->
+      <div class="bg-gray-700 p-4 rounded-lg">
+        <h3 class="text-lg font-semibold mb-2">Mis Reportes</h3>
+        <input type="text" class="p-2 rounded bg-gray-600 text-white w-full mb-2" placeholder="Código del empleado" />
+        <div class="flex items-center space-x-4">
+          <input type="date" class="p-2 rounded bg-gray-600 text-white w-full" />
+          <input type="date" class="p-2 rounded bg-gray-600 text-white w-full" />
+          <button type="button" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white">
+            Consultar
+          </button>
+        </div>
+      </div>
+
+      <!-- Botón de regreso -->
+      <div class="flex justify-end space-x-4 pt-4">
+        <a href="index.html" class="bg-red-600 hover:bg-red-700 px-6 py-2 rounded text-white font-bold">
+          Regresar
+        </a>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

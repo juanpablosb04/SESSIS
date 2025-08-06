@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ver Asistencia</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/JS/navbar.js"></script>
+</head>
+<body class="bg-gray-900 min-h-screen text-gray-200">
+
+  <div class="max-w-6xl mx-auto py-10 px-6">
+    <h2 class="text-3xl font-bold mb-6 text-center">Ver Asistencia</h2>
+
+    <div class="overflow-x-auto">
+     <table class="min-w-full border border-gray-700 rounded shadow">
+  <thead class="bg-gray-700">
+    <tr>
+      <th class="p-3 text-left">Fecha</th>
+      <th class="p-3 text-left">Cantidad</th>
+      <th class="p-3 text-left">Código y Nombre de Oficiales</th>
+      <th class="p-3 text-left">Turno</th>
+      <th class="p-3 text-left">Ubicación</th>
+      <th class="p-3 text-left">Observaciones</th>
+    </tr>
+  </thead>
+  <tbody class="bg-gray-800">
+    <!-- Fila de ejemplo -->
+    <tr class="border-t border-gray-700 hover:bg-gray-700 transition">
+      <td class="p-3">2025-08-06</td>
+      <td class="p-3">2</td>
+      <td class="p-3">
+        - COD001 - Carlos Ramírez<br>
+        - COD002 - Diana Torres
+      </td>
+      <td class="p-3">06:00 - 14:00</td>
+      <td class="p-3">Residencial Las Palmas</td>
+      <td class="p-3">Ninguna</td>
+    </tr>
+
+    <!-- Otra fila de ejemplo -->
+    <tr class="border-t border-gray-700 hover:bg-gray-700 transition">
+      <td class="p-3">2025-08-05</td>
+      <td class="p-3">1</td>
+      <td class="p-3">
+        - COD003 - Jorge Rivera
+      </td>
+      <td class="p-3">22:00 - 06:00</td>
+      <td class="p-3">Plaza Real</td>
+      <td class="p-3">Turno extendido</td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+    <!-- Botón Regresar -->
+    <div class="mt-8 flex justify-center">
+      <button onclick="window.location.href='index.html'"
+        class="bg-red-600 hover:bg-red-700 text-white py-2 px-6 rounded font-semibold transition">
+        Regresar
+      </button>
+    </div>
+  </div>
+
+</body>
+</html>
+

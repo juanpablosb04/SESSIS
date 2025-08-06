@@ -21,8 +21,17 @@ const navbar = `
         </ul>
       </li>
       <li><a href="/inventario.html">Inventario</a></li>
+      <li class="dropdown">
+        <a href="">Asistencia</a>
+        <ul class="dropdown-menu">
+          <li><a href="/asistencia.html">Registrar Asistencia</a></li>
+          <li><a href="/verAsistencia.html">Ver las asistencias</a></li>
+        </ul>
+      </li>
+      <li><a href="/reportes.html">Reportes</a></li>
     </ul>
     <button class="boton-elegante">LogOut</button>
+    
   </div>`;
 
   document.body.insertAdjacentHTML("afterbegin", navbar);

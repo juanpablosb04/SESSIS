@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registro de Asistencia</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+ 
+</head>
+<body class="bg-gray-900 min-h-screen flex items-center justify-center">
+  <div class="w-full max-w-3xl bg-gray-800 rounded-lg shadow-md p-8">
+    <h2 class="text-2xl font-bold text-gray-200 mb-6 text-center">Registro de Asistencia</h2>
+    
+    <form id="formAsistencia" class="flex flex-col space-y-4 text-gray-200">
+      
+      <!-- Fecha -->
+      <div>
+        <label class="block mb-1 font-semibold">Fecha</label>
+        <input type="date" class="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+      </div>
+
+      <!-- Cantidad de oficiales -->
+      <div>
+        <label class="block mb-1 font-semibold">Cantidad de oficiales</label>
+        <input type="number" id="cantidadOficiales" min="1" max="20" class="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+      </div>
+
+      <!-- Contenedor dinámico para nombres -->
+      <div id="nombresOficialesContainer" class="space-y-2"></div>
+
+      <!-- Turno de ingreso -->
+      <div>
+        <label class="block mb-1 font-semibold">Turno de ingreso</label>
+        <select class="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+          <option value="">Seleccione un turno</option>
+          <option value="06-14">06:00 a 14:00</option>
+          <option value="14-22">14:00 a 22:00</option>
+          <option value="22-06">22:00 a 06:00</option>
+        </select>
+      </div>
+
+      <!-- Ubicación del puesto -->
+      <div>
+        <label class="block mb-1 font-semibold">Ubicación del puesto</label>
+        <input type="text" class="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+      </div>
+
+      <!-- Observaciones -->
+      <div>
+        <label class="block mb-1 font-semibold">Observaciones</label>
+        <textarea rows="3" class="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+      </div>
+
+     <!-- Botones en línea -->
+<div class="flex justify-between space-x-4 mt-6">
+  <button type="submit"
+    class="w-1/2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded font-semibold transition">
+    Registrar Asistencia
+  </button>
+
+  <button type="button"
+    onclick="window.history.back()"
+    class="w-1/2 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded font-semibold transition">
+    Regresar
+  </button>
+</div>
+
+
+  <!-- Script para generar dinámicamente los campos de oficiales -->
+  <script>
+  const cantidadInput = document.getElementById('cantidadOficiales');
+  const container = document.getElementById('nombresOficialesContainer');
+
+  cantidadInput.addEventListener('input', () => {
+    container.innerHTML = ''; // Limpiar los campos anteriores
+    const cantidad = parseInt(cantidadInput.value);
+    if (!isNaN(cantidad) && cantidad > 0 && cantidad <= 20) {
+      for (let i = 1; i <= cantidad; i++) {
+        // Etiqueta: Código del oficial
+        const labelCodigo = document.createElement('label');
+        labelCodigo.textContent = `Código del Oficial ${i}`;
+        labelCodigo.className = 'block mt-4 font-semibold';
+
+        const inputCodigo = document.createElement('input');
+        inputCodigo.type = 'text';
+        inputCodigo.placeholder = `Código del Oficial ${i}`;
+        inputCodigo.className = 'w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500';
+        inputCodigo.required = true;
+
+        // Etiqueta: Nombre del oficial
+        const labelNombre = document.createElement('label');
+        labelNombre.textContent = `Nombre del Oficial ${i}`;
+        labelNombre.className = 'block mt-2 font-semibold';
+
+        const inputNombre = document.createElement('input');
+        inputNombre.type = 'text';
+        inputNombre.placeholder = `Nombre del Oficial ${i}`;
+        inputNombre.className = 'w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500';
+        inputNombre.required = true;
+
+        // Agregar al contenedor
+        container.appendChild(labelCodigo);
+        container.appendChild(inputCodigo);
+        container.appendChild(labelNombre);
+        container.appendChild(inputNombre);
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
