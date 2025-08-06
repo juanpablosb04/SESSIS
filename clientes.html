@@ -158,6 +158,42 @@
   });
 </script>
 
+
+<!-- Sección: Editar Horas Extras (Administrador) -->
+<div class="flex flex-col items-center justify-center mt-8 dark">
+  <div class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7 mb-8">
+    <h2 class="text-2xl font-bold text-gray-200 mb-4">Editar Horas Extras</h2>
+
+    <form class="flex flex-col">
+      <div class="flex space-x-4 mb-4">
+        <input
+          placeholder="Fecha"
+          class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-yellow-500 transition ease-in-out duration-150"
+          type="date"
+        />
+        <input
+          placeholder="Cantidad de horas"
+          class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-yellow-500 transition ease-in-out duration-150"
+          type="number"
+          min="1"
+        />
+      </div>
+
+      <textarea
+        placeholder="Motivo de las horas extras"
+        class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 mb-4 h-28 resize-none focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-yellow-500 transition ease-in-out duration-150"
+      ></textarea>
+
+      <button
+        class="bg-gradient-to-r from-yellow-500 to-yellow-400 text-black font-bold py-2 px-4 rounded-md mt-4 hover:from-yellow-600 hover:to-yellow-500 transition ease-in-out duration-150"
+        type="submit"
+      >
+        Guardar Cambios
+      </button>
+    </form>
+  </div>
+</div>
+
 -->
 </div>
 </body>

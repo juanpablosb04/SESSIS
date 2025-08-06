@@ -8,7 +8,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="/JS/navbar.js"></script>
   <style>
-    
     html,
     body {
       margin: 0;
@@ -117,6 +116,74 @@
                 type="submit" hidden>
                 Eliminar
               </button>
+              <!-- Consulta de horas extras -->
+              <div class="flex flex-col items-center justify-center mt-8 dark">
+                <div class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7 mb-8">
+                  <h2 class="text-2xl font-bold text-gray-200 mb-4">Horas Extras Registradas</h2>
+
+                  <div class="overflow-x-auto">
+                    <table class="w-full table-auto text-left border-collapse">
+                      <thead>
+                        <tr class="bg-gray-700 text-gray-100">
+                          <th class="px-4 py-2 border border-gray-600">Fecha</th>
+                          <th class="px-4 py-2 border border-gray-600">Horas</th>
+                          <th class="px-4 py-2 border border-gray-600">Motivo</th>
+                          <th class="px-4 py-2 border border-gray-600">Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody class="text-gray-300">
+                        <tr class="hover:bg-gray-700">
+                          <td class="px-4 py-2 border border-gray-600">2025-08-05</td>
+                          <td class="px-4 py-2 border border-gray-600">2</td>
+                          <td class="px-4 py-2 border border-gray-600">Soporte fuera de horario</td>
+                          <td class="px-4 py-2 border border-gray-600">Aprobado</td>
+                        </tr>
+                        <tr class="hover:bg-gray-700">
+                          <td class="px-4 py-2 border border-gray-600">2025-08-01</td>
+                          <td class="px-4 py-2 border border-gray-600">1</td>
+                          <td class="px-4 py-2 border border-gray-600">Capacitación</td>
+                          <td class="px-4 py-2 border border-gray-600">Pendiente</td>
+                        </tr>
+
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              ------
+              <!-- Sección: Registrar Horas Extras (Administrador) -->
+              <div class="flex flex-col items-center justify-center mt-8 dark">
+                <div class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7 mb-8">
+                  <h2 class="text-2xl font-bold text-gray-200 mb-4">Registrar Horas Extras</h2>
+
+                  <form class="flex flex-col">
+                    <input placeholder="Cédula del Empleado"
+                      class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 mb-4 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-green-500 transition ease-in-out duration-150"
+                      type="text" required />
+
+                    <div class="flex space-x-4 mb-4">
+                      <input placeholder="Fecha"
+                        class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-green-500 transition ease-in-out duration-150"
+                        type="date" required />
+                      <input placeholder="Cantidad de Horas"
+                        class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-green-500 transition ease-in-out duration-150"
+                        type="number" min="1" required />
+                    </div>
+
+                    <textarea placeholder="Motivo de las horas extras"
+                      class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 h-28 resize-none focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-green-500 transition ease-in-out duration-150"
+                      required></textarea>
+
+                    <button
+                      class="bg-gradient-to-r from-green-500 to-green-400 text-white font-bold py-2 px-4 rounded-md mt-4 hover:from-green-600 hover:to-green-500 transition ease-in-out duration-150"
+                      type="submit">
+                      Registrar Horas Extras
+                    </button>
+                  </form>
+                </div>
+              </div>
+
+
         </form>
       </div>
     </div>
