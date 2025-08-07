@@ -53,4 +53,32 @@ body{
 
 
 </body>
+
+<!-- Notificación flotante moderna -->
+<div id="notificacionCitas" class="fixed top-6 right-6 z-50 bg-blue-600 text-white px-6 py-4 rounded-lg shadow-lg flex items-center space-x-4 animate-fade-in-down">
+  <i class="fa-solid fa-bell text-2xl text-yellow-300"></i>
+  <div>
+    <p class="font-semibold">¡Tienes 3 citas programadas para hoy!</p>
+    <p class="text-sm text-blue-100">Revisa el módulo de citas para más detalles.</p>
+  </div>
+  <button onclick="document.getElementById('notificacionCitas').remove()" class="text-white text-lg ml-4 hover:text-gray-300">&times;</button>
+</div>
+
+
+<style>
+@keyframes fade-in-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-down {
+  animation: fade-in-down 0.7s ease-out;
+}
+</style>
+
 </html>
