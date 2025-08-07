@@ -14,8 +14,8 @@ const navbar = `
       <li class="dropdown">
         <a href="">Empleado</a>
         <ul class="dropdown-menu">
-          <li><a href="">Registrar Empleados</a></li>
-          <li><a href="">Registrar Horas Extras</a></li>
+          <li><a href="/empleados.html">Registrar y consultar Empleados</a></li>
+          <li><a href="/extras.html">Registrar Horas Extras</a></li>
         </ul>
       </li>
       <li><a href="/clientes.html">Clientes</a></li>
@@ -27,19 +27,16 @@ const navbar = `
         </ul>
       </li>
       <li><a href="/inventario.html">Inventario</a></li>
-      <li class="dropdown">
-        <a href="">Asistencia</a>
-        <ul class="dropdown-menu">
-          <li><a href="/asistencia.html">Registrar Asistencia</a></li>
-          <li><a href="/verAsistencia.html">Ver las asistencias</a></li>
-        </ul>
-      </li>
       <li><a href="/reportes.html">Reportes</a></li>
+      <li><a href="/usuarios.html">Usuarios</a></li>
     </ul>
-    <button class="boton-elegante">LogOut</button>
+    <a class="boton-elegante" href="/login.html">LogOut</a>
+
     
   </div>`;
 
   document.body.insertAdjacentHTML("afterbegin", navbar);
 
 });
+
+      
