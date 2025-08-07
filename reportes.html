@@ -24,7 +24,7 @@
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-8">
   <div class="w-full max-w-4xl bg-gray-800 p-6 rounded-lg shadow-md">
-    <h2 class="text-2xl font-bold mb-6">Generación de Reportes de Incidentes</h2>
+    <h2 class="text-2xl font-bold mb-6">Generación de Reportes administrativos</h2>
 
     <form class="space-y-6">
       <!-- Reporte Diario -->
@@ -50,47 +50,30 @@
         </div>
       </div>
 
-      <!-- Reporte de Ausencias -->
-      <div class="bg-gray-700 p-4 rounded-lg">
-        <h3 class="text-lg font-semibold mb-2">Reporte de Ausencias</h3>
-        <button type="button" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white">
-          Generar reporte de ausencias
-        </button>
-      </div>
-
-      <!-- Exportar a PDF -->
-      <div class="bg-gray-700 p-4 rounded-lg">
-        <h3 class="text-lg font-semibold mb-2">Exportar Reporte a PDF</h3>
-        <button type="button" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white">
-          Exportar a PDF
-        </button>
-      </div>
 
       <!-- Programar Envío -->
       <div class="bg-gray-700 p-4 rounded-lg">
-        <h3 class="text-lg font-semibold mb-2">Programar Envío Semanal</h3>
+        <h3 class="text-lg font-semibold mb-2"> Envío por correo Quincenal</h3>
         <div class="grid grid-cols-3 gap-4">
-          <input type="time" class="p-2 rounded bg-gray-600 text-white" />
           <input type="date" class="p-2 rounded bg-gray-600 text-white" />
           <input type="email" class="p-2 rounded bg-gray-600 text-white" placeholder="Correo destinatario" />
         </div>
         <button type="button" class="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white">
-          Guardar programación
+          Enviar programación 
         </button>
       </div>
 
-      <!-- Mis Reportes -->
-      <div class="bg-gray-700 p-4 rounded-lg">
-        <h3 class="text-lg font-semibold mb-2">Mis Reportes</h3>
-        <input type="text" class="p-2 rounded bg-gray-600 text-white w-full mb-2" placeholder="Código del empleado" />
-        <div class="flex items-center space-x-4">
-          <input type="date" class="p-2 rounded bg-gray-600 text-white w-full" />
-          <input type="date" class="p-2 rounded bg-gray-600 text-white w-full" />
-          <button type="button" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white">
-            Consultar
-          </button>
-        </div>
-      </div>
+      <!-- Reportes de incidentes -->
+<div class="bg-gray-700 p-4 rounded-lg">
+  <h3 class="text-lg font-semibold mb-2">Reportes de incidencias</h3>
+  <input type="text" class="p-2 rounded bg-gray-600 text-white w-full mb-2" placeholder="Código del reporte" />
+  <div class="flex justify-end">
+    <button type="button" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white">
+      Descargar
+    </button>
+  </div>
+</div>
+
 
       <!-- Botón de regreso -->
       <div class="flex justify-end space-x-4 pt-4">
