@@ -11,7 +11,13 @@ const navbar = `
     <div class="logo"><a href="/index.html">SES</a></div>
     <ul class="links">
       <li><a href="/index.html">Inicio</a></li>
-      <li><a href="/empleados.html">Empleados</a></li>
+      <li class="dropdown">
+        <a href="">Empleado</a>
+        <ul class="dropdown-menu">
+          <li><a href="">Registrar Empleados</a></li>
+          <li><a href="">Registrar Horas Extras</a></li>
+        </ul>
+      </li>
       <li><a href="/clientes.html">Clientes</a></li>
       <li class="dropdown">
         <a href="">Citas</a>

@@ -42,7 +42,7 @@ body {
 }
 
 form {
-    height: 480px;
+    height: 420px;
     width: 400px;
     background-color: rgba(255, 255, 255, 0.15);
     position: absolute;
@@ -137,17 +137,16 @@ button:hover::before {
     width: 150%;
 }
 
-.recuperar-link {
-  font-size: 15px;
-  color: #3b82f6;
+.ir-login {
+  font-size: 15px;  
+  color: #fff;     
   cursor: pointer;
   text-decoration: none;
   transition: color 0.2s ease-in-out;
-  margin-top: 25px;
-  display: inline-block;
+  margin-top: 10px;
 }
 
-.recuperar-link:hover {
+.ir-login {
   text-decoration: underline;
-  color: #1d4ed8;
+  color: #1d4ed8; 
 }
