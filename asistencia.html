@@ -58,42 +58,57 @@
   </div>
 
   <script>
-    const cantidadInput = document.getElementById('cantidadOficiales');
-    const container = document.getElementById('nombresOficialesContainer');
+  const cantidadInput = document.getElementById('cantidadOficiales');
+  const container = document.getElementById('nombresOficialesContainer');
 
-    cantidadInput.addEventListener('input', () => {
-      container.innerHTML = '';
-      const cantidad = parseInt(cantidadInput.value);
-      if (!isNaN(cantidad) && cantidad > 0 && cantidad <= 20) {
-        for (let i = 1; i <= cantidad; i++) {
-          const labelCodigo = document.createElement('label');
-          labelCodigo.textContent = `Código del Oficial ${i}`;
-          labelCodigo.className = 'block mt-4 font-semibold';
+  cantidadInput.addEventListener('input', () => {
+    container.innerHTML = '';
+    const cantidad = parseInt(cantidadInput.value);
+    if (!isNaN(cantidad) && cantidad > 0 && cantidad <= 20) {
+      for (let i = 1; i <= cantidad; i++) {
+        const labelCodigo = document.createElement('label');
+        labelCodigo.textContent = `Código del Oficial ${i}`;
+        labelCodigo.className = 'block mt-4 font-semibold';
 
-          const inputCodigo = document.createElement('input');
-          inputCodigo.type = 'text';
-          inputCodigo.placeholder = `Código del Oficial ${i}`;
-          inputCodigo.className = 'w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500';
-          inputCodigo.required = true;
+        const inputCodigo = document.createElement('input');
+        inputCodigo.type = 'text';
+        inputCodigo.placeholder = `Código del Oficial ${i}`;
+        inputCodigo.className = 'w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500';
+        inputCodigo.required = true;
 
-          const labelNombre = document.createElement('label');
-          labelNombre.textContent = `Nombre del Oficial ${i}`;
-          labelNombre.className = 'block mt-2 font-semibold';
+        const labelNombre = document.createElement('label');
+        labelNombre.textContent = `Nombre del Oficial ${i}`;
+        labelNombre.className = 'block mt-2 font-semibold';
 
-          const inputNombre = document.createElement('input');
-          inputNombre.type = 'text';
-          inputNombre.placeholder = `Nombre del Oficial ${i}`;
-          inputNombre.className = 'w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500';
-          inputNombre.required = true;
+        const inputNombre = document.createElement('input');
+        inputNombre.type = 'text';
+        inputNombre.placeholder = `Nombre del Oficial ${i}`;
+        inputNombre.className = 'w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500';
+        inputNombre.required = true;
 
-          container.appendChild(labelCodigo);
-          container.appendChild(inputCodigo);
-          container.appendChild(labelNombre);
-          container.appendChild(inputNombre);
-        }
+        container.appendChild(labelCodigo);
+        container.appendChild(inputCodigo);
+        container.appendChild(labelNombre);
+        container.appendChild(inputNombre);
       }
-    });
-  </script>
+    }
+  });
+</script>
+<script>
+  document.getElementById("formAsistencia").addEventListener("submit", function(event) {
+    event.preventDefault(); // Evita que recargue la página
+
+    const ahora = new Date();
+    const hora = ahora.toLocaleTimeString(); // Hora en formato local
+
+    alert(`Gracias, buen turno.\nHora de ingreso: ${hora}`);
+    
+    // Aquí podrías enviar el formulario al backend si lo necesitas
+    // this.submit();  // Descomentar si quieres que se envíe después del mensaje
+  });
+</script>
+
+
 
   <script src="/JS/navbarEmpleados.js"></script>
 </body>

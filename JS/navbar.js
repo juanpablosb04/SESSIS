@@ -16,6 +16,7 @@ const navbar = `
         <ul class="dropdown-menu">
           <li><a href="/empleados.html">Registrar y consultar Empleados</a></li>
           <li><a href="/extras.html">Registrar Horas Extras</a></li>
+           <li><a href="/asistenciaAdmin.html">Asistencia de empleados</a></li>
         </ul>
       </li>
       <li><a href="/clientes.html">Clientes</a></li>
