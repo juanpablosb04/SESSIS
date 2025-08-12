@@ -13,11 +13,22 @@
   <div class="max-w-6xl mx-auto py-10 px-6">
     <h2 class="text-3xl font-bold mb-6 text-center">Ver Asistencia</h2>
 
+    <!-- Barra de búsqueda por Código -->
+    <div class="mb-4">
+      <input
+        type="text"
+        id="buscarCodigo"
+        placeholder="Buscar por código (ej: a01)..."
+        class="w-full p-2 rounded bg-gray-800 border border-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        aria-label="Buscar por código"
+      />
+    </div>
+
     <div class="overflow-x-auto">
-      <table class="min-w-full border border-gray-700 rounded shadow">
+      <table class="min-w-full border border-gray-700 rounded shadow" id="tablaAsistencia">
         <thead class="bg-gray-700">
           <tr>
-             <th class="p-3 text-left">Codigo</th>
+            <th class="p-3 text-left">Codigo</th>
             <th class="p-3 text-left">Fecha</th>
             <th class="p-3 text-left">Cantidad</th>
             <th class="p-3 text-left">Código y Nombre de Oficiales</th>
@@ -30,7 +41,7 @@
         <tbody class="bg-gray-800">
           <!-- Fila de ejemplo -->
           <tr class="border-t border-gray-700 hover:bg-gray-700 transition">
-              <td class="p-3">a01</td>
+            <td class="p-3">a01</td>
             <td class="p-3">2025-08-06</td>
             <td class="p-3">2</td>
             <td class="p-3">
@@ -51,7 +62,7 @@
           </tr>
 
           <tr class="border-t border-gray-700 hover:bg-gray-700 transition">
-             <td class="p-3">a02</td>
+            <td class="p-3">a02</td>
             <td class="p-3">2025-08-05</td>
             <td class="p-3">1</td>
             <td class="p-3">- COD003 - Jorge Rivera</td>
@@ -68,7 +79,6 @@
             </td>
           </tr>
         </tbody>
-        
       </table>
     </div>
   </div>
@@ -85,19 +95,38 @@
   </div>
 
   <script>
+    // --- Búsqueda por Código (columna 1) ---
+    document.getElementById("buscarCodigo").addEventListener("input", function () {
+      const filtro = this.value.trim().toLowerCase();
+      const filas = document.querySelectorAll("#tablaAsistencia tbody tr");
+      filas.forEach(fila => {
+        const codigo = fila.querySelector("td:nth-child(1)")?.textContent.toLowerCase() || "";
+        fila.style.display = codigo.includes(filtro) ? "" : "none";
+      });
+    });
+
+    // --- Acciones Editar / Eliminar ---
     let accionPendiente = null;
     let filaSeleccionada = null;
 
     function editarRegistro(btn) {
-      const fecha = btn.closest("tr").querySelector("td").textContent;
-      alert(`Abrir formulario para editar registro del ${fecha}`);
-      // Aquí podrías abrir un modal con los datos para editar
+      const celdas = btn.closest("tr").querySelectorAll("td");
+      const codigo = celdas[0].textContent.trim();
+      const fecha  = celdas[1].textContent.trim();
+      alert(`Abrir formulario para editar:\nCódigo: ${codigo}\nFecha: ${fecha}`);
+      // Aquí podrías abrir un modal con el formulario de edición
     }
 
     function eliminarRegistro(btn) {
       filaSeleccionada = btn.closest("tr");
       accionPendiente = "eliminar";
-      document.getElementById("mensajeModal").textContent = "¿Seguro que deseas eliminar este registro?";
+
+      const celdas = filaSeleccionada.querySelectorAll("td");
+      const codigo = celdas[0].textContent.trim();
+      const fecha  = celdas[1].textContent.trim();
+
+      document.getElementById("mensajeModal").textContent =
+        `¿Seguro que deseas eliminar el registro?\nCódigo: ${codigo} | Fecha: ${fecha}`;
       document.getElementById("modalAccion").classList.remove("hidden");
     }
 
@@ -117,3 +146,4 @@
 
 </body>
 </html>
+
