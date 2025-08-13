@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Generar Reportes</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="/JS/navbar.js"></script>
@@ -12,6 +13,10 @@
       margin: 0;
       padding: 0;
       height: 100%;
+      background-image: url('/Img/reportesFondo.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
     }
 
     .fondo {
@@ -21,6 +26,7 @@
     }
   </style>
 </head>
+
 <body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-8">
   <div class="w-full max-w-4xl bg-gray-800 p-6 rounded-lg shadow-md mt-8">
     <h2 class="text-2xl font-bold mb-6">Generación de Reportes administrativos</h2>
@@ -29,7 +35,7 @@
       <div class="bg-gray-700 p-4 rounded-lg">
         <h3 class="text-lg font-semibold mb-2">Reporte Diario de Asistencia</h3>
         <div class="flex items-center space-x-4">
-          <input type="date" class="p-2 rounded bg-gray-600 text-white w-full" placeholder="Selecciona una fecha" />
+          <input id="fechaReporte" type="date" class="p-2 rounded bg-gray-600 text-white w-full" readonly />
           <button type="button" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white">
             Generar reporte diario
           </button>
@@ -54,7 +60,7 @@
           <input type="email" class="p-2 rounded bg-gray-600 text-white" placeholder="Correo destinatario" />
         </div>
         <button type="button" class="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white">
-          Enviar programación 
+          Enviar programación
         </button>
       </div>
 
@@ -70,4 +76,11 @@
     </form>
   </div>
 </body>
+
+<script>
+  const hoy = new Date();
+  const fechaISO = hoy.toISOString().split("T")[0];
+  document.getElementById("fechaReporte").value = fechaISO;
+</script>
+
 </html>

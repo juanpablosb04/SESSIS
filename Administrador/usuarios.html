@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel de Administración - Personal Corporativo</title>
   <!-- Fuentes personalizadas -->
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Roboto:wght@300;400;500;600&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Roboto:wght@300;400;500;600&family=Quicksand:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
   <!-- Iconografía moderna -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="styles/Usuarios.css">
+  <link rel="stylesheet" href="/styles/Usuarios.css">
   <script src="/JS/navbar.js"></script>
-  
 </head>
+
 <body>
   <main class="panel-administrativo">
     <!-- Cabecera del sistema -->
@@ -19,7 +22,7 @@
       <button class="navegacion-superior" onclick="window.location.href='index.html'">
         <i class="fas fa-home"></i> Dashboard
       </button>
-      
+
       <div class="contenido-cabecera">
         <div class="icono-panel">
           <i class="fas fa-users-cog"></i>
@@ -82,14 +85,15 @@
     <div id="overlayModal" class="modal-overlay" onclick="cerrarFormulario()">
       <div class="formulario-modal" onclick="event.stopPropagation()">
         <h2 class="titulo-formulario">Registro de Nuevo Colaborador</h2>
-        
+
         <form id="formularioPersonal">
           <div class="campo-formulario">
             <label class="etiqueta-campo">
               <i class="fas fa-id-card"></i>
               Número de Identificación
             </label>
-            <input type="text" class="entrada-campo" name="identificacion" placeholder="Ingrese cédula de identidad" required>
+            <input type="text" class="entrada-campo" name="identificacion" placeholder="Ingrese cédula de identidad"
+              required>
           </div>
 
           <div class="campo-formulario">
@@ -97,7 +101,8 @@
               <i class="fas fa-user"></i>
               Nombre Completo
             </label>
-            <input type="text" class="entrada-campo" name="nombreCompleto" placeholder="Nombres y apellidos completos" required>
+            <input type="text" class="entrada-campo" name="nombreCompleto" placeholder="Nombres y apellidos completos"
+              required>
           </div>
 
           <div class="campo-formulario">
@@ -105,7 +110,8 @@
               <i class="fas fa-envelope"></i>
               Correo Electrónico Corporativo
             </label>
-            <input type="email" class="entrada-campo" name="emailCorporativo" placeholder="usuario@empresa.com" required>
+            <input type="email" class="entrada-campo" name="emailCorporativo" placeholder="usuario@empresa.com"
+              required>
           </div>
 
           <div class="campo-formulario">
@@ -149,9 +155,9 @@
 
   <script>
     // Sistema de gestión de usuarios completamente reescrito
-    (function() {
+    (function () {
       'use strict';
-      
+
       const gestorUsuarios = {
         usuarios: [
           {
@@ -163,18 +169,18 @@
             estado: 'activo'
           }
         ],
-        
+
         // Inicialización del sistema
         inicializar() {
           this.configurarEventos();
           this.actualizarContador();
         },
-        
+
         // Configuración de eventos
         configurarEventos() {
           const formulario = document.getElementById('formularioPersonal');
           formulario.addEventListener('submit', (evento) => this.procesarFormulario(evento));
-          
+
           // Validación en tiempo real
           const camposEntrada = formulario.querySelectorAll('.entrada-campo, .seleccion-campo');
           camposEntrada.forEach(campo => {
@@ -182,14 +188,14 @@
             campo.addEventListener('input', () => this.limpiarError(campo));
           });
         },
-        
+
         // Mostrar formulario modal
         mostrarModal() {
           const overlay = document.getElementById('overlayModal');
           overlay.classList.add('activo');
           document.body.style.overflow = 'hidden';
         },
-        
+
         // Ocultar formulario modal
         ocultarModal() {
           const overlay = document.getElementById('overlayModal');
@@ -197,12 +203,12 @@
           document.body.style.overflow = 'auto';
           this.limpiarFormulario();
         },
-        
+
         // Validar campo individual
         validarCampo(campo) {
           const contenedor = campo.closest('.campo-formulario');
           const valor = campo.value.trim();
-          
+
           if (valor === '') {
             contenedor.classList.add('campo-error');
             contenedor.classList.remove('campo-valido');
@@ -213,17 +219,17 @@
             return true;
           }
         },
-        
+
         // Limpiar error de campo
         limpiarError(campo) {
           const contenedor = campo.closest('.campo-formulario');
           contenedor.classList.remove('campo-error');
         },
-        
+
         // Procesar envío del formulario
         procesarFormulario(evento) {
           evento.preventDefault();
-          
+
           const datosFormulario = new FormData(evento.target);
           const nuevoUsuario = {
             id: Date.now(),
@@ -233,54 +239,54 @@
             rol: datosFormulario.get('rolOrganizacional'),
             estado: datosFormulario.get('estadoPerfil')
           };
-          
+
           if (this.validarFormularioCompleto()) {
             this.agregarUsuario(nuevoUsuario);
             this.mostrarNotificacion('Usuario registrado exitosamente', 'exito');
             this.ocultarModal();
           }
         },
-        
+
         // Validar formulario completo
         validarFormularioCompleto() {
           const campos = document.querySelectorAll('.entrada-campo, .seleccion-campo');
           let formularioValido = true;
-          
+
           campos.forEach(campo => {
             if (!this.validarCampo(campo)) {
               formularioValido = false;
             }
           });
-          
+
           return formularioValido;
         },
-        
+
         // Agregar nuevo usuario
         agregarUsuario(usuario) {
           this.usuarios.push(usuario);
           this.actualizarTabla();
           this.actualizarContador();
         },
-        
+
         // Actualizar tabla de usuarios
         actualizarTabla() {
           const tbody = document.getElementById('tablaPersonal');
           tbody.innerHTML = '';
-          
+
           this.usuarios.forEach(usuario => {
             const fila = this.crearFilaUsuario(usuario);
             tbody.appendChild(fila);
           });
         },
-        
+
         // Crear fila de usuario
         crearFilaUsuario(usuario) {
           const fila = document.createElement('tr');
           fila.setAttribute('data-usuario', usuario.id);
-          
+
           const estadoClase = usuario.estado === 'activo' ? 'estado-activo' : 'estado-inactivo';
           const rolTexto = this.obtenerTextoRol(usuario.rol);
-          
+
           fila.innerHTML = `
             <td><strong>${usuario.identificacion}</strong></td>
             <td>${usuario.nombreCompleto}</td>
@@ -298,10 +304,10 @@
               </div>
             </td>
           `;
-          
+
           return fila;
         },
-        
+
         // Obtener texto del rol
         obtenerTextoRol(rol) {
           const roles = {
@@ -312,12 +318,12 @@
           };
           return roles[rol] || rol;
         },
-        
+
         // Editar usuario
         editarUsuario(id) {
           this.mostrarNotificacion('Función de edición en desarrollo', 'info');
         },
-        
+
         // Desactivar usuario
         desactivarUsuario(id) {
           const usuario = this.usuarios.find(u => u.id === id);
@@ -328,7 +334,7 @@
             this.mostrarNotificacion(`Usuario ${accion} correctamente`, 'exito');
           }
         },
-        
+
         // Actualizar contador de registros
         actualizarContador() {
           const contador = document.querySelector('.contador-registros strong');
@@ -336,18 +342,18 @@
           const texto = total === 1 ? '1 registro' : `${total} registros`;
           contador.textContent = texto;
         },
-        
+
         // Limpiar formulario
         limpiarFormulario() {
           const formulario = document.getElementById('formularioPersonal');
           formulario.reset();
-          
+
           const campos = formulario.querySelectorAll('.campo-formulario');
           campos.forEach(campo => {
             campo.classList.remove('campo-valido', 'campo-error');
           });
         },
-        
+
         // Sistema de notificaciones
         mostrarNotificacion(mensaje, tipo = 'info') {
           const notificacion = document.createElement('div');
@@ -361,19 +367,19 @@
               </button>
             </div>
           `;
-          
+
           document.body.appendChild(notificacion);
-          
+
           // Mostrar notificación
           setTimeout(() => notificacion.classList.add('visible'), 100);
-          
+
           // Auto-eliminar después de 4 segundos
           setTimeout(() => {
             notificacion.classList.remove('visible');
             setTimeout(() => notificacion.remove(), 300);
           }, 4000);
         },
-        
+
         // Obtener icono para notificación
         obtenerIconoNotificacion(tipo) {
           const iconos = {
@@ -385,22 +391,22 @@
           return iconos[tipo] || 'fa-info-circle';
         }
       };
-      
+
       // Funciones globales para compatibilidad
       window.mostrarFormulario = () => gestorUsuarios.mostrarModal();
       window.cerrarFormulario = () => gestorUsuarios.ocultarModal();
       window.editarUsuario = (id) => gestorUsuarios.editarUsuario(id);
       window.desactivarUsuario = (id) => gestorUsuarios.desactivarUsuario(id);
       window.gestorUsuarios = gestorUsuarios;
-      
+
       // Inicializar sistema al cargar la página
       document.addEventListener('DOMContentLoaded', () => {
         gestorUsuarios.inicializar();
       });
-      
+
     })();
   </script>
-  
+
   <!-- Estilos adicionales para notificaciones -->
   <style>
     .notificacion {
@@ -415,12 +421,12 @@
       transition: var(--transicion-suave);
       opacity: 0;
     }
-    
+
     .notificacion.visible {
       transform: translateX(0);
       opacity: 1;
     }
-    
+
     .contenido-notificacion {
       display: flex;
       align-items: center;
@@ -431,32 +437,32 @@
       font-family: var(--fuente-moderna);
       font-weight: 500;
     }
-    
+
     .notificacion-exito .contenido-notificacion {
       border-left-color: #10b981;
       color: #065f46;
     }
-    
+
     .notificacion-error .contenido-notificacion {
       border-left-color: #ef4444;
       color: #991b1b;
     }
-    
+
     .notificacion-info .contenido-notificacion {
       border-left-color: var(--azul-accion);
       color: var(--texto-principal);
     }
-    
+
     .notificacion-advertencia .contenido-notificacion {
       border-left-color: #f59e0b;
       color: #92400e;
     }
-    
+
     .contenido-notificacion i:first-child {
       margin-right: 12px;
       font-size: 1.2rem;
     }
-    
+
     .cerrar-notificacion {
       background: none;
       border: none;
@@ -467,12 +473,12 @@
       opacity: 0.7;
       transition: var(--transicion-suave);
     }
-    
+
     .cerrar-notificacion:hover {
       opacity: 1;
       transform: scale(1.1);
     }
-    
+
     .etiqueta-rol {
       display: inline-block;
       padding: 6px 12px;
@@ -482,25 +488,25 @@
       text-transform: uppercase;
       letter-spacing: 0.3px;
     }
-    
+
     .etiqueta-rol.administrador {
       background: linear-gradient(135deg, #ddd6fe, #c4b5fd);
       color: #6b21a8;
       border: 1px solid #a855f7;
     }
-    
+
     .etiqueta-rol.empleado {
       background: linear-gradient(135deg, #dbeafe, #bfdbfe);
       color: #1e40af;
       border: 1px solid #3b82f6;
     }
-    
+
     .etiqueta-rol.supervisor {
       background: linear-gradient(135deg, #fed7d7, #feb2b2);
       color: #c53030;
       border: 1px solid #e53e3e;
     }
-    
+
     .etiqueta-rol.gerente {
       background: linear-gradient(135deg, #d1fae5, #a7f3d0);
       color: #047857;
@@ -508,4 +514,5 @@
     }
   </style>
 </body>
+
 </html>

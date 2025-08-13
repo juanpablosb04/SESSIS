@@ -14,12 +14,12 @@ const navbar = `
       <li class="dropdown">
         <a href="">Empleado</a>
         <ul class="dropdown-menu">
-          <li><a href="/asistencia.html">Registrar hora de entrada</a></li>
-          <li><a href="/verAsistencia.html">Ver las asistencias</a></li>
+          <li><a href="/Empleado/registrarAsistencia.html">Registrar hora de entrada</a></li>
+          <li><a href="/Empleado/consultarAsistencia.html">Ver las asistencias</a></li>
         </ul>
       </li>
-      <li><a href="/ReportesIncidentes.html">Reporte Incidentes</a></li>
-      <li><a href="/verHorasExtras.html">Ver mis Horas extras</a></li>
+      <li><a href="/Empleado/reporteIncidentes.html">Reporte Incidentes</a></li>
+      <li><a href="/Empleado/consultarHorasExtras.html">Ver mis Horas extras</a></li>
     </ul>
     <a class="boton-elegante" href="/login.html">LogOut</a>
   </div>`;

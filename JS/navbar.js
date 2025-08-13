@@ -14,22 +14,22 @@ const navbar = `
       <li class="dropdown">
         <a href="">Empleado</a>
         <ul class="dropdown-menu">
-          <li><a href="/empleados.html">Registrar y consultar Empleados</a></li>
-          <li><a href="/extras.html">Registrar Horas Extras</a></li>
-           <li><a href="/asistenciaAdmin.html">Asistencia de empleados</a></li>
+          <li><a href="/Administrador/empleados.html">Registrar y consultar Empleados</a></li>
+          <li><a href="/Administrador/horasExtras.html">Registrar Horas Extras</a></li>
+           <li><a href="/Administrador/asistencia.html">Asistencia de empleados</a></li>
         </ul>
       </li>
-      <li><a href="/clientes.html">Clientes</a></li>
+      <li><a href="/Administrador/clientes.html">Clientes</a></li>
       <li class="dropdown">
         <a href="">Citas</a>
         <ul class="dropdown-menu">
-          <li><a href="/registrarCitas.html">Registrar cita</a></li>
-          <li><a href="/verCitas.html">Ver citas agendadas</a></li>
+          <li><a href="/Administrador/registrarCitas.html">Registrar cita</a></li>
+          <li><a href="/Administrador/consultarCitas.html">Ver citas agendadas</a></li>
         </ul>
       </li>
-      <li><a href="/inventario.html">Inventario</a></li>
-      <li><a href="/reportes.html">Reportes</a></li>
-      <li><a href="/usuarios.html">Usuarios</a></li>
+      <li><a href="/Administrador/inventario.html">Inventario</a></li>
+      <li><a href="/Administrador/reportesGenerales.html">Reportes</a></li>
+      <li><a href="/Administrador/usuarios.html">Usuarios</a></li>
     </ul>
     <a class="boton-elegante" href="/login.html">LogOut</a>
 
