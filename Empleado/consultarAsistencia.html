@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -37,7 +36,6 @@
           </tr>
         </thead>
         <tbody class="bg-gray-800">
-          <!-- Fila de ejemplo -->
           <tr class="border-t border-gray-700 hover:bg-gray-700 transition">
             <td class="p-3">2025-08-06</td>
             <td class="p-3">2</td>
@@ -50,7 +48,7 @@
             <td class="p-3">Ninguna</td>
             <td class="p-3">
               <button onclick="editarAsistencia(this)"
-                class="bg-yellow-600 hover:bg-red-700 text-white px-4 py-1 rounded">
+                class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-1 rounded">
                 Editar
               </button>
               <button onclick="registrarSalida(this)" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded">
@@ -68,7 +66,7 @@
             <td class="p-3">Turno extendido</td>
             <td class="p-3">
               <button onclick="editarAsistencia(this)"
-                class="bg-yellow-600 hover:bg-red-700 text-white px-4 py-1 rounded">
+                class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-1 rounded">
                 Editar
               </button>
               <button onclick="registrarSalida(this)" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded">
@@ -80,8 +78,7 @@
       </table>
     </div>
 
-
-
+    <!-- Modal de Editar Asistencia -->
     <div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
       <div class="bg-white text-gray-800 rounded-lg shadow-lg w-96 p-6">
         <h2 class="text-xl font-bold mb-4">Editar Asistencia</h2>
@@ -112,53 +109,56 @@
         </label>
 
         <div class="flex justify-end gap-2">
-          <button onclick="cerrarModal()" class="bg-gray-500 text-white px-4 py-1 rounded">Cerrar</button>
+          <button onclick="guardarCambios()" class="bg-green-600 text-white px-4 py-1 rounded">Guardar</button>
+          <button onclick="cerrarModalEditar()" class="bg-gray-500 text-white px-4 py-1 rounded">Cerrar</button>
         </div>
       </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Modal de Salida -->
     <div id="modalSalida" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
       <div class="bg-white text-gray-800 rounded-lg p-6 text-center max-w-sm">
         <p id="mensajeSalida" class="text-lg font-semibold text-gray-800"></p>
-        <button onclick="cerrarModal()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+        <button onclick="cerrarModalSalida()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
           Cerrar
         </button>
       </div>
     </div>
 
+    <!-- Script -->
     <script>
       function registrarSalida(btn) {
         const horaActual = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        const mensaje = `Gracias, ¡turno completo!, salio a las ${horaActual}`;
+        const mensaje = `Gracias, ¡turno completo! Salió a las ${horaActual}`;
         document.getElementById("mensajeSalida").textContent = mensaje;
         document.getElementById("modalSalida").classList.remove("hidden");
       }
 
-      function cerrarModal() {
+      function cerrarModalSalida() {
         document.getElementById("modalSalida").classList.add("hidden");
+      }
+
+      function cerrarModalEditar() {
+        document.getElementById("modalEditar").classList.add("hidden");
       }
 
       function editarAsistencia(btn) {
         const fila = btn.closest("tr");
-
-        
         document.getElementById("editFecha").value = fila.cells[0].innerText.trim();
         document.getElementById("editCantidad").value = fila.cells[1].innerText.trim();
         document.getElementById("editCodigos").value = fila.cells[2].innerText.trim();
         document.getElementById("editTurno").value = fila.cells[3].innerText.trim();
         document.getElementById("editUbicacion").value = fila.cells[4].innerText.trim();
         document.getElementById("editObservaciones").value = fila.cells[5].innerText.trim();
-
-        
         document.getElementById("modalEditar").classList.remove("hidden");
       }
 
-      function cerrarModal() {
-        document.getElementById("modalEditar").classList.add("hidden");
+      function guardarCambios() {
+        alert("¡Registro de asistencia actualizado correctamente!");
+        cerrarModalEditar();
       }
     </script>
 
+  </div>
 </body>
-
 </html>
