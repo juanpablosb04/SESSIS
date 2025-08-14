@@ -33,10 +33,10 @@
     <div class="flex flex-col items-center pt-10 pb-20">
       <h3 class="text-[22px] mb-[10px] font-bold">Citas de hoy 17/07/2025</h3>
       <table
-        class="table-auto max-w-[1350px] text-left border-collapse border border-gray-600 text-gray-200 bg-gray-900 bg-opacity-80 backdrop-blur-md rounded-md">
+        class="table-auto max-w-[1350px] text-left border-collapse border border-gray-600 text-gray-200 bg-gray-900 bg-opacity-80 backdrop-blur-md rounded-[20px] overflow-hidden">
         <thead class="bg-gray-700">
           <tr>
-            <th class="border border-gray-600 px-4 py-2">Cédula</th>
+            <th class="border border-gray-600 px-4 py-2 first:rounded-tl-[20px] last:rounded-tr-[20px]">Cédula</th>
             <th class="border border-gray-600 px-4 py-2">Correo</th>
             <th class="border border-gray-600 px-4 py-2">Teléfono</th>
             <th class="border border-gray-600 px-4 py-2">Fecha</th>
@@ -44,7 +44,7 @@
             <th class="border border-gray-600 px-4 py-2">Hora de finalización</th>
             <th class="border border-gray-600 px-4 py-2">Motivo</th>
             <th class="border border-gray-600 px-4 py-2">Descripción</th>
-            <th class="border border-gray-600 px-4 py-2">Acciones</th>
+            <th class="border border-gray-600 px-4 py-2 first:rounded-tr-[20px] last:rounded-tr-[20px]">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -75,67 +75,69 @@
   </div>
 
   <!-- Modal fondo -->
-<div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-  <!-- Modal contenido -->
-  <div class="bg-white rounded-lg shadow-lg w-full max-w-xl p-6">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold text-gray-800">Editar Cita</h2>
-      <button onclick="cerrarModal()" class="text-gray-500 hover:text-red-500 text-xl">&times;</button>
+  <div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <!-- Modal contenido -->
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-xl p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-gray-800">Editar Cita</h2>
+        <button onclick="cerrarModal()" class="text-gray-500 hover:text-red-500 text-xl">&times;</button>
+      </div>
+
+      <!-- Formulario de edición (solo visual) -->
+      <form>
+        <div class="mb-4">
+          <label class="block text-gray-700 font-medium">Cédula</label>
+          <input type="text" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="Cédula del cliente">
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 font-medium">Correo</label>
+          <input type="email" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="Correo electrónico">
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 font-medium">Teléfono</label>
+          <input type="text" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="Número de teléfono">
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 font-medium">Fecha</label>
+          <input type="date" class="w-full border border-gray-300 rounded px-3 py-2">
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 font-medium">Hora de inicio</label>
+          <input type="time" class="w-full border border-gray-300 rounded px-3 py-2">
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 font-medium">Hora de finalización</label>
+          <input type="time" class="w-full border border-gray-300 rounded px-3 py-2">
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 font-medium">Motivo</label>
+          <input type="text" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="Motivo de la cita">
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 font-medium">Descripción</label>
+          <textarea class="w-full border border-gray-300 rounded px-3 py-2" rows="3"
+            placeholder="Descripción de la cita"></textarea>
+        </div>
+        <div class="text-right">
+          <button type="button" onclick="guardarModal()"
+            class="bg-gray-600 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded">
+            Guardar
+          </button>
+        </div>
+      </form>
     </div>
-
-    <!-- Formulario de edición (solo visual) -->
-    <form>
-      <div class="mb-4">
-        <label class="block text-gray-700 font-medium">Cédula</label>
-        <input type="text" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="Cédula del cliente">
-      </div>
-      <div class="mb-4">
-        <label class="block text-gray-700 font-medium">Correo</label>
-        <input type="email" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="Correo electrónico">
-      </div>
-      <div class="mb-4">
-        <label class="block text-gray-700 font-medium">Teléfono</label>
-        <input type="text" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="Número de teléfono">
-      </div>
-      <div class="mb-4">
-        <label class="block text-gray-700 font-medium">Fecha</label>
-        <input type="date" class="w-full border border-gray-300 rounded px-3 py-2">
-      </div>
-      <div class="mb-4">
-        <label class="block text-gray-700 font-medium">Hora de inicio</label>
-        <input type="time" class="w-full border border-gray-300 rounded px-3 py-2">
-      </div>
-      <div class="mb-4">
-        <label class="block text-gray-700 font-medium">Hora de finalización</label>
-        <input type="time" class="w-full border border-gray-300 rounded px-3 py-2">
-      </div>
-      <div class="mb-4">
-        <label class="block text-gray-700 font-medium">Motivo</label>
-        <input type="text" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="Motivo de la cita">
-      </div>
-      <div class="mb-4">
-        <label class="block text-gray-700 font-medium">Descripción</label>
-        <textarea class="w-full border border-gray-300 rounded px-3 py-2" rows="3" placeholder="Descripción de la cita"></textarea>
-      </div>
-      <div class="text-right">
-        <button type="button" onclick="guardarModal()" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded">
-          Guardar
-        </button>
-      </div>
-    </form>
   </div>
-</div>
 
-<!-- Script de apertura/cierre -->
-<script>
-  function abrirModal() {
-    document.getElementById('modalEditar').classList.remove('hidden');
-  }
+  <!-- Script de apertura/cierre -->
+  <script>
+    function abrirModal() {
+      document.getElementById('modalEditar').classList.remove('hidden');
+    }
 
-  function guardarModal() {
-    document.getElementById('modalEditar').classList.add('hidden');
-  }
-</script>
+    function guardarModal() {
+      document.getElementById('modalEditar').classList.add('hidden');
+    }
+  </script>
 
 </body>
 

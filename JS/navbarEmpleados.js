@@ -12,7 +12,7 @@ const navbar = `
     <ul class="links">
       <li><a href="/index.html">Inicio</a></li>
       <li class="dropdown">
-        <a href="">Empleado</a>
+        <a>Empleado</a>
         <ul class="dropdown-menu">
           <li><a href="/Empleado/registrarAsistencia.html">Registrar hora de entrada</a></li>
           <li><a href="/Empleado/consultarAsistencia.html">Ver las asistencias</a></li>
