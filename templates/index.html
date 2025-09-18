@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/styles/login.css">
+    <link rel="stylesheet" href="/static/login.css">
     <title>login</title>
 </head>
 
@@ -13,20 +13,20 @@
         <div class="shape"></div>
         <div class="shape"></div>
     </div>
-    <form>
+    <form action="/login" method="POST">
         <h3>SESSIS 👮🏽‍♂️</h3>
 
         <label for="username">Correo electronico</label>
-        <input type="text" placeholder="example@gmail.com" id="username">
+        <input type="text" name="username" placeholder="example@gmail.com" required>
 
         <label for="password">Contraseña</label>
-        <input type="password" placeholder="••••••••" id="password">
+        <input type="password" name="password" placeholder="••••••••" required>
 
-        <button class="button">Iniciar sesión</button>
+        <button class="button" type="submit">Iniciar sesión</button>
 
         <h3><a class="recuperar-link" href="/recuperarContrasena.html">Recuperar Contraseña</a></h3>
-
     </form>
+
 </body>
 
 </html>
