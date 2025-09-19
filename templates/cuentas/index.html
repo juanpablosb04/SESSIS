@@ -1,4 +1,15 @@
-*,
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/login.css">
+    <title>login</title>
+</head>
+
+<style>
+    *,
 *:before,
 *:after {
     padding: 0;
@@ -151,3 +162,28 @@ button:hover::before {
   text-decoration: underline;
   color: #1d4ed8;
 }
+</style>
+<body>
+    <div class="background">
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    <form action="{% url 'login' %}" method="POST">
+    {% csrf_token %}
+
+        <h3>SESSIS 👮🏽‍♂️</h3>
+
+        <label for="username">Correo electronico</label>
+        <input type="text" name="email" placeholder="example@gmail.com" required>
+
+        <label for="password">Contraseña</label>
+        <input type="password" name="password" placeholder="••••••••" required>
+
+        <button class="button" type="submit">Iniciar sesión</button>
+
+        <h3><a class="recuperar-link" href="/recuperar">Recuperar Contraseña</a></h3>
+    </form>
+
+</body>
+
+</html>
