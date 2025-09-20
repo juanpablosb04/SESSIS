@@ -1,2 +1,4 @@
-email: recuperacionsessis@outlook.com
-password: SistemaSESSIS2025
+email: sistemasessis@gmail.com
+password: SistemaSESSIS2025 (esta password tambien es para lo del admin de DJANGO)
+
+PASSWORD DE APP: fpkl szho vbmk vssi

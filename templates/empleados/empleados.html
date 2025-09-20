@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -6,7 +8,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Empleados SES</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="/static/JS/navbar.js"></script>
   <style>
     html,
     body {
@@ -16,7 +17,7 @@
     }
 
     .fondo {
-      background-image: url("static/Img/empleadosFondo.png");
+      background-image: url("{% static 'Img/empleadosFondo.png' %}");
       background-size: cover;
       height: 1080px;
     }
@@ -24,6 +25,9 @@
 </head>
 
 <body>
+
+  {% include "includes/navbar.html" %}
+  
   <div class="fondo">
     <div class="flex flex-col items-center justify-center mt-8 dark">
       <div class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7">

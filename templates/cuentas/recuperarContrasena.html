@@ -165,7 +165,8 @@ button:hover::before {
         <div class="shape"></div>
         <div class="shape"></div>
     </div>
-    <form method="POST" action="/recuperar">
+    <form method="POST" action="/recuperar/">
+        {% csrf_token %}
     <h3>Recuperación de Contraseña👮🏽‍♂️</h3>
 
     <label for="username">Correo electronico donde se enviará el código</label>
@@ -173,7 +174,7 @@ button:hover::before {
 
     <button type="submit" class="button">Enviar Correo</button>
 
-    <h3><a class="ir-login" href="/login">Recuerdas tu Contraseña? Inicia sesión!</a></h3>
+    <h3><a class="ir-login" href="{% url 'login' %}">Recuerdas tu Contraseña? Inicia sesión!</a></h3>
 </form>
 
 </body>
