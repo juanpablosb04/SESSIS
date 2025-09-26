@@ -1,7 +1,5 @@
 from django.db import models
-from cuentas.models import Usuarios   # 👈 tu modelo de usuario personalizado
-
-
+from cuentas.models import Usuarios   # tu modelo de usuario personalizado
 # -------------------------------
 # Modelo principal de Clientes
 # -------------------------------
@@ -35,7 +33,7 @@ class Clientes(models.Model):
     )
 
     class Meta:
-        managed = True  # 🔑 Permitir que Django administre esta tabla
+        managed = True
         db_table = 'Clientes'  # Nombre exacto de la tabla en SQL Server
 
     def __str__(self):
@@ -47,12 +45,17 @@ class Clientes(models.Model):
 # -------------------------------
 class ClientesAuditoria(models.Model):
     id_auditoria = models.AutoField(primary_key=True)
+
+    # 🔹 Ahora usamos SET_NULL para no romper cuando se elimina un cliente
     cliente = models.ForeignKey(
         Clientes,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name="auditorias",
         db_column="cliente_id"
     )
+
     usuario = models.ForeignKey(
         Usuarios,
         on_delete=models.SET_NULL,
@@ -60,6 +63,7 @@ class ClientesAuditoria(models.Model):
         blank=True,
         db_column="usuario_id"
     )  
+
     accion = models.CharField(max_length=50)  # CREAR, MODIFICAR, ELIMINAR
     fecha = models.DateTimeField(auto_now_add=True)
 
@@ -71,7 +75,9 @@ class ClientesAuditoria(models.Model):
     residencia = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
-        db_table = "CLIENTES_AUDITORIA_TB"  # 👈 nombre exacto de tabla
+        db_table = "CLIENTES_AUDITORIA_TB"
 
     def __str__(self):
-        return f"{self.accion} - {self.cliente.nombre_completo} ({self.fecha})"
+        # 👇 Si cliente fue borrado, evitamos error con "Desconocido"
+        cliente_nombre = self.cliente.nombre_completo if self.cliente else "Cliente eliminado"
+        return f"{self.accion} - {cliente_nombre} ({self.fecha})"

@@ -4,12 +4,14 @@ from django.utils.timezone import now
 from .models import Clientes, ClientesAuditoria
 
 
-# -------------------------------
-# Función genérica para registrar auditoría
-# -------------------------------
-def registrar_auditoria(cliente, accion, usuario):
+def registrar_auditoria(cliente, accion, usuario, include_fk=True):
+    """
+    Registra un evento de auditoría de un cliente.
+    - include_fk=True: guarda la relación con cliente (CREAR, MODIFICAR).
+    - include_fk=False: cliente eliminado, no guarda FK (solo snapshot).
+    """
     ClientesAuditoria.objects.create(
-        cliente=cliente,
+        cliente=cliente if include_fk else None,   # 👈 evitar error en DELETE
         accion=accion,
         nombre_completo=cliente.nombre_completo,
         email=cliente.email,
@@ -21,20 +23,15 @@ def registrar_auditoria(cliente, accion, usuario):
     )
 
 
-# -------------------------------
-# Señal: cuando se crea o modifica un cliente
-# -------------------------------
 @receiver(post_save, sender=Clientes)
 def auditar_cliente_guardado(sender, instance, created, **kwargs):
     accion = 'CREAR' if created else 'MODIFICAR'
-    usuario = getattr(instance, '_usuario', None)  # usuario se setea antes de save()
+    usuario = getattr(instance, '_usuario', None)
     registrar_auditoria(instance, accion, usuario)
 
 
-# -------------------------------
-# Señal: cuando se elimina un cliente
-# -------------------------------
 @receiver(post_delete, sender=Clientes)
 def auditar_cliente_eliminado(sender, instance, **kwargs):
     usuario = getattr(instance, '_usuario', None)
-    registrar_auditoria(instance, 'ELIMINAR', usuario)
+    # 👇 Cliente ya no existe en la FK, solo guardamos snapshot
+    registrar_auditoria(instance, 'ELIMINAR', usuario, include_fk=False)
