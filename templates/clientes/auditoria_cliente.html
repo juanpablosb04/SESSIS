@@ -9,20 +9,11 @@
 </head>
 <body class="bg-gray-900 text-gray-200 min-h-screen">
 
-  <!-- Navbar -->
-  {% include "navbar.html" %}
-  <style>
-  /* 🔹 Forzar las letras del navbar a blanco SOLO en clientes */
-  .navbar a {
-    color: white !important;
-  }
-  .navbar a:hover {
-    color: #d1d5db !important; /* gris clarito al pasar el mouse */
-  }
-  </style>
+  <!-- Navbar global -->
+  {% include "includes/navbar.html" %}
 
   <!-- Encabezado -->
-  <div class="p-8">
+  <div class="p-8 max-w-7xl mx-auto">
     <h1 class="text-3xl font-bold mb-4">Auditoría del Cliente</h1>
     <p class="text-gray-300 mb-6">
       <span class="font-semibold">Cliente:</span> {{ cliente.nombre_completo }}  
@@ -33,7 +24,7 @@
     <div class="overflow-x-auto bg-gray-800 rounded-lg shadow-md p-6">
       <h2 class="text-2xl font-semibold mb-4">Historial de Cambios</h2>
       <table class="w-full text-left border border-gray-700">
-        <thead class="bg-gray-700">
+        <thead class="bg-gray-700 text-gray-200">
           <tr>
             <th class="p-2">Fecha</th>
             <th class="p-2">Acción</th>
@@ -45,7 +36,7 @@
             <th class="p-2">Residencia</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="text-gray-300">
           {% for registro in auditoria %}
           <tr class="border-b border-gray-700">
             <td class="p-2">{{ registro.fecha|date:"d/m/Y H:i" }}</td>
@@ -94,4 +85,3 @@
   </div>
 </body>
 </html>
-

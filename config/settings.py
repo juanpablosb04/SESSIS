@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'cuentas',
     'empleados',
     'roles',
-    'clientes.apps.ClientesConfig',
+    'clientes',
 ]
 
 MIDDLEWARE = [

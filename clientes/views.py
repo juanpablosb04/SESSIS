@@ -3,6 +3,7 @@ from django.contrib import messages
 from .models import Clientes, ClientesAuditoria
 import re
 
+
 # -------------------------------
 # LISTA, CREAR, EDITAR Y ELIMINAR CLIENTES
 # -------------------------------
@@ -77,8 +78,10 @@ def clientes_view(request):
             cliente.delete()
             messages.success(request, "🗑️ Cliente eliminado correctamente")
 
+        # 👇 Siempre redirige a la lista de clientes
         return redirect('clientes')
 
+    # 👇 Render al template que movimos a templates/clientes/
     return render(request, 'clientes/clientes.html', {'clientes': clientes})
 
 
@@ -93,10 +96,12 @@ def auditoria_cliente(request, cliente_id):
     cliente = get_object_or_404(Clientes, id_cliente=cliente_id)
     auditoria = ClientesAuditoria.objects.filter(cliente=cliente).order_by('-fecha')
 
+    # 👇 Render al template que debe estar en templates/clientes/
     return render(request, 'clientes/auditoria_cliente.html', {
         'cliente': cliente,
         'auditoria': auditoria
     })
+
 
 
 

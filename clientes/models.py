@@ -1,9 +1,10 @@
 from django.db import models
-from django.conf import settings  # ✅ Usar el modelo de usuario configurado en settings.py
-from django.db import models
-from cuentas.models import Usuarios   # 👈 importa tu modelo de usuarios personalizado
+from cuentas.models import Usuarios   # 👈 tu modelo de usuario personalizado
 
 
+# -------------------------------
+# Modelo principal de Clientes
+# -------------------------------
 class Clientes(models.Model):
     id_cliente = models.AutoField(primary_key=True)  # Llave primaria autoincremental
     nombre_completo = models.CharField(
@@ -39,19 +40,30 @@ class Clientes(models.Model):
 
     def __str__(self):
         return f"{self.nombre_completo} ({self.cedula})"
-    
 
-# ✅ Modelo de auditoría
-from django.contrib.auth.models import User  # 👈 importante para la relación con usuarios
 
+# -------------------------------
+# Modelo de Auditoría de Clientes
+# -------------------------------
 class ClientesAuditoria(models.Model):
     id_auditoria = models.AutoField(primary_key=True)
-    cliente = models.ForeignKey(Clientes, on_delete=models.CASCADE, related_name="auditorias", db_column="cliente_id")
-    usuario = models.ForeignKey(Usuarios, on_delete=models.SET_NULL, null=True, blank=True, db_column="usuario_id")  
-    accion = models.CharField(max_length=50)  # CREADO, EDITADO, ELIMINADO
+    cliente = models.ForeignKey(
+        Clientes,
+        on_delete=models.CASCADE,
+        related_name="auditorias",
+        db_column="cliente_id"
+    )
+    usuario = models.ForeignKey(
+        Usuarios,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column="usuario_id"
+    )  
+    accion = models.CharField(max_length=50)  # CREAR, MODIFICAR, ELIMINAR
     fecha = models.DateTimeField(auto_now_add=True)
 
-    # Snapshot de datos del cliente
+    # Snapshot de datos del cliente en el momento de la acción
     nombre_completo = models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     cedula = models.CharField(max_length=20, blank=True, null=True)
@@ -59,8 +71,7 @@ class ClientesAuditoria(models.Model):
     residencia = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
-        db_table = "CLIENTES_AUDITORIA_TB"  # 👈 forzar nombre exacto de tabla
+        db_table = "CLIENTES_AUDITORIA_TB"  # 👈 nombre exacto de tabla
 
     def __str__(self):
         return f"{self.accion} - {self.cliente.nombre_completo} ({self.fecha})"
-
