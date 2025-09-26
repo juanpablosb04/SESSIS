@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,14 +41,15 @@ INSTALLED_APPS = [
     'cuentas',
     'empleados',
     'roles',
+    'clientes.apps.ClientesConfig',
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
+   'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # 👈 importante
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -80,9 +82,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'mssql',
         'NAME': 'SESSIS',
-        'USER': '',      # vacío porque usas Trusted_Connection
+        'USER': '',      
         'PASSWORD': '',
-        'HOST': 'localhost',
+        'HOST': 'AKILES08CR\\SQLEXPRESS',
         'PORT': '',
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
@@ -139,3 +141,26 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+MESSAGE_TAGS = {
+    messages.DEBUG: 'secondary',
+    messages.INFO: 'info',
+    messages.SUCCESS: 'success',
+    messages.WARNING: 'warning',
+    messages.ERROR: 'danger',
+}
+
+# Redirigir a la vista 'login' personalizada si no está autenticado
+LOGIN_URL = 'login'  
+
+# Redirigir al inicio después de logearse
+LOGIN_REDIRECT_URL = 'inicio'
+
+# Redirigir al login después de cerrar sesión
+LOGOUT_REDIRECT_URL = 'login'
+
+
+
+
