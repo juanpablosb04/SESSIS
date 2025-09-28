@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Auditoría - {{ cliente.nombre_completo }}</title>
+  <title>Auditoría - {{ usuario.email }}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .fondo {
@@ -17,15 +17,12 @@
 </head>
 <body class="bg-gray-900 text-gray-200 min-h-screen fondo">
 
-  <!-- Navbar global -->
   {% include "includes/navbar.html" %}
 
-  <!-- Encabezado -->
   <div class="p-8 max-w-7xl mx-auto">
-    <h1 class="text-3xl font-bold mb-4">Auditoría del Cliente</h1>
+    <h1 class="text-3xl font-bold mb-4">Auditoría del Usuario</h1>
     <p class="text-gray-300 mb-6">
-      <span class="font-semibold">Cliente:</span> {{ cliente.nombre_completo }}  
-      ({{ cliente.cedula }})
+      <span class="font-semibold">Usuario:</span> {{ usuario.email }}
     </p>
 
     <!-- Tabla de auditoría -->
@@ -36,12 +33,11 @@
           <tr>
             <th class="p-2">Fecha</th>
             <th class="p-2">Acción</th>
-            <th class="p-2">Usuario</th>
-            <th class="p-2">Nombre</th>
+            <th class="p-2">Usuario que realizó</th>
+            <th class="p-2">ID Empleado</th>
+            <th class="p-2">Rol</th>
             <th class="p-2">Email</th>
-            <th class="p-2">Cédula</th>
-            <th class="p-2">Teléfono</th>
-            <th class="p-2">Residencia</th>
+            <th class="p-2">Estado</th>
           </tr>
         </thead>
         <tbody class="text-gray-300">
@@ -51,7 +47,7 @@
             <td class="p-2">
               {% if registro.accion == "CREAR" %}
                 <span class="bg-green-600 px-2 py-1 rounded text-white">CREAR</span>
-              {% elif registro.accion == "MODIFICAR" %}
+              {% elif registro.accion == "EDITAR" %}
                 <span class="bg-yellow-500 px-2 py-1 rounded text-white">MODIFICAR</span>
               {% elif registro.accion == "ELIMINAR" %}
                 <span class="bg-red-600 px-2 py-1 rounded text-white">ELIMINAR</span>
@@ -60,22 +56,25 @@
               {% endif %}
             </td>
             <td class="p-2">
-              {% if registro.usuario %}
-                {{ registro.usuario }}
+              {% if registro.usuario_accion %}
+                {{ registro.usuario_accion.email }}
               {% else %}
                 <span class="italic text-gray-400">Sistema</span>
               {% endif %}
             </td>
-            <td class="p-2">{{ registro.nombre_completo }}</td>
+            <td class="p-2">
+              {% if registro.id_empleado %}
+                {{ registro.id_empleado }} <!-- Aquí mostramos solo el ID -->
+              {% endif %}
+            </td>
+            <td class="p-2">{{ registro.id_rol }}</td>
             <td class="p-2">{{ registro.email }}</td>
-            <td class="p-2">{{ registro.cedula }}</td>
-            <td class="p-2">{{ registro.telefono }}</td>
-            <td class="p-2">{{ registro.residencia }}</td>
+            <td class="p-2">{{ registro.estado }}</td>
           </tr>
           {% empty %}
           <tr>
-            <td colspan="8" class="p-4 text-center text-gray-400">
-              No hay registros de auditoría para este cliente.
+            <td colspan="7" class="p-4 text-center text-gray-400">
+              No hay registros de auditoría para este usuario.
             </td>
           </tr>
           {% endfor %}
@@ -83,11 +82,10 @@
       </table>
     </div>
 
-    <!-- Botón Volver -->
     <div class="mt-6">
-      <a href="{% url 'clientes' %}" 
+      <a href="{% url 'lista_usuarios' %}" 
          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-        ⬅ Volver a Clientes
+        ⬅ Volver a Usuarios
       </a>
     </div>
   </div>

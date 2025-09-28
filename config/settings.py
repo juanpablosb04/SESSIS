@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'empleados',
     'roles',
     'clientes',
+    'usuarios',
 ]
 
 MIDDLEWARE = [
@@ -84,7 +85,7 @@ DATABASES = {
         'NAME': 'SESSIS',
         'USER': '',      
         'PASSWORD': '',
-        'HOST': 'AKILES08CR\\SQLEXPRESS',
+        'HOST': 'DESKTOP-L71P5IF',
         'PORT': '',
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
