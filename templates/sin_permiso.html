@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acceso Denegado</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
+    .fondo {
+      background-image: url("/static/Img/sin_permisoFondo.png");
+      background-size: cover;
+    }
+  </style>
+</head>
+<body>
+  <div class="fondo flex items-center justify-center h-full">
+    <div class="bg-[#212121] shadow-2xl shadow-black/50 rounded-xl p-12 max-w-lg text-center">
+      <h1 class="text-4xl font-bold text-red-500 mb-6">Acceso Denegado</h1>
+      <p class="text-lg text-gray-200 mb-8">No tienes acceso a este sitio con tu cuenta.</p>
+      <a href="{% url 'inicio' %}" class="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
+        Volver
+      </a>
+    </div>
+  </div>
+</body>
+</html>
+
+

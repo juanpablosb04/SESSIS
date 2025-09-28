@@ -83,9 +83,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'mssql',
         'NAME': 'SESSIS',
-        'USER': '',      
+        'USER': '',      # vacío porque usas Trusted_Connection
         'PASSWORD': '',
-        'HOST': 'DESKTOP-L71P5IF',
+        'HOST': 'localhost',
         'PORT': '',
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',

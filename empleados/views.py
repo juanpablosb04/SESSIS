@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import EmpleadoForm
 from .models import Empleado
+from config.decorators import role_required
 
 # Vista de prueba para Registrar Empleado
 
+@role_required(["Administrador"])
 def registrar_empleado(request):
     if request.method == 'POST':
         form = EmpleadoForm(request.POST)
@@ -19,7 +21,7 @@ def registrar_empleado(request):
         'empleados': empleados
     })
 
-
+@role_required(["Administrador"])
 def editar_empleado(request, id_empleado):
     empleado = get_object_or_404(Empleado, id_empleado=id_empleado)
     if request.method == 'POST':
@@ -36,7 +38,7 @@ def editar_empleado(request, id_empleado):
     return redirect('empleados')
 
 
-
+@role_required(["Administrador"])
 def eliminar_empleado(request, id_empleado):
     empleado = get_object_or_404(Empleado, id_empleado=id_empleado)
     if request.method == 'POST':

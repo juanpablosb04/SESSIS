@@ -20,9 +20,9 @@ def user_login(request):
             # Guardar sesión manualmente
             request.session["usuario_id"] = usuario.id_usuario
             request.session["usuario_email"] = usuario.email
-            request.session["usuario_rol"] = usuario.id_rol_id
-            messages.success(request, f"Bienvenido {usuario.email}")
+            request.session["usuario_rol"] = usuario.id_rol.nombre_rol
             return redirect("inicio")
+
         except Usuarios.DoesNotExist:
             messages.error(request, "Correo o contraseña incorrectos")
 
@@ -50,7 +50,7 @@ def recuperar_password(request):
 
             enviar_correo_gmail(email, nueva_contrasena)
 
-            messages.success(request, "Si el correo existe, te hemos enviado una nueva contraseña.")
+            messages.success(request, "Te hemos enviado una nueva contraseña.")
             return redirect('login')
 
         except Usuarios.DoesNotExist:
