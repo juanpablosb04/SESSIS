@@ -28,10 +28,11 @@
       {% csrf_token %}
       <input type="hidden" name="action" value="crear">
 
+      <!-- Select de empleados mostrando solo el nombre -->
       <select name="id_empleado" autocomplete="off" class="w-full p-2 rounded bg-gray-700 text-white" required>
         <option value="">Seleccione Empleado</option>
         {% for empleado in empleados %}
-          <option value="{{ empleado.id_empleado }}">{{ empleado.id_empleado }} - {{ empleado.nombre_completo }}</option>
+          <option value="{{ empleado.id_empleado }}">{{ empleado.nombre_completo }}</option>
         {% endfor %}
       </select>
 
@@ -65,7 +66,7 @@
       <thead class="bg-gray-700 text-gray-200">
         <tr>
           <th class="p-2">ID Usuario</th>
-          <th class="p-2">ID Empleado</th>
+          <th class="p-2">Empleado</th>
           <th class="p-2">Rol</th>
           <th class="p-2">Email</th>
           <th class="p-2">Estado</th>
@@ -76,8 +77,16 @@
         {% for usuario in usuarios %}
         <tr class="border-b border-gray-700">
           <td class="p-2">{{ usuario.id_usuario }}</td>
-          <td class="p-2">{{ usuario.id_empleado.id_empleado }}</td>
-          <td class="p-2">{{ usuario.id_rol }}</td>
+          <!-- Mostrar nombre del empleado -->
+          <td class="p-2">{{ usuario.id_empleado.nombre_completo }}</td>
+          <!-- Mostrar nombre del rol -->
+          <td class="p-2">
+            {% for rol in roles %}
+              {% if rol.0 == usuario.id_rol %}
+                {{ rol.1 }}
+              {% endif %}
+            {% endfor %}
+          </td>
           <td class="p-2">{{ usuario.email }}</td>
           <td class="p-2">{{ usuario.estado }}</td>
           <td class="p-2 flex justify-center gap-2">
@@ -130,7 +139,7 @@
       <select id="edit_empleado" name="id_empleado" autocomplete="off" class="w-full p-2 rounded bg-gray-700 text-white" required>
         <option value="">Seleccione Empleado</option>
         {% for empleado in empleados %}
-          <option value="{{ empleado.id_empleado }}">{{ empleado.id_empleado }} - {{ empleado.nombre_completo }}</option>
+          <option value="{{ empleado.id_empleado }}">{{ empleado.nombre_completo }}</option>
         {% endfor %}
       </select>
 
@@ -143,7 +152,11 @@
         {% endfor %}
       </select>
 
-      <input id="edit_estado" name="estado" class="w-full p-2 rounded bg-gray-700 text-white">
+      <!-- Estado como dropdown -->
+      <select id="edit_estado" name="estado" class="w-full p-2 rounded bg-gray-700 text-white" required>
+        <option value="Activo">Activo</option>
+        <option value="Inactivo">Inactivo</option>
+      </select>
 
       <div class="flex justify-end gap-2 mt-4">
         <button type="button" onclick="cerrarModalEditar()" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded">Cancelar</button>
