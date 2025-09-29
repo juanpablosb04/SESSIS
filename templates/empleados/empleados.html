@@ -36,6 +36,7 @@
         <h2 class="text-2xl font-bold text-gray-200 mb-4">Registro de empleado</h2>
         <form method="POST" class="flex flex-col">
           {% csrf_token %}
+          <input type="hidden" name="action" value="crear">
 
           <div class="flex space-x-4 mb-4">
             <input name="nombre_completo" placeholder="Nombre completo"
@@ -106,14 +107,14 @@
                     Editar
                   </button>
 
-                  <form method="POST" action="{% url 'eliminar_empleado' empleado.id_empleado %}"
-                    onsubmit="return confirmarEliminar()">
+                  <form method="POST" onsubmit="return confirmarEliminar()">
                     {% csrf_token %}
+                    <input type="hidden" name="action" value="eliminar">
+                    <input type="hidden" name="empleado_id" value="{{ empleado.id_empleado }}">
                     <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">
                       Eliminar
                     </button>
                   </form>
-                </td>
                 </td>
               </tr>
               {% empty %}
@@ -134,7 +135,8 @@
       <h3 class="text-xl font-bold mb-4 text-white">Editar Empleado</h3>
       <form id="form-editar" class="flex flex-col space-y-4" method="POST">
         {% csrf_token %}
-        <input type="hidden" name="id_empleado" id="id_empleado">
+        <input type="hidden" name="action" value="editar">
+        <input type="hidden" name="empleado_id" id="id_empleado">
 
         <input name="nombre_completo" id="edit_nombre" placeholder="Nombre completo" type="text"
           class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 focus:bg-gray-600" />
@@ -167,7 +169,6 @@
     </div>
   </div>
 
-
   <script>
   function abrirModal(id, nombre, email, cedula, telefono, direccion, fecha) {
     document.getElementById('modal').classList.remove('hidden');
@@ -180,10 +181,7 @@
     document.getElementById('edit_telefono').value = telefono;
     document.getElementById('edit_direccion').value = direccion;
     document.getElementById('edit_fecha').value = fecha;
-
-    document.getElementById('form-editar').action = "{% url 'editar_empleado' 0 %}".replace('0', id);
-
-}
+  }
 
   function cerrarModal() {
     document.getElementById('modal').classList.add('hidden');
@@ -193,7 +191,7 @@
   function confirmarEliminar() {
     return confirm("¿Seguro que quieres eliminar este empleado?");
   }
-</script>
+  </script>
 
 </body>
 

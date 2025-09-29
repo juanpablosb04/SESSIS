@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Usuario, AuditoriaUsuario
+from config.decorators import role_required
 from empleados.models import Empleado
 
 # Lista de roles
@@ -11,6 +12,7 @@ ROLES = [
 # ========================
 # LISTA, CREAR, EDITAR, ELIMINAR USUARIOS
 # ========================
+@role_required(["Administrador"])
 def lista_usuarios(request):
     if request.method == "POST":
         action = request.POST.get("action")
@@ -89,6 +91,7 @@ def lista_usuarios(request):
 # ========================
 # AUDITORÍA DE UN USUARIO
 # ========================
+@role_required(["Administrador"])
 def auditoria_usuario(request, id_usuario):
     usuario = get_object_or_404(Usuario, id_usuario=id_usuario)
     auditoria = AuditoriaUsuario.objects.filter(usuario_afectado=usuario).order_by('-fecha')

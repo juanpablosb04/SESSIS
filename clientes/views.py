@@ -1,12 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Clientes, ClientesAuditoria
+from config.decorators import role_required
 import re
 
 
 # -------------------------------
 # LISTA, CREAR, EDITAR Y ELIMINAR CLIENTES
 # -------------------------------
+@role_required(["Administrador"])
 def clientes_view(request):
     # 👇 Validación de sesión manual (si no hay usuario -> login)
     if not request.session.get("usuario_id"):
@@ -88,6 +90,7 @@ def clientes_view(request):
 # -------------------------------
 # VISTA DE AUDITORÍA DE CLIENTES
 # -------------------------------
+@role_required(["Administrador"])
 def auditoria_cliente(request, cliente_id):
     # 👇 Validación de sesión manual
     if not request.session.get("usuario_id"):
