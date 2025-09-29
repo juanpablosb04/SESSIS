@@ -1,11 +1,8 @@
 # Clientes/urls.py
 from django.urls import path
-from . import views
+from .views import clientes_view, auditoria_cliente  # 👈 import explícito
 
 urlpatterns = [
-    # Lista + crear + editar + eliminar clientes
-    path('', views.clientes_view, name='clientes'),
-
-    # Auditoría de un cliente específico
-    path('auditoria/<int:cliente_id>/', views.auditoria_cliente, name='auditoria_cliente'),
+    path('', clientes_view, name='clientes'),
+    path('auditoria/<int:cliente_id>/', auditoria_cliente, name='auditoria_cliente'),
 ]

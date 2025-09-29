@@ -2,7 +2,6 @@
 
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -59,7 +58,7 @@
       <table class="w-full text-left border border-gray-600">
         <thead class="bg-gray-700 text-gray-200">
           <tr>
-            <th class="p-2">ID</th>
+            <!-- ID removido de la vista -->
             <th class="p-2">Nombre</th>
             <th class="p-2">Email</th>
             <th class="p-2">Cédula</th>
@@ -71,45 +70,49 @@
         <tbody class="text-gray-300">
           {% for cliente in clientes %}
           <tr class="border-b border-gray-700">
-            <td class="p-2">{{ cliente.id_cliente }}</td>
+            <!-- sin ID visible -->
             <td class="p-2">{{ cliente.nombre_completo }}</td>
             <td class="p-2">{{ cliente.email }}</td>
             <td class="p-2">{{ cliente.cedula }}</td>
             <td class="p-2">{{ cliente.telefono }}</td>
             <td class="p-2">{{ cliente.residencia }}</td>
-            <td class="p-2 text-center flex justify-center gap-2">
-              <!-- Botón Editar -->
-              <button onclick="abrirModalEditar('{{ cliente.id_cliente }}',
-                                                 '{{ cliente.nombre_completo }}',
-                                                 '{{ cliente.email }}',
-                                                 '{{ cliente.cedula }}',
-                                                 '{{ cliente.telefono }}',
-                                                 '{{ cliente.residencia }}')"
-                      class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">
-                Editar
-              </button>
-
-              <!-- Botón Eliminar -->
-              <form method="POST" action="{% url 'clientes' %}" onsubmit="return confirm('¿Seguro que quieres eliminar este cliente?');">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="eliminar">
-                <input type="hidden" name="cliente_id" value="{{ cliente.id_cliente }}">
-                <button type="submit"
-                        class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">
-                  Eliminar
+            <td class="p-2 text-center">
+              <div class="flex flex-wrap justify-center gap-2">
+                <!-- Botón Editar (ID se pasa por JS) -->
+                <button
+                  onclick="abrirModalEditar('{{ cliente.id_cliente }}',
+                                             '{{ cliente.nombre_completo }}',
+                                             '{{ cliente.email }}',
+                                             '{{ cliente.cedula }}',
+                                             '{{ cliente.telefono }}',
+                                             '{{ cliente.residencia }}')"
+                  class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">
+                  Editar
                 </button>
-              </form>
 
-              <!-- Botón Auditoría -->
-              <a href="{% url 'auditoria_cliente' cliente.id_cliente %}" 
-                 class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">
-                Auditoría
-              </a>
+                <!-- Botón Eliminar (ID oculto) -->
+                <form method="POST" action="{% url 'clientes' %}"
+                      onsubmit="return confirm('¿Seguro que quieres eliminar este cliente?');">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="eliminar">
+                  <input type="hidden" name="cliente_id" value="{{ cliente.id_cliente }}">
+                  <button type="submit"
+                          class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">
+                    Eliminar
+                  </button>
+                </form>
+
+                <!-- Botón Auditoría (ID en la URL) -->
+                <a href="{% url 'auditoria_cliente' cliente.id_cliente %}"
+                   class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">
+                  Auditoría
+                </a>
+              </div>
             </td>
           </tr>
           {% empty %}
           <tr>
-            <td colspan="7" class="p-4 text-center text-gray-400">No hay clientes registrados.</td>
+            <td colspan="6" class="p-4 text-center text-gray-400">No hay clientes registrados.</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -169,4 +172,5 @@
 
 </body>
 </html>
+
 

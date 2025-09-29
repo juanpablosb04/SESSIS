@@ -1,16 +1,16 @@
+# clientes/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Clientes, ClientesAuditoria
 from config.decorators import role_required
 import re
 
-
 # -------------------------------
-# LISTA, CREAR, EDITAR Y ELIMINAR CLIENTES
+# LISTA + CREAR/EDITAR/ELIMINAR CLIENTES
 # -------------------------------
 @role_required(["Administrador"])
 def clientes_view(request):
-    # 👇 Validación de sesión manual (si no hay usuario -> login)
+    # Validación de sesión manual (por tu login propio)
     if not request.session.get("usuario_id"):
         return redirect("login")
 
@@ -19,9 +19,7 @@ def clientes_view(request):
     if request.method == 'POST':
         action = request.POST.get('action')
 
-        # -------------------------------
-        # CREAR CLIENTE
-        # -------------------------------
+        # -------- CREAR --------
         if action == 'crear':
             nombre = request.POST.get('nombre')
             email = request.POST.get('email')
@@ -39,18 +37,19 @@ def clientes_view(request):
             elif Clientes.objects.filter(cedula=cedula).exists():
                 messages.error(request, "⚠️ La cédula ya está registrada")
             else:
-                Clientes.objects.create(
+                cliente = Clientes(
                     nombre_completo=nombre,
                     email=email,
                     cedula=cedula,
                     telefono=telefono,
                     residencia=residencia
                 )
+                # 👉 pasa el correo del usuario logueado (tu sesión custom)
+                cliente._usuario_email = request.session.get("usuario_email")
+                cliente.save()
                 messages.success(request, "✅ Cliente creado correctamente")
 
-        # -------------------------------
-        # EDITAR CLIENTE
-        # -------------------------------
+        # -------- EDITAR --------
         elif action == 'editar':
             cliente_id = request.POST.get('cliente_id')
             cliente = get_object_or_404(Clientes, id_cliente=cliente_id)
@@ -68,42 +67,44 @@ def clientes_view(request):
                 cliente.cedula = nueva_cedula
                 cliente.telefono = request.POST.get('telefono')
                 cliente.residencia = request.POST.get('residencia')
+                # 👉 correo del ejecutor
+                cliente._usuario_email = request.session.get("usuario_email")
                 cliente.save()
                 messages.success(request, "✏️ Cliente editado correctamente")
 
-        # -------------------------------
-        # ELIMINAR CLIENTE
-        # -------------------------------
+        # -------- ELIMINAR --------
         elif action == 'eliminar':
             cliente_id = request.POST.get('cliente_id')
             cliente = get_object_or_404(Clientes, id_cliente=cliente_id)
+            # 👉 correo del ejecutor
+            cliente._usuario_email = request.session.get("usuario_email")
             cliente.delete()
             messages.success(request, "🗑️ Cliente eliminado correctamente")
 
-        # 👇 Siempre redirige a la lista de clientes
+        # Siempre redirige para evitar re-envíos
         return redirect('clientes')
 
-    # 👇 Render al template que movimos a templates/clientes/
     return render(request, 'clientes/clientes.html', {'clientes': clientes})
 
 
 # -------------------------------
-# VISTA DE AUDITORÍA DE CLIENTES
+# AUDITORÍA DE UN CLIENTE
 # -------------------------------
 @role_required(["Administrador"])
 def auditoria_cliente(request, cliente_id):
-    # 👇 Validación de sesión manual
+    # Validación de sesión manual (tu login propio)
     if not request.session.get("usuario_id"):
         return redirect("login")
 
     cliente = get_object_or_404(Clientes, id_cliente=cliente_id)
     auditoria = ClientesAuditoria.objects.filter(cliente=cliente).order_by('-fecha')
 
-    # 👇 Render al template que debe estar en templates/clientes/
     return render(request, 'clientes/auditoria_cliente.html', {
         'cliente': cliente,
         'auditoria': auditoria
     })
+
+
 
 
 

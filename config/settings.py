@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'cuentas',
     'empleados',
     'roles',
-    'clientes',
+    'clientes.apps.ClientesConfig',
     'usuarios',
 ]
 
@@ -85,7 +85,7 @@ DATABASES = {
         'NAME': 'SESSIS',
         'USER': '',      # vacío porque usas Trusted_Connection
         'PASSWORD': '',
-        'HOST': 'localhost',
+        'HOST': 'AKILES08CR\\SQLEXPRESS',
         'PORT': '',
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
