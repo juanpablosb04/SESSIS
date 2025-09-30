@@ -1,0 +1,198 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Empleados SES</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
+    .fondo {
+      background-image: url("{% static 'Img/empleadosFondo.png' %}");
+      background-size: cover;
+      height: 1080px;
+    }
+  </style>
+</head>
+
+<body>
+
+  {% include "includes/navbar.html" %}
+
+  <div class="fondo">
+    <div class="flex flex-col items-center justify-center mt-8 dark">
+      <div class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7">
+
+        <!-- Formulario de Registro de Empleado -->
+        <h2 class="text-2xl font-bold text-gray-200 mb-4">Registro de empleado</h2>
+        <form method="POST" class="flex flex-col">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="crear">
+
+          <div class="flex space-x-4 mb-4">
+            <input name="nombre_completo" placeholder="Nombre completo"
+              class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-full focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+              type="text" />
+          </div>
+
+          <input name="email" placeholder="Correo Electrónico"
+            class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 mb-4 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+            type="email" />
+
+          <div class="flex space-x-4 mb-4">
+            <input name="cedula" placeholder="Cédula"
+              class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+              type="text" />
+            <input name="telefono" placeholder="Teléfono"
+              class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+              type="text" />
+          </div>
+
+          <input name="direccion" placeholder="Dirección"
+            class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 mb-4 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+            type="text" />
+
+          <label class="text-sm mb-2 text-gray-200 cursor-pointer" for="fecha_contratacion">
+            Fecha de Contratación
+          </label>
+          <input name="fecha_contratacion" id="fecha_contratacion"
+            class="bg-gray-700 text-gray-200 border-0 rounded-md p-2" type="date" />
+
+          <button
+            class="bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-bold py-2 px-4 rounded-md mt-4 hover:bg-indigo-600 hover:to-blue-600 transition ease-in-out duration-150"
+            type="submit">
+            Registrar
+          </button>
+        </form>
+      </div>
+      <div class="p-6">
+
+        <!--Listado de Empleado -->
+        <h2 class="text-xl font-bold text-gray-200 mt-8 mb-4">Lista de Empleados</h2>
+        <div class="overflow-x-auto">
+          <table class="min-w-full bg-gray-800 rounded-lg overflow-hidden">
+            <thead class="bg-gray-700 text-gray-200">
+              <tr>
+                <th class="px-4 py-2 text-left">Nombre</th>
+                <th class="px-4 py-2 text-left">Correo</th>
+                <th class="px-4 py-2 text-left">Cédula</th>
+                <th class="px-4 py-2 text-left">Teléfono</th>
+                <th class="px-4 py-2 text-left">Dirección</th>
+                <th class="px-4 py-2 text-left">Fecha Contratación</th>
+                <th class="px-4 py-2 text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="text-gray-300">
+              {% for empleado in empleados %}
+              <tr class="border-b border-gray-700">
+                <td class="px-4 py-2">{{ empleado.nombre_completo }}</td>
+                <td class="px-4 py-2">{{ empleado.email }}</td>
+                <td class="px-4 py-2">{{ empleado.cedula }}</td>
+                <td class="px-4 py-2">{{ empleado.telefono }}</td>
+                <td class="px-4 py-2">{{ empleado.direccion }}</td>
+                <td class="px-4 py-2">{{ empleado.fecha_contratacion }}</td>
+                <td class="px-4 py-2 text-center flex justify-center gap-2">
+                  <button
+                    onclick="abrirModal('{{ empleado.id_empleado }}', '{{ empleado.nombre_completo }}', '{{ empleado.email }}', '{{ empleado.cedula }}', '{{ empleado.telefono }}', '{{ empleado.direccion }}', '{{ empleado.fecha_contratacion }}')"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">
+                    Editar
+                  </button>
+
+                  <form method="POST" onsubmit="return confirmarEliminar()">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="eliminar">
+                    <input type="hidden" name="empleado_id" value="{{ empleado.id_empleado }}">
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">
+                      Eliminar
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="7" class="px-4 py-2 text-center text-gray-400">No hay empleados registrados</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+    <div class="bg-gray-900 rounded-lg p-6 w-full max-w-lg">
+      <h3 class="text-xl font-bold mb-4 text-white">Editar Empleado</h3>
+      <form id="form-editar" class="flex flex-col space-y-4" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="editar">
+        <input type="hidden" name="empleado_id" id="id_empleado">
+
+        <input name="nombre_completo" id="edit_nombre" placeholder="Nombre completo" type="text"
+          class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 focus:bg-gray-600" />
+
+        <input name="email" id="edit_email" placeholder="Correo Electrónico" type="email"
+          class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 focus:bg-gray-600" />
+
+        <input name="cedula" id="edit_cedula" placeholder="Cédula" type="text"
+          class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 focus:bg-gray-600" />
+
+        <input name="telefono" id="edit_telefono" placeholder="Teléfono" type="text"
+          class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 focus:bg-gray-600" />
+
+        <input name="direccion" id="edit_direccion" placeholder="Dirección" type="text"
+          class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 focus:bg-gray-600" />
+
+        <input name="fecha_contratacion" id="edit_fecha" type="date"
+          class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 focus:bg-gray-600" />
+
+        <div class="flex justify-end gap-2 pt-4">
+          <button type="button" onclick="cerrarModal()"
+            class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-1 px-4 rounded">
+            Cancelar
+          </button>
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-4 rounded">
+            Guardar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+  function abrirModal(id, nombre, email, cedula, telefono, direccion, fecha) {
+    document.getElementById('modal').classList.remove('hidden');
+    document.getElementById('modal').classList.add('flex');
+
+    document.getElementById('id_empleado').value = id;
+    document.getElementById('edit_nombre').value = nombre;
+    document.getElementById('edit_email').value = email;
+    document.getElementById('edit_cedula').value = cedula;
+    document.getElementById('edit_telefono').value = telefono;
+    document.getElementById('edit_direccion').value = direccion;
+    document.getElementById('edit_fecha').value = fecha;
+  }
+
+  function cerrarModal() {
+    document.getElementById('modal').classList.add('hidden');
+    document.getElementById('modal').classList.remove('flex');
+  }
+
+  function confirmarEliminar() {
+    return confirm("¿Seguro que quieres eliminar este empleado?");
+  }
+  </script>
+
+</body>
+
+</html>
