@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clientes SES</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/static/JS/navbar.js"></script>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .fondo {
+      background-image: url("static/Img/registrarCitasFondo.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .form-container {
+      max-height: 95vh;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="fondo">
+    <div class="form-container w-full max-w-[1550px] bg-gray-800 rounded-lg shadow-md p-7">
+      <h2 class="text-2xl font-bold text-gray-200 mb-4">Registro de Citas</h2>
+      <form class="flex flex-col">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+          <div class="flex flex-col">
+            <label class="text-sm text-gray-200 mb-1" for="cedula">Cédula del cliente</label>
+            <input
+              class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+              id="cedula" type="text" placeholder="Ej: 001234567" />
+          </div>
+
+          <div class="flex flex-col">
+            <label class="text-sm text-gray-200 mb-1" for="fechaCita">Fecha de la cita</label>
+            <input
+              class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+              id="fechaCita" type="date" />
+          </div>
+
+          <div class="flex flex-col">
+            <label class="text-sm text-gray-200 mb-1" for="horaInicio">Hora de inicio</label>
+            <input
+              class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+              id="horaInicio" type="time" />
+          </div>
+
+          <div class="flex flex-col">
+            <label class="text-sm text-gray-200 mb-1" for="horaFin">Hora de finalización</label>
+            <input
+              class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+              id="horaFin" type="time" />
+          </div>
+        </div>
+
+        <input
+          placeholder="Correo Electrónico del cliente"
+          class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 mb-4 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+          id="correoElectronico" type="email" />
+
+        <div class="flex space-x-4 mb-4">
+          <input
+            placeholder="Teléfono"
+            class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+            type="text" />
+
+          <input
+            placeholder="Motivo - Ejem: Nueva Contratación o Revisión de contrato actual"
+            class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+            id="motivo" type="text" />
+        </div>
+
+        <input
+          placeholder="Descripción"
+          class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 mb-4 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
+          type="text" />
+
+        <button
+          class="bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-bold py-2 px-4 rounded-md mt-4 hover:bg-indigo-600 hover:to-blue-600 transition ease-in-out duration-150"
+          type="submit">
+          Registrar
+        </button>
+      </form>
+    </div>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,47 @@
+<link rel="stylesheet" href="/static/navbar.css">
+
+<div class="navbar">
+  <div class="logo"><a href="{% url 'inicio' %}">SES</a></div>
+  <ul class="links">
+
+    {% if request.session.usuario_rol == "Administrador" %}
+      <!-- Opciones para Administrador -->
+      <li class="dropdown">
+        <a href="#">Empleado</a>
+        <ul class="dropdown-menu">
+          <li><a href="{% url 'empleados' %}">Registrar y consultar Empleados</a></li>
+          <li><a href="">Registrar Horas Extras</a></li>
+          <li><a href="">Asistencia de empleados</a></li>
+        </ul>
+      </li>
+      <li><a href="{% url 'clientes' %}">Clientes</a></li>
+      <li class="dropdown">
+        <a href="#">Citas</a>
+        <ul class="dropdown-menu">
+          <li><a href="">Registrar cita</a></li>
+          <li><a href="">Ver citas agendadas</a></li>
+        </ul>
+      </li>
+      <li><a href="">Inventario</a></li>
+      <li><a href="">Reportes</a></li>
+      <li><a href="{% url 'lista_usuarios' %}">Usuarios</a></li>
+    {% endif %}
+
+    {% if request.session.usuario_rol == "Oficial" %}
+      <!-- Opciones para Oficial -->
+      <li class="dropdown">
+        <a href="#">Empleado</a>
+        <ul class="dropdown-menu">
+          <li><a href="">Registrar hora de entrada</a></li>
+          <li><a href="">Ver las asistencias</a></li>
+        </ul>
+      </li>
+      <li><a href="">Reporte Incidentes</a></li>
+      <li><a href="">Ver mis Horas extras</a></li>
+    {% endif %}
+
+  </ul>
+
+  <a class="boton-elegante" href="{% url 'logout' %}">LogOut</a>
+</div>
+

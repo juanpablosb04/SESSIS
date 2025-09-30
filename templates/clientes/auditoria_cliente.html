@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auditoría - {{ cliente.nombre_completo }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .fondo {
+      background-image: url("{% static 'Img/clientesFondo.png' %}");
+      background-size: cover;
+      background-position: center;
+      min-height: 100vh;
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-200 min-h-screen fondo">
+
+  <!-- Navbar global -->
+  {% include "includes/navbar.html" %}
+
+  <!-- Encabezado -->
+  <div class="p-8 max-w-7xl mx-auto">
+    <h1 class="text-3xl font-bold mb-4">Auditoría del Cliente</h1>
+    <p class="text-gray-300 mb-6">
+      <span class="font-semibold">Cliente:</span>
+      {{ cliente.nombre_completo }} ({{ cliente.cedula }})
+    </p>
+
+    <!-- Tabla de auditoría -->
+    <div class="overflow-x-auto bg-gray-800/90 backdrop-blur rounded-lg shadow-md p-6">
+      <h2 class="text-2xl font-semibold mb-4">Historial de Cambios</h2>
+
+      <table class="w-full text-left border border-gray-700">
+        <thead class="bg-gray-700 text-gray-200">
+          <tr>
+            <th class="p-2">Fecha</th>
+            <th class="p-2">Acción</th>
+            <th class="p-2">Usuario que realizó</th>
+            <th class="p-2">Nombre</th>
+            <th class="p-2">Email</th>
+            <th class="p-2">Cédula</th>
+            <th class="p-2">Teléfono</th>
+            <th class="p-2">Residencia</th>
+          </tr>
+        </thead>
+        <tbody class="text-gray-300">
+          {% for registro in auditoria %}
+          <tr class="border-b border-gray-700">
+            <td class="p-2 whitespace-nowrap">{{ registro.fecha|date:"d/m/Y H:i" }}</td>
+            <td class="p-2">
+              {% if registro.accion == "CREAR" %}
+                <span class="bg-green-600 px-2 py-1 rounded text-white text-sm">CREAR</span>
+              {% elif registro.accion == "MODIFICAR" %}
+                <span class="bg-yellow-500 px-2 py-1 rounded text-white text-sm">MODIFICAR</span>
+              {% elif registro.accion == "ELIMINAR" %}
+                <span class="bg-red-600 px-2 py-1 rounded text-white text-sm">ELIMINAR</span>
+              {% else %}
+                {{ registro.accion }}
+              {% endif %}
+            </td>
+            <td class="p-2">
+              {% if registro.usuario %}
+                {{ registro.usuario.email }}
+              {% elif registro.usuario_email %}
+                {{ registro.usuario_email }}
+              {% else %}
+                <span class="italic text-gray-400">Sistema</span>
+              {% endif %}
+            </td>
+            <td class="p-2">{{ registro.nombre_completo }}</td>
+            <td class="p-2">{{ registro.email }}</td>
+            <td class="p-2">{{ registro.cedula }}</td>
+            <td class="p-2">{{ registro.telefono }}</td>
+            <td class="p-2">{{ registro.residencia }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="p-4 text-center text-gray-400">
+              No hay registros de auditoría para este cliente.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Botón Volver -->
+    <div class="mt-6">
+      <a href="{% url 'clientes' %}"
+         class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+        <span>⬅</span> Volver a Clientes
+      </a>
+    </div>
+  </div>
+</body>
+</html>
