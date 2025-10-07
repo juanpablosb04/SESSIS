@@ -2,5 +2,5 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.empleados_view, name='empleados'),
+    path('', views.inventarios_view, name='inventario'),
 ]

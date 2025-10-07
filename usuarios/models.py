@@ -45,7 +45,7 @@ class AuditoriaUsuario(models.Model):
     estado = models.CharField(max_length=50, null=True)
 
     class Meta:
-        db_table = 'USUARIOS_AUDITORIA_TB'
+        db_table = 'Usuarios_Auditoria_TB'
         ordering = ['-fecha']
 
     def __str__(self):

@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'roles',
     'clientes.apps.ClientesConfig',
     'usuarios',
+    'inventarios',
+    'ubicaciones',
 ]
 
 MIDDLEWARE = [

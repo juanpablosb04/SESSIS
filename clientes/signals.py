@@ -16,15 +16,15 @@ def registrar_auditoria(cliente, accion, usuario_email, include_fk=True):
 
     ClientesAuditoria.objects.create(
         cliente=cliente if include_fk else None,
-        usuario=user_inst,                 # FK a Usuarios (puede ser None)
-        usuario_email=usuario_email,       # además guardas el string del correo
+        usuario=user_inst,                 
+        usuario_email=usuario_email,       
         accion=accion,
         fecha=now(),
         nombre_completo=cliente.nombre_completo,
         email=cliente.email,
         cedula=cliente.cedula,
         telefono=cliente.telefono,
-        residencia=cliente.residencia,
+        residencia=cliente.id_ubicacion.nombre if cliente.id_ubicacion else None,
     )
 
 @receiver(post_save, sender=Clientes)

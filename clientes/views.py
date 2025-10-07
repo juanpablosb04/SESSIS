@@ -2,19 +2,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Clientes, ClientesAuditoria
+from ubicaciones.models import Ubicaciones
 from config.decorators import role_required
 import re
 
-# -------------------------------
-# LISTA + CREAR/EDITAR/ELIMINAR CLIENTES
-# -------------------------------
 @role_required(["Administrador"])
 def clientes_view(request):
-    # Validación de sesión manual (por tu login propio)
     if not request.session.get("usuario_id"):
         return redirect("login")
 
-    clientes = Clientes.objects.all()
+    clientes = Clientes.objects.select_related("id_ubicacion").all()
+    ubicaciones = Ubicaciones.objects.all()  # 👈 para pasar al template
 
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -25,9 +23,8 @@ def clientes_view(request):
             email = request.POST.get('email')
             cedula = request.POST.get('cedula')
             telefono = request.POST.get('telefono')
-            residencia = request.POST.get('residencia')
+            id_ubicacion = request.POST.get('id_ubicacion')  # 👈 capturar ubicación
 
-            # Validaciones
             if not nombre or not email or not cedula:
                 messages.error(request, "⚠️ Nombre, email y cédula son obligatorios")
             elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
@@ -42,9 +39,8 @@ def clientes_view(request):
                     email=email,
                     cedula=cedula,
                     telefono=telefono,
-                    residencia=residencia
+                    id_ubicacion=Ubicaciones.objects.get(id_ubicacion=id_ubicacion) if id_ubicacion else None
                 )
-                # 👉 pasa el correo del usuario logueado (tu sesión custom)
                 cliente._usuario_email = request.session.get("usuario_email")
                 cliente.save()
                 messages.success(request, "✅ Cliente creado correctamente")
@@ -56,6 +52,7 @@ def clientes_view(request):
 
             nuevo_email = request.POST.get('email')
             nueva_cedula = request.POST.get('cedula')
+            id_ubicacion = request.POST.get('id_ubicacion')  # 👈 actualizar ubicación
 
             if Clientes.objects.filter(email=nuevo_email).exclude(id_cliente=cliente.id_cliente).exists():
                 messages.error(request, "⚠️ Ese correo ya está en uso")
@@ -66,8 +63,7 @@ def clientes_view(request):
                 cliente.email = nuevo_email
                 cliente.cedula = nueva_cedula
                 cliente.telefono = request.POST.get('telefono')
-                cliente.residencia = request.POST.get('residencia')
-                # 👉 correo del ejecutor
+                cliente.id_ubicacion = Ubicaciones.objects.get(id_ubicacion=id_ubicacion) if id_ubicacion else None
                 cliente._usuario_email = request.session.get("usuario_email")
                 cliente.save()
                 messages.success(request, "✏️ Cliente editado correctamente")
@@ -76,15 +72,17 @@ def clientes_view(request):
         elif action == 'eliminar':
             cliente_id = request.POST.get('cliente_id')
             cliente = get_object_or_404(Clientes, id_cliente=cliente_id)
-            # 👉 correo del ejecutor
             cliente._usuario_email = request.session.get("usuario_email")
             cliente.delete()
             messages.success(request, "🗑️ Cliente eliminado correctamente")
 
-        # Siempre redirige para evitar re-envíos
         return redirect('clientes')
 
-    return render(request, 'clientes/clientes.html', {'clientes': clientes})
+    return render(request, 'clientes/clientes.html', {
+        'clientes': clientes,
+        'ubicaciones': ubicaciones  # 👈 enviar ubicaciones al template
+    })
+
 
 
 # -------------------------------

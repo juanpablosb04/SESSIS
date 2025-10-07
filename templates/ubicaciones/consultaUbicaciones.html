@@ -1,0 +1,138 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Listado de Ubicaciones</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
+    .fondo {
+      background-image: url("{% static 'Img/consultaUbicacionFondo.png' %}");
+      background-size: cover;
+      height: 1080px;
+    }
+  </style>
+</head>
+
+<div class="fondo">
+<body class="bg-gray-900 text-gray-200">
+
+  {% include "includes/navbar.html" %}
+
+  <div class="flex flex-col items-center mt-8">
+    <div class="w-full max-w-[1400px] bg-gray-800 rounded-lg shadow-md p-10">
+
+      <h2 class="text-2xl font-bold text-gray-200 mb-6">Ubicaciones Registradas</h2>
+
+      <!-- Iteramos todas las ubicaciones -->
+      {% for ubicacion in ubicaciones %}
+      <div class="flex items-center bg-gray-700 rounded-lg shadow-md p-6 mb-6">
+
+        <!-- Imagen -->
+        <div class="w-48 h-48 flex-shrink-0 mr-8">
+          {% if ubicacion.imagen_url %}
+          <img src="{{ ubicacion.imagen_url }}" alt="Imagen de {{ ubicacion.nombre }}"
+            class="w-full h-full object-cover rounded-lg">
+          {% else %}
+          <div class="w-full h-full flex items-center justify-center bg-gray-600 rounded-lg text-sm text-gray-300">
+            Sin imagen
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Información -->
+        <div class="flex-1">
+          <h3 class="text-2xl font-semibold">{{ ubicacion.nombre }}</h3>
+          <p class="text-gray-300 text-lg">Tipo: {{ ubicacion.tipo|default:"No definido" }}</p>
+          <p class="text-gray-300 text-lg">Dirección: {{ ubicacion.direccion }}</p>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex flex-col space-y-2 ml-4">
+          <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md text-center transition"
+            onclick="openEditModal('{{ ubicacion.id_ubicacion }}', '{{ ubicacion.nombre }}', '{{ ubicacion.tipo }}', '{{ ubicacion.direccion }}', '{{ ubicacion.imagen_url }}')">
+            Editar
+          </button>
+
+          <form method="POST" action="">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="eliminar">
+            <input type="hidden" name="ubicacion_id" value="{{ ubicacion.id_ubicacion }}">
+            <button type="submit"
+              class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md text-center transition">
+              Eliminar
+            </button>
+          </form>
+        </div>
+
+      </div>
+      {% empty %}
+      <p class="text-gray-400">No hay ubicaciones registradas.</p>
+      {% endfor %}
+
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6">
+      <h3 class="text-xl font-bold text-gray-200 mb-4">Editar Ubicación</h3>
+      <form method="POST" id="editForm">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="editar">
+        <input type="hidden" name="ubicacion_id" id="modal_ubicacion_id">
+
+        <label class="block mb-2 text-gray-200">Nombre</label>
+        <input type="text" name="nombre" id="modal_nombre" class="w-full mb-4 p-2 rounded bg-gray-700 text-gray-200">
+
+        <label class="block mb-2 text-gray-200">Tipo</label>
+        <input type="text" name="tipo" id="modal_tipo" class="w-full mb-4 p-2 rounded bg-gray-700 text-gray-200">
+
+        <label class="block mb-2 text-gray-200">Dirección</label>
+        <input type="text" name="direccion" id="modal_direccion"
+          class="w-full mb-4 p-2 rounded bg-gray-700 text-gray-200">
+
+        <label class="block mb-2 text-gray-200">URL Imagen</label>
+        <input type="text" name="imagen_url" id="modal_imagen_url"
+          class="w-full mb-4 p-2 rounded bg-gray-700 text-gray-200">
+
+        <div class="flex justify-end space-x-2">
+          <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
+            onclick="closeEditModal()">Cancelar</button>
+          <button type="submit"
+            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+  <script>
+    function openEditModal(id, nombre, tipo, direccion, imagen_url) {
+      document.getElementById('modal_ubicacion_id').value = id;
+      document.getElementById('modal_nombre').value = nombre;
+      document.getElementById('modal_tipo').value = tipo;
+      document.getElementById('modal_direccion').value = direccion;
+      document.getElementById('modal_imagen_url').value = imagen_url;
+      document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.add('hidden');
+    }
+  </script>
+
+
+</body>
+
+</html>

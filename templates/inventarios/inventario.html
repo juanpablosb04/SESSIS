@@ -1,0 +1,193 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventario SES</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/static/JS/navbar.js"></script>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
+    .fondo {
+      background-image: url("{% static 'Img/inventarioFondo.png' %}");
+      background-size: cover;
+      height: 90vh;
+    }
+  </style>
+</head>
+
+<body>
+
+  {% include "includes/navbar.html" %}
+
+  <div class="fondo">
+    <div class="flex flex-col items-center justify-center mt-8 dark">
+
+      <!-- CREAR INVENTARIO -->
+      <div class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7">
+        <h2 class="text-2xl font-bold text-gray-200 mb-4">Registro de equipo de inventario</h2>
+        <form method="POST" class="flex flex-col">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="crear">
+
+          <div class="flex space-x-4 mb-4">
+            <input name="id_inventario" placeholder="ID del equipo de inventario"
+              class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2" type="text" required />
+            <input name="nombre" placeholder="Nombre" class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2"
+              type="text" required />
+          </div>
+
+          <input name="descripcion" placeholder="Descripción"
+            class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 mb-4" type="text" />
+
+          <div class="flex space-x-4 mb-4">
+            <input name="estado" placeholder="Estado" class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2"
+              type="text" />
+            <select name="id_ubicacion" class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2">
+              <option disabled selected>Selecciona ubicación</option>
+              {% for ubic in ubicaciones %}
+              <option value="{{ ubic.id_ubicacion }}">{{ ubic.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <button class="bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-bold py-2 px-4 rounded-md mt-4"
+            type="submit">
+            Registrar al sistema de inventario
+          </button>
+        </form>
+      </div>
+
+      <!-- LISTA INVENTARIOS -->
+      <div class="p-6">
+        <h2 class="text-2xl font-bold mb-4 text-white">Lista de Inventario</h2>
+        <table
+          class="table-auto max-w-[1350px] w-full text-left border-collapse border border-gray-600 text-gray-200 bg-gray-900 bg-opacity-80 backdrop-blur-md rounded-[20px] overflow-hidden">
+          <thead class="bg-gray-700">
+            <tr>
+              <th class="border border-gray-600 px-4 py-2">ID del Equipo</th>
+              <th class="border border-gray-600 px-4 py-2">Nombre</th>
+              <th class="border border-gray-600 px-4 py-2">Descripción</th>
+              <th class="border border-gray-600 px-4 py-2">Estado</th>
+              <th class="border border-gray-600 px-4 py-2">Ubicación</th>
+              <th class="border border-gray-600 px-4 py-2">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for inv in inventarios %}
+            <tr class="bg-gray-800 hover:bg-gray-700">
+              <td class="border border-gray-600 px-4 py-2">{{ inv.id_inventario }}</td>
+              <td class="border border-gray-600 px-4 py-2">{{ inv.nombre }}</td>
+              <td class="border border-gray-600 px-4 py-2">{{ inv.descripcion }}</td>
+              <td class="border border-gray-600 px-4 py-2">{{ inv.estado }}</td>
+              <td class="border border-gray-600 px-4 py-2">{{ inv.id_ubicacion.nombre}}</td>
+              <td class="border border-gray-600 px-4 py-2 flex gap-2">
+                <!-- BOTÓN EDITAR -->
+                <button
+                  onclick="abrirModal('{{ inv.id_inventario }}','{{ inv.nombre }}','{{ inv.descripcion }}','{{ inv.estado }}','{{ inv.id_cliente.id_cliente }}')"
+                  class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-2 rounded">
+                  Editar
+                </button>
+
+                <!-- FORM ELIMINAR -->
+                <form method="POST" onsubmit="return confirm('¿Seguro que quieres eliminar este inventario?');">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="eliminar">
+                  <input type="hidden" name="inventario_id" value="{{ inv.id_inventario }}">
+                  <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-1 px-2 rounded">
+                    Eliminar
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center text-gray-400 py-4">No hay equipos en inventario</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- MODAL EDITAR -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+      <div class="bg-gray-900 rounded-lg p-6 w-full max-w-lg">
+        <h3 class="text-xl font-bold mb-4 text-white">Editar equipo de inventario</h3>
+        <form method="POST" class="flex flex-col space-y-4">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="editar">
+          <input type="hidden" name="inventario_id" id="edit_inventario_id">
+
+          <div class="flex space-x-4">
+            <input id="edit_id_inventario" name="id_inventario" placeholder="ID del Equipo" type="text"
+              class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2" required />
+            <input id="edit_nombre" name="nombre" placeholder="Nombre" type="text"
+              class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2" required />
+          </div>
+
+          <input id="edit_descripcion" name="descripcion" placeholder="Descripción" type="text"
+            class="bg-gray-700 text-gray-200 border-0 rounded-md p-2" />
+
+          <div class="flex space-x-4">
+            <input id="edit_estado" name="estado" placeholder="Estado" type="text"
+              class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2" />
+            <select name="id_ubicacion" class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2">
+              <option disabled selected>Selecciona ubicación</option>
+              {% for ubic in ubicaciones %}
+              <option value="{{ ubic.id_ubicacion }}">{{ ubic.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="flex justify-end gap-2">
+            <button type="button" onclick="cerrarModal()"
+              class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-1 px-4 rounded">
+              Cancelar
+            </button>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-4 rounded">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function abrirModal(id, nombre, descripcion, estado, cliente_id) {
+      document.getElementById('modal').classList.remove('hidden');
+      document.getElementById('modal').classList.add('flex');
+
+      document.getElementById('edit_inventario_id').value = id;
+      document.getElementById('edit_id_inventario').value = id;
+      document.getElementById('edit_nombre').value = nombre;
+      document.getElementById('edit_descripcion').value = descripcion;
+      document.getElementById('edit_estado').value = estado;
+
+      // Seleccionar el cliente correcto en el select
+      let select = document.getElementById('edit_ubicacion');
+      for (let i = 0; i < select.options.length; i++) {
+        if (select.options[i].value === ubicacion_id) {
+          select.options[i].selected = true;
+          break;
+        }
+      }
+    }
+
+    function cerrarModal() {
+      document.getElementById('modal').classList.add('hidden');
+      document.getElementById('modal').classList.remove('flex');
+    }
+  </script>
+</body>
+
+</html>
