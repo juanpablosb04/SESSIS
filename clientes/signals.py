@@ -1,39 +1,62 @@
 # clientes/signals.py
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.timezone import now
+
 from .models import Clientes, ClientesAuditoria
-from cuentas.models import Usuarios  # tu modelo real
+
+
+def _get_usuario_by_email(usuario_email):
+    """
+    Busca el usuario por email en tu modelo real.
+    Lo importamos dentro de la función para evitar problemas de importación/ciclos.
+    """
+    if not usuario_email:
+        return None
+    try:
+        from cuentas.models import Usuarios  # tu modelo real de usuarios
+    except Exception:
+        return None
+    return Usuarios.objects.filter(email=usuario_email).first()
+
 
 def registrar_auditoria(cliente, accion, usuario_email, include_fk=True):
     """
-    Registra auditoría en dbo.CLIENTES_AUDITORIA_TB.
-    - include_fk=False si el cliente ya fue borrado (DELETE).
+    Registra en CLIENTES_AUDITORIA_TB.
+    - include_fk=True: guarda FK al cliente (CREAR/MODIFICAR/CAMBIAR_ESTADO).
+      (Si algún día quisieras registrar un borrado lógico sin FK, podrías pasar False.)
     """
-    user_inst = None
-    if usuario_email:
-        user_inst = Usuarios.objects.filter(email=usuario_email).first()
+    user_inst = _get_usuario_by_email(usuario_email)
 
     ClientesAuditoria.objects.create(
         cliente=cliente if include_fk else None,
-        usuario=user_inst,                 
-        usuario_email=usuario_email,       
+        usuario=user_inst,
+        usuario_email=usuario_email,
         accion=accion,
         fecha=now(),
+
+        # Snapshot del cliente en el momento de la acción
         nombre_completo=cliente.nombre_completo,
         email=cliente.email,
         cedula=cliente.cedula,
         telefono=cliente.telefono,
-        residencia=cliente.id_ubicacion.nombre if cliente.id_ubicacion else None,
+        # Guardamos el nombre de la ubicación como “residencia” (tal como venías haciéndolo)
+        residencia=(cliente.id_ubicacion.nombre if getattr(cliente, "id_ubicacion", None) else None),
     )
+
 
 @receiver(post_save, sender=Clientes)
 def auditar_cliente_guardado(sender, instance, created, **kwargs):
-    accion = "CREAR" if created else "MODIFICAR"
+    """
+    - CREAR si es nuevo.
+    - Si en la vista seteas `instance._accion_audit = "CAMBIAR_ESTADO"`, se usa eso.
+    - En cualquier otro update normal: MODIFICAR.
+    """
     usuario_email = getattr(instance, "_usuario_email", None)
-    registrar_auditoria(instance, accion, usuario_email, include_fk=True)
 
-@receiver(post_delete, sender=Clientes)
-def auditar_cliente_eliminado(sender, instance, **kwargs):
-    usuario_email = getattr(instance, "_usuario_email", None)
-    registrar_auditoria(instance, "ELIMINAR", usuario_email, include_fk=False)
+    if created:
+        accion = "CREAR"
+    else:
+        accion = getattr(instance, "_accion_audit", None) or "MODIFICAR"
+
+    registrar_auditoria(instance, accion, usuario_email, include_fk=True)
