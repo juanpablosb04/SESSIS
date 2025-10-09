@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
 from .models import Usuario, AuditoriaUsuario
 from config.decorators import role_required
 from empleados.models import Empleado
@@ -25,8 +26,10 @@ def lista_usuarios(request):
                 email=request.POST["email"],
                 password=request.POST["password"],
                 estado=request.POST.get("estado", "Activo")
+                
             )
 
+            
             # Registrar auditoría
             AuditoriaUsuario.objects.create(
                 usuario_afectado=usuario,
@@ -38,13 +41,14 @@ def lista_usuarios(request):
                 estado=usuario.estado
             )
 
+            messages.success(request, "✅ Usuario creado correctamente.", extra_tags='crear')
+
         elif action == "editar":
             usuario = get_object_or_404(Usuario, id_usuario=request.POST["usuario_id"])
             usuario.id_empleado_id = int(request.POST["id_empleado"])
             usuario.id_rol = int(request.POST["id_rol"])
             usuario.email = request.POST["email"]
 
-            # 🔹 Mantener contraseña si el input está vacío
             nueva_password = request.POST["password"]
             if nueva_password.strip():  # Solo actualiza si tiene valor
                 usuario.password = nueva_password
@@ -62,6 +66,8 @@ def lista_usuarios(request):
                 email=usuario.email,
                 estado=usuario.estado
             )
+
+            messages.success(request, "✏️ Usuario editado correctamente.", extra_tags='editar')
 
         elif action == "eliminar":
             usuario = get_object_or_404(Usuario, id_usuario=request.POST["usuario_id"])

@@ -1,7 +1,7 @@
 # empleados/views.py
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from .models import Empleado, EmpleadosAuditoria   # 👈 importa también la auditoría
+from .models import Empleado, EmpleadosAuditoria
 from config.decorators import role_required
 import re
 
@@ -23,13 +23,16 @@ def empleados_view(request):
             fecha = request.POST.get("fecha_contratacion", "").strip()  # 'YYYY-MM-DD'
 
             if not nombre or not email or not cedula or not fecha:
+
                 messages.error(request, "⚠️ Nombre, correo, cédula y fecha son obligatorios.")
             elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-                messages.error(request, "⚠️ El correo no tiene un formato válido.")
+                messages.error(request, "⚠️ El correo no tiene un formato válido.", extra_tags='crear')
             elif Empleado.objects.filter(email=email).exists():
-                messages.error(request, "⚠️ El correo ya está registrado.")
+                messages.error(request, "⚠️ El correo ya está registrado.", extra_tags='crear')
             elif Empleado.objects.filter(cedula=cedula).exists():
-                messages.error(request, "⚠️ La cédula ya está registrada.")
+                messages.error(request, "⚠️ La cédula ya está registrada.", extra_tags='crear')
+
+
             else:
                 empleado = Empleado(
                     nombre_completo=nombre,
@@ -39,9 +42,11 @@ def empleados_view(request):
                     direccion=direccion or None,
                     fecha_contratacion=fecha,
                 )
+
                 empleado._usuario_email = request.session.get("usuario_email")  # 👈 para signals
                 empleado.save()
-                messages.success(request, "✅ Empleado creado correctamente.")
+                messages.success(request, "✅ Empleado creado correctamente.", extra_tags='crear')
+
 
         # ---------------- EDITAR ----------------
         elif action == "editar":
@@ -55,14 +60,15 @@ def empleados_view(request):
             nueva_direccion = request.POST.get("direccion", "").strip()
             nueva_fecha = request.POST.get("fecha_contratacion", "").strip()
 
+
             if not nuevo_nombre or not nuevo_email or not nueva_cedula or not nueva_fecha:
-                messages.error(request, "⚠️ Nombre, correo, cédula y fecha son obligatorios.")
+                messages.error(request, "⚠️ Nombre, correo, cédula y fecha son obligatorios.", extra_tags='editar')
             elif not re.match(r"[^@]+@[^@]+\.[^@]+", nuevo_email):
-                messages.error(request, "⚠️ El correo no tiene un formato válido.")
+                messages.error(request, "⚠️ El correo no tiene un formato válido.", extra_tags='editar')
             elif Empleado.objects.filter(email=nuevo_email).exclude(id_empleado=empleado.id_empleado).exists():
-                messages.error(request, "⚠️ Ese correo ya está en uso.")
+                messages.error(request, "⚠️ Ese correo ya está en uso.", extra_tags='editar')
             elif Empleado.objects.filter(cedula=nueva_cedula).exclude(id_empleado=empleado.id_empleado).exists():
-                messages.error(request, "⚠️ Esa cédula ya está en uso.")
+                messages.error(request, "⚠️ Esa cédula ya está en uso.", extra_tags='editar')
             else:
                 empleado.nombre_completo = nuevo_nombre
                 empleado.email = nuevo_email
@@ -70,9 +76,12 @@ def empleados_view(request):
                 empleado.telefono = nuevo_telefono or None
                 empleado.direccion = nueva_direccion or None
                 empleado.fecha_contratacion = nueva_fecha
-                empleado._usuario_email = request.session.get("usuario_email")  # 👈 para signals
+                empleado._usuario_email = request.session.get("usuario_email")
                 empleado.save()
-                messages.success(request, "✏️ Empleado editado correctamente.")
+
+                messages.success(request, "✏️ Empleado editado correctamente.", extra_tags='editar')
+
+
 
         # ---------------- ELIMINAR ----------------
         elif action == "eliminar":
@@ -80,7 +89,9 @@ def empleados_view(request):
             empleado = get_object_or_404(Empleado, id_empleado=empleado_id)
             empleado._usuario_email = request.session.get("usuario_email")  # 👈 para signals
             empleado.delete()
-            messages.success(request, "🗑️ Empleado eliminado correctamente.")
+
+            messages.success(request, "🗑️ Empleado eliminado correctamente.", extra_tags='eliminar')
+
 
         return redirect("empleados")
 

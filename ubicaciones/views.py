@@ -12,7 +12,7 @@ def registro_ubicaciones_view(request):
         imagen_url = request.POST.get('imagen_url')
 
         if not nombre or not direccion:
-            messages.error(request, "⚠️ Nombre y dirección son obligatorios")
+            messages.error(request, "⚠️ Nombre y dirección son obligatorios", extra_tags='crear')
         else:
             Ubicaciones.objects.create(
                 nombre=nombre,
@@ -20,7 +20,7 @@ def registro_ubicaciones_view(request):
                 direccion=direccion,
                 imagen_url=imagen_url
             )
-            messages.success(request, "✅ Ubicación registrada correctamente")
+            messages.success(request, "✅ Ubicación registrada correctamente", extra_tags='crear')
             return redirect('registroUbicaciones')
 
     return render(request, 'ubicaciones/registroUbicaciones.html')
@@ -47,7 +47,7 @@ def consulta_ubicaciones_view(request):
             ubicacion.direccion = request.POST.get('direccion')
             ubicacion.imagen_url = request.POST.get('imagen_url')
             ubicacion.save()
-            messages.success(request, "✏️ Ubicación actualizada correctamente")
+            messages.success(request, "✏️ Ubicación actualizada correctamente", extra_tags='editar')
             return redirect('consultaUbicaciones')
 
     return render(request, 'ubicaciones/consultaUbicaciones.html', {

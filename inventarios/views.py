@@ -23,9 +23,9 @@ def inventarios_view(request):
             id_ubicacion = request.POST.get('id_ubicacion')
 
             if not id_inventario or not nombre or not id_ubicacion:
-                messages.error(request, "⚠️ ID, nombre y ubicación son obligatorios")
+                messages.error(request, "⚠️ ID, nombre y ubicación son obligatorios", extra_tags='crear')
             elif Inventario.objects.filter(id_inventario=id_inventario).exists():
-                messages.error(request, "⚠️ Ese ID de inventario ya existe")
+                messages.error(request, "⚠️ Ese ID de inventario ya existe", extra_tags='crear')
             else:
                 ubicacion = get_object_or_404(Ubicaciones, id_ubicacion=id_ubicacion)
                 Inventario.objects.create(
@@ -35,7 +35,7 @@ def inventarios_view(request):
                     estado=estado,
                     id_ubicacion=ubicacion
                 )
-                messages.success(request, "✅ Equipo de inventario creado correctamente")
+                messages.success(request, "✅ Equipo de inventario creado correctamente", extra_tags='crear')
 
         # -------- EDITAR --------
         elif action == 'editar':
@@ -49,7 +49,7 @@ def inventarios_view(request):
             nuevo_ubicacion_id = request.POST.get('id_ubicacion')
 
             if nuevo_id and Inventario.objects.filter(id_inventario=nuevo_id).exclude(id_inventario=inventario.id_inventario).exists():
-                messages.error(request, "⚠️ Ese ID ya está en uso por otro inventario")
+                messages.error(request, "⚠️ Ese ID ya está en uso por otro inventario", extra_tags='editar')
             else:
                 inventario.id_inventario = nuevo_id or inventario.id_inventario
                 inventario.nombre = nuevo_nombre
@@ -58,7 +58,7 @@ def inventarios_view(request):
                 if nuevo_ubicacion_id:
                     inventario.id_ubicacion = get_object_or_404(Ubicaciones, id_ubicacion=nuevo_ubicacion_id)
                 inventario.save()
-                messages.success(request, "✏️ Inventario editado correctamente")
+                messages.success(request, "✏️ Inventario editado correctamente", extra_tags='editar')
 
         # -------- ELIMINAR --------
         elif action == 'eliminar':
