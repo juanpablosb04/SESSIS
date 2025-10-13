@@ -10,7 +10,7 @@
       <a href="#">Empleado</a>
       <ul class="dropdown-menu">
         <li><a href="{% url 'empleados' %}">Registrar y consultar Empleados</a></li>
-        <li><a href="">Registrar Horas Extras</a></li>
+        <li><a href="{% url 'horasExtras' %}">Registrar Horas Extras</a></li>
         <li><a href="">Asistencia de empleados</a></li>
       </ul>
     </li>
@@ -44,7 +44,7 @@
       </ul>
     </li>
     <li><a href="">Reporte Incidentes</a></li>
-    <li><a href="">Ver mis Horas extras</a></li>
+    <li><a href="{% url 'consultarHorasExtras' %}">Ver mis Horas extras</a></li>
     {% endif %}
 
   </ul>

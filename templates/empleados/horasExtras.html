@@ -1,217 +1,241 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Control de Tiempo Adicional - Portal Administrativo</title>
-  <!-- Tipografías corporativas -->
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Roboto:wght@300;400;500;600&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Iconografía profesional -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="/static/horasExtras.css">
-  <script src="/static/JS/navbar.js"></script>
-  
+  <title>Horas Extras</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .fondo{
+      background-image:url("{% static 'Img/clientesFondo.png' %}");
+      background-size:cover;background-position:center;min-height:100vh;
+    }
+  </style>
 </head>
-<body>
-  <main class="plataforma-tiempo-extra">
-    <!-- Módulo de Registro de Tiempo Extra -->
-    <section class="modulo-registro-tiempo">
-      <div class="cabecera-modulo">
-        <div class="icono-tiempo-principal">
-          <i class="fas fa-clock"></i>
-        </div>
-        <h2 class="titulo-seccion">Control de Tiempo Adicional</h2>
-        <p class="descripcion-modulo">Sistema especializado para el registro y gestión de horas laborales extraordinarias</p>
+<body class="text-gray-200">
+  {% include "includes/navbar.html" %}
+
+  <div class="fondo p-8 flex flex-col items-center">
+
+    {% if messages %}
+      <div class="w-full max-w-[1000px] mb-6">
+        {% for message in messages %}
+          <div class="p-3 mb-2 rounded
+            {% if message.tags == 'success' %} bg-green-600
+            {% elif message.tags == 'error' %} bg-red-600
+            {% elif message.tags == 'warning' %} bg-yellow-500 text-black
+            {% else %} bg-gray-800 {% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
       </div>
+    {% endif %}
 
-      <form id="formularioTiempoExtra" class="formulario-tiempo-extra">
-        <div class="grupo-entrada">
-          <label class="etiqueta-entrada">
-            <i class="fas fa-id-card"></i>
-            Identificación del Colaborador
-          </label>
-          <input type="text" class="campo-entrada" name="cedulaEmpleado" placeholder="Ingrese número de cédula del empleado" required>
+    <!-- Formulario: Registrar horas extras -->
+    <div class="w-full max-w-[850px] bg-gray-800/95 rounded-lg shadow-md p-7 mb-10">
+      <h2 class="text-2xl font-bold text-gray-200 mb-4">Registrar Horas Extras</h2>
+      <form method="POST" action="{% url 'horasExtras' %}" class="flex flex-col">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="crear">
+
+        <div class="mb-4">
+          <label class="block text-sm mb-1 text-gray-300">Empleado</label>
+          <select name="empleado_id" class="w-full p-2 rounded bg-gray-700 text-white" required>
+            <option value="">-- Seleccione un empleado --</option>
+            {% for e in empleados %}
+              <option value="{{ e.id_empleado }}">{{ e.nombre_completo }} — {{ e.cedula }}</option>
+            {% endfor %}
+          </select>
         </div>
 
-        <div class="grupo-entrada doble-columna">
-          <div>
-            <label class="etiqueta-entrada">
-              <i class="fas fa-calendar-alt"></i>
-              Fecha de Labores Extras
-            </label>
-            <input type="date" class="campo-entrada" name="fechaLabores" required>
+        <div class="flex flex-col md:flex-row md:space-x-4 mb-4">
+          <div class="w-full md:w-1/2">
+            <label class="block text-sm mb-1 text-gray-300">Fecha</label>
+            <input type="date" name="fecha" class="w-full p-2 rounded bg-gray-700 text-white" required>
           </div>
-          <div>
-            <label class="etiqueta-entrada">
-              <i class="fas fa-stopwatch"></i>
-              Cantidad de Horas
-            </label>
-            <input type="number" class="campo-entrada" name="cantidadHoras" placeholder="Número de horas trabajadas" min="0.5" step="0.5" max="12" required>
+          <div class="w-full md:w-1/2 mt-3 md:mt-0">
+            <label class="block text-sm mb-1 text-gray-300">Cantidad de horas</label>
+            <input type="number" name="cantidad_horas" min="0.5" step="0.5" max="24"
+                   class="w-full p-2 rounded bg-gray-700 text-white" placeholder="Ej: 1, 2, 3.5" required>
           </div>
         </div>
 
-        <div class="grupo-entrada">
-          <label class="etiqueta-entrada">
-            <i class="fas fa-clipboard-list"></i>
-            Justificación Detallada
-          </label>
-          <textarea class="area-descripcion" name="motivoDetallado" placeholder="Describa detalladamente el motivo que justifica las horas extras trabajadas, incluyendo las tareas realizadas y su importancia..." required></textarea>
+        <div class="mb-4">
+          <label class="block text-sm mb-1 text-gray-300">Justificación</label>
+          <textarea name="justificacion" rows="3" class="w-full p-2 rounded bg-gray-700 text-white"
+                    placeholder="Detalle breve de la razón de las horas extras..."></textarea>
         </div>
 
-        <button type="submit" class="boton-registro-principal">
-          <i class="fas fa-save"></i>
-          Registrar Tiempo Extra
-          <i class="fas fa-arrow-right" style="margin-left: 10px;"></i>
+        <div class="mb-5">
+          <label class="block text-sm mb-1 text-gray-300">Estado</label>
+          <select name="estado" class="w-full p-2 rounded bg-gray-700 text-white">
+            <option value="PENDIENTE">Pendiente</option>
+            <option value="APROBADO">Aprobado</option>
+            <option value="RECHAZADO">Rechazado</option>
+          </select>
+        </div>
+
+        <button type="submit"
+                class="bg-gradient-to-r from-green-500 to-green-700 text-white font-bold py-2 px-4 rounded hover:from-green-600 hover:to-green-800 transition">
+          Registrar
         </button>
       </form>
-    </section>
+    </div>
 
-    <!-- Módulo de Historial de Registros -->
-    <section class="modulo-historial-registros">
-      <div class="cabecera-historial">
-        <h3 class="titulo-historial">
-          <i class="fas fa-history" style="margin-right: 15px; color: var(--color-acento-interactivo);"></i>
-          Historial de Tiempo Extra
-        </h3>
-        <div class="indicador-registros">
-          <i class="fas fa-database"></i>
-          Total: <span id="contadorRegistros">2</span> registros
-        </div>
-      </div>
+    <!-- Historial de horas extras -->
+    <div class="w-full max-w-[1000px] bg-gray-800/95 rounded-lg shadow-md p-7 mt-2">
+      <h2 class="text-2xl font-bold text-gray-200 mb-4">Historial de Horas Extras</h2>
 
-      <div class="contenedor-tabla-datos">
-        <table class="tabla-tiempo-extra">
-          <thead>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-left border border-gray-600">
+          <thead class="bg-gray-700 text-gray-200">
             <tr>
-              <th><i class="fas fa-calendar"></i> Fecha</th>
-              <th><i class="fas fa-clock"></i> Horas</th>
-              <th><i class="fas fa-comment"></i> Justificación</th>
-              <th><i class="fas fa-check-circle"></i> Estado</th>
-              <th><i class="fas fa-cogs"></i> Acciones</th>
+              <th class="p-2">Empleado</th>
+              <th class="p-2">Fecha</th>
+              <th class="p-2">Horas</th>
+              <th class="p-2">Justificación</th>
+              <th class="p-2">Estado</th>
+              <th class="p-2 text-center">Acciones</th>
             </tr>
           </thead>
-          <tbody id="tablaRegistrosTiempo">
-            <tr data-registro="1">
-              <td><strong>05 Agosto 2025</strong></td>
-              <td><span style="font-weight: 600; color: var(--color-acento-interactivo);">2.0 hrs</span></td>
-              <td>Soporte técnico fuera de horario regular</td>
-              <td><span class="etiqueta-estado estado-aprobado">Aprobado</span></td>
-              <td>
-                <div class="acciones-registro">
-                  <button class="accion-ver" onclick="verDetalleRegistro(1)" title="Ver detalles">
-                    <i class="fas fa-eye"></i>
-                  </button>
-                  <button class="accion-borrar" onclick="confirmarBorrarRegistro(1)" title="Borrar registro">
-                    <i class="fas fa-trash-alt"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr data-registro="2">
-              <td><strong>01 Agosto 2025</strong></td>
-              <td><span style="font-weight: 600; color: var(--color-acento-interactivo);">1.0 hrs</span></td>
-              <td>Capacitación especializada del personal</td>
-              <td><span class="etiqueta-estado estado-pendiente">En Revisión</span></td>
-              <td>
-                <div class="acciones-registro">
-                  <button class="accion-ver" onclick="verDetalleRegistro(2)" title="Ver detalles">
-                    <i class="fas fa-eye"></i>
-                  </button>
-                  <button class="accion-borrar" onclick="confirmarBorrarRegistro(2)" title="Borrar registro">
-                    <i class="fas fa-trash-alt"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
+          <tbody class="text-gray-300">
+            {% for r in registros %}
+              <tr class="border-b border-gray-700">
+                <td class="p-2">{{ r.empleado.nombre_completo }}</td>
+                <td class="p-2">{{ r.fecha|date:"d/m/Y" }}</td>
+                <td class="p-2">{{ r.cantidad_horas|floatformat:"-2" }}</td>
+                <td class="p-2">{{ r.justificacion|default:"—" }}</td>
+                <td class="p-2">
+                  {% with est=r.estado|lower %}
+                    {% if est == "aprobado" %}
+                      <span class="px-2 py-1 rounded bg-green-600 text-white text-xs">Aprobado</span>
+                    {% elif est == "en revisión" or est == "en revision" or est == "pendiente" %}
+                      <span class="px-2 py-1 rounded bg-yellow-500 text-black text-xs">En revisión</span>
+                    {% elif est == "rechazado" %}
+                      <span class="px-2 py-1 rounded bg-red-600 text-white text-xs">Rechazado</span>
+                    {% else %}
+                      <span class="px-2 py-1 rounded bg-gray-600 text-white text-xs">{{ r.estado }}</span>
+                    {% endif %}
+                  {% endwith %}
+                </td>
+                <td class="p-2">
+                  <div class="flex flex-nowrap justify-center gap-2">
+                    <!-- Editar -->
+                    <button
+                      class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded whitespace-nowrap"
+                      data-id="{{ r.id_hora_extra }}"
+                      data-empleado="{{ r.empleado.id_empleado }}"
+                      data-fecha="{{ r.fecha|date:'Y-m-d' }}"
+                      data-horas="{{ r.cantidad_horas }}"
+                      data-just="{{ r.justificacion|default_if_none:''|escapejs }}"
+                      data-estado="{{ r.estado }}"
+                      onclick="abrirModalEditar(
+                        this.dataset.id,
+                        this.dataset.empleado,
+                        this.dataset.fecha,
+                        this.dataset.horas,
+                        this.dataset.just,
+                        this.dataset.estado
+                      )">
+                      Editar
+                    </button>
+
+                    <!-- Auditoría de horas extra por empleado -->
+                    <a href="{% url 'auditoria_horas_extras_por_empleado' r.empleado.id_empleado %}"
+                       class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded whitespace-nowrap">
+                      Auditoría
+                    </a>
+
+                    <!-- (Eliminado) Botón Eliminar: NO se muestra en este módulo -->
+                  </div>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="6" class="p-4 text-center text-gray-400">No hay registros de horas extras.</td>
+              </tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
-    </section>
+    </div>
 
-    <!-- Modal de confirmación para borrar -->
-    <div id="modalConfirmacion" class="modal-overlay">
-      <div class="modal-contenido">
-        <div class="modal-icono">
-          <i class="fas fa-exclamation-triangle"></i>
+  </div>
+
+  <!-- Modal Editar -->
+  <div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+    <div class="bg-gray-900 rounded-lg p-6 w-full max-w-lg">
+      <h3 class="text-xl font-bold mb-4 text-white">Editar Registro</h3>
+      <form method="POST" action="{% url 'horasExtras' %}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="editar">
+        <input type="hidden" id="edit_id" name="hora_extra_id">
+
+        <div class="mb-3">
+          <label class="block text-sm mb-1 text-gray-300">Empleado</label>
+          <select id="edit_empleado" name="empleado_id" class="w-full p-2 rounded bg-gray-700 text-white">
+            {% for e in empleados %}
+              <option value="{{ e.id_empleado }}">{{ e.nombre_completo }} — {{ e.cedula }}</option>
+            {% endfor %}
+          </select>
         </div>
-          <h4 class="modal-titulo">Confirmar eliminación</h4>
-          <p class="modal-mensaje">¿Estás seguro de que deseas eliminar este registro de tiempo extra? Esta acción no se puede deshacer.</p>
-          <div class="modal-acciones">
-            <button class="boton-modal boton-confirmar" onclick="eliminarRegistroConfirmado()">Sí, eliminar</button>
-            <button class="boton-modal boton-cancelar" onclick="cerrarModal()">Cancelar</button>
+
+        <div class="flex flex-col md:flex-row md:space-x-4 mb-3">
+          <div class="w-full md:w-1/2">
+            <label class="block text-sm mb-1 text-gray-300">Fecha</label>
+            <input id="edit_fecha" name="fecha" type="date" class="w-full p-2 rounded bg-gray-700 text-white">
+          </div>
+          <div class="w-full md:w-1/2 mt-3 md:mt-0">
+            <label class="block text-sm mb-1 text-gray-300">Horas</label>
+            <input id="edit_horas" name="cantidad_horas" type="number" min="0.5" step="0.5" max="24"
+                   class="w-full p-2 rounded bg-gray-700 text-white">
           </div>
         </div>
-      </div>
 
-      <!-- Sistema de notificación -->
-      <div id="notificacion" class="sistema-notificacion notificacion-info">
-        <div class="contenido-notificacion">
-          <i class="fas fa-bell"></i>
-          <span id="mensajeNotificacion">Tienes citas registradas para hoy.</span>
-          <button class="cerrar-notificacion" onclick="cerrarNotificacion()">
-            <i class="fas fa-times"></i>
+        <div class="mb-3">
+          <label class="block text-sm mb-1 text-gray-300">Justificación</label>
+          <textarea id="edit_just" name="justificacion" rows="3"
+                    class="w-full p-2 rounded bg-gray-700 text-white"></textarea>
+        </div>
+
+        <div class="mb-5">
+          <label class="block text-sm mb-1 text-gray-300">Estado</label>
+          <select id="edit_estado" name="estado" class="w-full p-2 rounded bg-gray-700 text-white">
+            <option value="PENDIENTE">Pendiente</option>
+            <option value="APROBADO">Aprobado</option>
+            <option value="RECHAZADO">Rechazado</option>
+          </select>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="cerrarModalEditar()"
+                  class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-1 px-4 rounded">
+            Cancelar
+          </button>
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-4 rounded">
+            Guardar
           </button>
         </div>
-      </div>
-  </main>
+      </form>
+    </div>
+  </div>
 
   <script>
-    let idParaEliminar = null;
-
-    function confirmarBorrarRegistro(id) {
-      idParaEliminar = id;
-      document.getElementById('modalConfirmacion').classList.add('mostrar');
+    function abrirModalEditar(id, empleado_id, fecha, horas, just, estado){
+      document.getElementById('edit_id').value = id || "";
+      document.getElementById('edit_empleado').value = empleado_id || "";
+      document.getElementById('edit_fecha').value = fecha || "";
+      document.getElementById('edit_horas').value = horas || "";
+      document.getElementById('edit_just').value = just || "";
+      document.getElementById('edit_estado').value = estado || "PENDIENTE";
+      document.getElementById('modalEditar').classList.remove('hidden');
+      document.getElementById('modalEditar').classList.add('flex');
     }
-
-    function cerrarModal() {
-      idParaEliminar = null;
-      document.getElementById('modalConfirmacion').classList.remove('mostrar');
+    function cerrarModalEditar(){
+      document.getElementById('modalEditar').classList.add('hidden');
+      document.getElementById('modalEditar').classList.remove('flex');
     }
-
-    function eliminarRegistroConfirmado() {
-      if (idParaEliminar !== null) {
-        const fila = document.querySelector(`tr[data-registro="${idParaEliminar}"]`);
-        if (fila) {
-          fila.classList.add('fila-eliminando');
-          setTimeout(() => {
-            fila.remove();
-            actualizarContador();
-            mostrarNotificacion("Registro eliminado correctamente.", "exito");
-          }, 500);
-        }
-        cerrarModal();
-      }
-    }
-
-    function verDetalleRegistro(id) {
-      mostrarNotificacion(`Visualizando detalles del registro #${id}`, "info");
-    }
-
-    function mostrarNotificacion(mensaje, tipo = "info") {
-      const notificacion = document.getElementById('notificacion');
-      notificacion.className = `sistema-notificacion notificacion-${tipo} mostrar`;
-      document.getElementById('mensajeNotificacion').innerText = mensaje;
-
-      setTimeout(() => {
-        notificacion.classList.remove('mostrar');
-      }, 5000);
-    }
-
-    function cerrarNotificacion() {
-      document.getElementById('notificacion').classList.remove('mostrar');
-    }
-
-    function actualizarContador() {
-      const total = document.querySelectorAll('#tablaRegistrosTiempo tr').length;
-      document.getElementById('contadorRegistros').innerText = total;
-    }
-
-    // Simulación automática de notificación de citas al cargar
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        mostrarNotificacion("¡Recordatorio! Hoy hay citas programadas.", "info");
-      }, 1000);
-    });
   </script>
 </body>
 </html>

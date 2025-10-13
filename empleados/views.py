@@ -1,11 +1,34 @@
 # empleados/views.py
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from .models import Empleado, EmpleadosAuditoria   # 👈 importa también la auditoría
-from config.decorators import role_required
+from decimal import Decimal, InvalidOperation
 import re
+from django.db.models import Sum
+from django.db.models.functions import Coalesce
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect, render
+from config.decorators import role_required
+from .models import (
+    Empleado,
+    EmpleadosAuditoria,          # auditoría de empleados (ya la tenías)
+    HorasExtras,                 # registros de horas extra
+    HorasExtrasAuditoria,        # 👈 auditoría de horas extra (asegúrate de tener este modelo)
+)
+
+# =========================
+# Utilidades
+# =========================
+def _to_decimal(val: str) -> Decimal:
+    """
+    Convierte '3,5' o '3.5' a Decimal('3.5').
+    Lanza InvalidOperation si no es válido.
+    """
+    if val is None:
+        raise InvalidOperation()
+    return Decimal(str(val).strip().replace(",", "."))
 
 
+# =========================
+# Empleados (CRUD básico)
+# =========================
 @role_required(["Administrador"])
 def empleados_view(request):
     empleados = Empleado.objects.all().order_by("nombre_completo")
@@ -13,7 +36,7 @@ def empleados_view(request):
     if request.method == "POST":
         action = request.POST.get("action")
 
-        # ---------------- CREAR ----------------
+        # -------- CREAR --------
         if action == "crear":
             nombre = request.POST.get("nombre_completo", "").strip()
             email = request.POST.get("email", "").strip()
@@ -39,11 +62,12 @@ def empleados_view(request):
                     direccion=direccion or None,
                     fecha_contratacion=fecha,
                 )
-                empleado._usuario_email = request.session.get("usuario_email")  # 👈 para signals
+                # para auditoría en signals
+                empleado._usuario_email = request.session.get("usuario_email")
                 empleado.save()
                 messages.success(request, "✅ Empleado creado correctamente.")
 
-        # ---------------- EDITAR ----------------
+        # -------- EDITAR --------
         elif action == "editar":
             empleado_id = request.POST.get("empleado_id")
             empleado = get_object_or_404(Empleado, id_empleado=empleado_id)
@@ -70,15 +94,15 @@ def empleados_view(request):
                 empleado.telefono = nuevo_telefono or None
                 empleado.direccion = nueva_direccion or None
                 empleado.fecha_contratacion = nueva_fecha
-                empleado._usuario_email = request.session.get("usuario_email")  # 👈 para signals
+                empleado._usuario_email = request.session.get("usuario_email")
                 empleado.save()
                 messages.success(request, "✏️ Empleado editado correctamente.")
 
-        # ---------------- ELIMINAR ----------------
+        # -------- ELIMINAR --------
         elif action == "eliminar":
             empleado_id = request.POST.get("empleado_id")
             empleado = get_object_or_404(Empleado, id_empleado=empleado_id)
-            empleado._usuario_email = request.session.get("usuario_email")  # 👈 para signals
+            empleado._usuario_email = request.session.get("usuario_email")
             empleado.delete()
             messages.success(request, "🗑️ Empleado eliminado correctamente.")
 
@@ -87,24 +111,199 @@ def empleados_view(request):
     return render(request, "empleados/empleados.html", {"empleados": empleados})
 
 
-# -------------------------------
-# AUDITORÍA DE UN EMPLEADO
-# -------------------------------
+# =========================
+# Horas extras (Admin)
+# =========================
 @role_required(["Administrador"])
-def auditoria_empleado(request, empleado_id):
-    # (si tu login propio usa sesión, puedes validar aquí también)
-    # if not request.session.get("usuario_id"):
-    #     return redirect("login")
+def horas_extras_admin(request):
+    empleados = Empleado.objects.all().order_by("nombre_completo")
 
-    empleado = get_object_or_404(Empleado, id_empleado=empleado_id)
-    auditoria = EmpleadosAuditoria.objects.filter(empleado=empleado).order_by("-fecha")
+    if request.method == "POST":
+        action = (request.POST.get("action") or "crear").strip().lower()
+
+        # ---------- CREAR ----------
+        if action == "crear":
+            emp_id = request.POST.get("empleado_id")
+            fecha = request.POST.get("fecha")
+            horas_raw = (request.POST.get("cantidad_horas") or "").strip()
+            just = (request.POST.get("justificacion") or "").strip()
+            estado = (request.POST.get("estado") or "").strip()
+
+            if not emp_id or not fecha or not horas_raw or not estado:
+                messages.error(request, "⚠️ Empleado, fecha, horas y estado son obligatorios.")
+                return redirect("horasExtras")
+
+            empleado = get_object_or_404(Empleado, id_empleado=emp_id)
+
+            # aceptar 3,5 o 3.5
+            try:
+                horas_dec = Decimal(horas_raw.replace(",", "."))
+            except (InvalidOperation, TypeError):
+                messages.error(request, "⚠️ La cantidad de horas no es un número válido.")
+                return redirect("horasExtras")
+
+            if horas_dec <= 0:
+                messages.error(request, "⚠️ La cantidad de horas debe ser mayor que 0.")
+                return redirect("horasExtras")
+            if horas_dec > Decimal("24"):
+                messages.error(request, "⚠️ Máximo permitido: 24 horas por registro.")
+                return redirect("horasExtras")
+
+            ESTADOS = {
+                "aprobado": "Aprobado",
+                "en revisión": "En revisión",
+                "en revision": "En revisión",
+                "rechazado": "Rechazado",
+                "pendiente": "Pendiente",
+                "aprobado": "Aprobado",
+            }
+            estado_norm = ESTADOS.get(estado.lower(), estado)
+
+            # ¡Crear en dos pasos para setear _usuario_email antes del save!
+            registro = HorasExtras(
+                empleado=empleado,
+                fecha=fecha,
+                cantidad_horas=horas_dec,
+                justificacion=just or None,
+                estado=estado_norm,
+            )
+            registro._usuario_email = request.session.get("usuario_email")
+            registro.save()
+
+            messages.success(request, "✅ Horas extras registradas correctamente.")
+            return redirect("horasExtras")
+
+        # ---------- EDITAR (opcional, si ya lo usas desde el modal) ----------
+        elif action == "editar":
+            he_id = request.POST.get("hora_extra_id")
+            emp_id = request.POST.get("empleado_id")
+            fecha = request.POST.get("fecha")
+            horas_raw = (request.POST.get("cantidad_horas") or "").strip()
+            just = (request.POST.get("justificacion") or "").strip()
+            estado = (request.POST.get("estado") or "").strip()
+
+            registro = get_object_or_404(HorasExtras, id_hora_extra=he_id)
+            empleado = get_object_or_404(Empleado, id_empleado=emp_id)
+
+            try:
+                horas_dec = Decimal(horas_raw.replace(",", "."))
+            except (InvalidOperation, TypeError):
+                messages.error(request, "⚠️ La cantidad de horas no es un número válido.")
+                return redirect("horasExtras")
+
+            ESTADOS = {
+                "aprobado": "Aprobado",
+                "en revisión": "En revisión",
+                "en revision": "En revisión",
+                "rechazado": "Rechazado",
+                "pendiente": "Pendiente",
+            }
+            estado_norm = ESTADOS.get(estado.lower(), estado)
+
+            registro.empleado = empleado
+            registro.fecha = fecha
+            registro.cantidad_horas = horas_dec
+            registro.justificacion = just or None
+            registro.estado = estado_norm
+            registro._usuario_email = request.session.get("usuario_email")
+            registro.save()
+
+            messages.success(request, "✏️ Registro actualizado.")
+            return redirect("horasExtras")
+
+        # ---------- CUALQUIER OTRA ACCIÓN ----------
+        else:
+            messages.error(request, "Acción no soportada.")
+            return redirect("horasExtras")
+
+    # GET -> historial para la tabla
+    registros = (
+        HorasExtras.objects
+        .select_related("empleado")
+        .order_by("-fecha", "-id_hora_extra")[:200]
+    )
 
     return render(
         request,
-        "empleados/auditoria_empleado.html",
-        {
-            "empleado": empleado,
-            "auditoria": auditoria,
-        },
+        "empleados/horasExtras.html",
+        {"empleados": empleados, "registros": registros},
     )
 
+
+# =========================
+# Auditoría
+# =========================
+@role_required(["Administrador"])
+def auditoria_empleado(request, empleado_id):
+    empleado = get_object_or_404(Empleado, id_empleado=empleado_id)
+    auditoria = EmpleadosAuditoria.objects.filter(empleado=empleado).order_by("-fecha")
+    return render(
+        request,
+        "empleados/auditoria_empleado.html",
+        {"empleado": empleado, "auditoria": auditoria},
+    )
+
+
+@role_required(["Administrador"])
+def auditoria_horas_extras_por_empleado(request, empleado_id):
+    """
+    Muestra la auditoría de horas extra de un empleado específico.
+    Requiere el modelo HorasExtrasAuditoria con campos:
+      - empleado (FK Empleado, nullable)
+      - usuario_email (char, nullable)
+      - accion (char)
+      - fecha (datetime)
+      - fecha_registro (date), cantidad_horas (decimal), justificacion (char), estado (char)  # snapshot
+    """
+    empleado = get_object_or_404(Empleado, id_empleado=empleado_id)
+    logs = (
+        HorasExtrasAuditoria.objects
+        .filter(empleado=empleado)
+        .order_by("-fecha")[:300]
+    )
+
+    return render(
+        request,
+        "empleados/auditoria_horas_extras.html",
+        {"empleado": empleado, "logs": logs},
+    )
+
+@role_required(["Oficial"])
+def consultar_horas_extras_oficial(request):
+    usuario_email = request.session.get("usuario_email")
+    empleado = Empleado.objects.filter(email=usuario_email).first() if usuario_email else None
+
+    if not empleado:
+        messages.warning(
+            request,
+            "No se encontró un empleado asociado a tu cuenta. "
+            "Contacta al administrador para vincular tu usuario con un empleado."
+        )
+        registros = []
+        total_horas = Decimal("0")
+        ultima_actualizacion = None
+    else:
+        registros = (HorasExtras.objects
+                     .select_related("empleado")
+                     .filter(empleado=empleado)
+                     .order_by("-fecha", "-id_hora_extra"))
+
+        # total de horas (maneja None -> 0)
+        total_horas = registros.aggregate(
+            total=Coalesce(Sum("cantidad_horas"), Decimal("0"))
+        )["total"]
+
+        # última actualización (registro más reciente por fecha/id)
+        ultimo = registros.first()
+        ultima_actualizacion = ultimo.fecha if ultimo else None
+
+    return render(
+        request,
+        "Empleado/consultarHorasExtras.html",
+        {
+            "empleado": empleado,
+            "registros": registros,
+            "total_horas": total_horas,
+            "ultima_actualizacion": ultima_actualizacion,
+        },
+    )
