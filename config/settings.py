@@ -87,7 +87,7 @@ DATABASES = {
         'NAME': 'SESSIS',
         'USER': '',      # vacío porque usas Trusted_Connection
         'PASSWORD': '',
-        'HOST': '',
+        'HOST': 'AKILES08CR\\SQLEXPRESS',
         'PORT': '',
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
