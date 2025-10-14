@@ -14,6 +14,59 @@
       background-size: cover;
       min-height: 100vh;
     }
+
+    .alert-error {
+      background-color: rgba(255, 0, 0, 0.15);
+      color: #ff4d4d;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-success {
+      background-color: rgba(0, 128, 0, 0.15);
+      color: #4dff4d;
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-error2 {
+      background-color: rgba(255, 0, 0, 0.15);
+      color: #1f2937;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-success2 {
+      background-color: rgba(0, 128, 0, 0.15);
+      color: #1f2937;
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
   </style>
 </head>
 
@@ -23,24 +76,20 @@
   <div class="fondo">
     <div class="flex flex-col items-center justify-start py-8">
 
-      <!-- Mensajes -->
-      {% if messages %}
-        <div class="w-full max-w-[1000px] mb-6">
-          {% for message in messages %}
-            <div class="p-3 mb-2 rounded 
-                        {% if message.tags == 'success' %} bg-green-600 
-                        {% elif message.tags == 'error' %} bg-red-600 
-                        {% elif message.tags == 'warning' %} bg-yellow-500 text-black 
-                        {% else %} bg-gray-800 {% endif %}">
-              {{ message }}
-            </div>
-          {% endfor %}
-        </div>
-      {% endif %}
-
       <!-- Formulario de Registro -->
       <div class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7">
         <h2 class="text-2xl font-bold text-gray-200 mb-4">Registro de empleado</h2>
+        {% if messages %}
+        {% for message in messages %}
+        {% if 'crear' in message.tags %}
+        {% if 'success' in message.tags %}
+        <div class="alert-success">{{ message }}</div>
+        {% else %}
+        <div class="alert-error">{{ message }}</div>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
         <form method="POST" class="flex flex-col">
           {% csrf_token %}
           <input type="hidden" name="action" value="crear">
@@ -75,9 +124,23 @@
       </div>
 
       <!-- Listado -->
-      <div class="w-full max-w-[1000px] p-6">
+      <div class="w-full max-w-[1300px] p-6">
+        <!--Listado de Empleado -->
+
         <h2 class="text-xl font-bold text-gray-200 mt-8 mb-4">Lista de Empleados</h2>
+        
         <div class="overflow-x-auto">
+        {% if messages %}
+        {% for message in messages %}
+        {% if 'editar' in message.tags or 'eliminar' in message.tags %}
+        {% if 'success' in message.tags %}
+        <div class="alert-success2">{{ message }}</div>
+        {% else %}
+        <div class="alert-error2">{{ message }}</div>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
           <table class="min-w-full bg-gray-800 rounded-lg overflow-hidden">
             <thead class="bg-gray-700 text-gray-200">
               <tr>
@@ -189,6 +252,7 @@
   </div>
 
   <script>
+
     function abrirModalDesdeDataset(btn) {
       document.getElementById('modal').classList.remove('hidden');
       document.getElementById('modal').classList.add('flex');
@@ -206,12 +270,32 @@
       const m = document.getElementById('modal');
       m.classList.add('hidden');
       m.classList.remove('flex');
+
+    function abrirModal(id, nombre, email, cedula, telefono, direccion, fecha) {
+      document.getElementById('modal').classList.remove('hidden');
+      document.getElementById('modal').classList.add('flex');
+
+      document.getElementById('id_empleado').value = id;
+      document.getElementById('edit_nombre').value = nombre;
+      document.getElementById('edit_email').value = email;
+      document.getElementById('edit_cedula').value = cedula;
+      document.getElementById('edit_telefono').value = telefono;
+      document.getElementById('edit_direccion').value = direccion;
+      document.getElementById('edit_fecha').value = fecha;
+    }
+
+    function cerrarModal() {
+      document.getElementById('modal').classList.add('hidden');
+      document.getElementById('modal').classList.remove('flex');
+
     }
 
     function confirmarEliminar() {
       return confirm("¿Seguro que quieres eliminar este empleado?");
     }
+
+  }
   </script>
 </body>
-</html>
 
+</html>

@@ -21,6 +21,59 @@
       background-size: cover;
       height: 90vh;
     }
+
+    .alert-error {
+      background-color: rgba(255, 0, 0, 0.15);
+      color: #ff4d4d;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-success {
+      background-color: rgba(0, 128, 0, 0.15);
+      color: #4dff4d;
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-error2 {
+      background-color: rgba(255, 0, 0, 0.15);
+      color: #fff;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-success2 {
+      background-color: rgba(0, 128, 0, 0.15);
+      color: #fff;
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
   </style>
 </head>
 
@@ -34,6 +87,17 @@
       <!-- CREAR INVENTARIO -->
       <div class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7">
         <h2 class="text-2xl font-bold text-gray-200 mb-4">Registro de equipo de inventario</h2>
+        {% if messages %}
+        {% for message in messages %}
+        {% if 'crear' in message.tags %}
+        {% if 'success' in message.tags %}
+        <div class="alert-success">{{ message }}</div>
+        {% else %}
+        <div class="alert-error">{{ message }}</div>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
         <form method="POST" class="flex flex-col">
           {% csrf_token %}
           <input type="hidden" name="action" value="crear">
@@ -69,6 +133,18 @@
       <!-- LISTA INVENTARIOS -->
       <div class="p-6">
         <h2 class="text-2xl font-bold mb-4 text-white">Lista de Inventario</h2>
+        <div class="overflow-x-auto">
+        {% if messages %}
+        {% for message in messages %}
+        {% if 'editar' in message.tags or 'eliminar' in message.tags %}
+        {% if 'success' in message.tags %}
+        <div class="alert-success2">{{ message }}</div>
+        {% else %}
+        <div class="alert-error2">{{ message }}</div>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
         <table
           class="table-auto max-w-[1350px] w-full text-left border-collapse border border-gray-600 text-gray-200 bg-gray-900 bg-opacity-80 backdrop-blur-md rounded-[20px] overflow-hidden">
           <thead class="bg-gray-700">

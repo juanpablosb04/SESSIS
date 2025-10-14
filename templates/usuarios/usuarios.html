@@ -13,6 +13,32 @@
       background-position: center;
       min-height: 100vh;
     }
+
+    .alert-error {
+      background-color: rgba(255, 0, 0, 0.15);
+      color: #ff4d4d;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-success {
+      background-color: rgba(0, 128, 0, 0.15);
+      color: #4dff4d;
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
   </style>
 </head>
 <body>
@@ -24,6 +50,17 @@
   <!-- Formulario de registro -->
   <div class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7 mb-10">
     <h2 class="text-2xl font-bold text-gray-200 mb-4">Registro de Usuarios</h2>
+    {% if messages %}
+        {% for message in messages %}
+        {% if 'crear' in message.tags %}
+        {% if 'success' in message.tags %}
+        <div class="alert-success">{{ message }}</div>
+        {% else %}
+        <div class="alert-error">{{ message }}</div>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
     <form method="POST" action="" class="flex flex-col space-y-4" autocomplete="off">
       {% csrf_token %}
       <input type="hidden" name="action" value="crear">
@@ -62,6 +99,17 @@
   <!-- Tabla de usuarios -->
   <div class="w-full max-w-[1000px] bg-gray-800 rounded-lg shadow-md p-7">
     <h2 class="text-2xl font-bold text-gray-200 mb-4">Lista de Usuarios</h2>
+    {% if messages %}
+        {% for message in messages %}
+        {% if 'editar' in message.tags or 'eliminar' in message.tags %}
+        {% if 'success' in message.tags %}
+        <div class="alert-success">{{ message }}</div>
+        {% else %}
+        <div class="alert-error">{{ message }}</div>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
     <table class="w-full text-left border border-gray-600">
       <thead class="bg-gray-700 text-gray-200">
         <tr>
