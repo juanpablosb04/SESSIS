@@ -228,6 +228,29 @@ CREATE TABLE dbo.Empleados_Auditoria_TB (
 GO
 
 
+CREATE TABLE dbo.HorasExtras_Auditoria_TB
+(
+    id_auditoria      INT IDENTITY(1,1) PRIMARY KEY,
+    hora_extra_id     INT            NULL,
+    empleado_id       INT            NULL,
+    usuario_email     VARCHAR(255)   NULL,
+    accion            VARCHAR(50)    NOT NULL,      -- CREAR / MODIFICAR / ELIMINAR
+    fecha             DATETIME2(0)   NOT NULL DEFAULT SYSUTCDATETIME(),
+    -- snapshot
+    empleado_nombre   VARCHAR(255)   NULL,
+    empleado_cedula   VARCHAR(50)    NULL,
+    fecha_registro    DATE           NULL,
+    cantidad_horas    DECIMAL(5,2)   NULL,
+    justificacion     VARCHAR(MAX)   NULL,
+    estado            VARCHAR(50)    NULL,
+
+    -- Foreign Keys
+    CONSTRAINT FK_HX_AUD_HX  FOREIGN KEY (hora_extra_id) REFERENCES dbo.HorasExtras(id_hora_extra),
+    CONSTRAINT FK_HX_AUD_EMP FOREIGN KEY (empleado_id)   REFERENCES dbo.Empleado(id_empleado)
+);
+GO
+
+
 -- ==========================================
 -- INSERTS PARA EMPLEADO
 -- ==========================================
