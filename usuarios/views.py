@@ -4,11 +4,11 @@ from .models import Usuario, AuditoriaUsuario
 from config.decorators import role_required
 from empleados.models import Empleado
 
-# Lista de roles
-ROLES = [
-    (1, "Administrador"),
-    (2, "Oficial")
-]
+# Diccionario de roles
+ROLES = {
+    1: "Administrador",
+    2: "Oficial"
+}
 
 # ========================
 # LISTA, CREAR, EDITAR, ELIMINAR USUARIOS
@@ -50,7 +50,7 @@ def lista_usuarios(request):
             usuario.email = request.POST["email"]
 
             nueva_password = request.POST["password"]
-            if nueva_password.strip():  # Solo actualiza si tiene valor
+            if nueva_password.strip():
                 usuario.password = nueva_password
 
             usuario.estado = request.POST.get("estado", "")
@@ -71,7 +71,6 @@ def lista_usuarios(request):
 
         elif action == "eliminar":
             usuario = get_object_or_404(Usuario, id_usuario=request.POST["usuario_id"])
-            # Registrar auditoría antes de eliminar
             AuditoriaUsuario.objects.create(
                 usuario_afectado=usuario,
                 usuario_accion=usuario_actual,
@@ -90,7 +89,7 @@ def lista_usuarios(request):
     return render(
         request,
         "usuarios/usuarios.html",
-        {"usuarios": usuarios, "empleados": empleados, "roles": ROLES}
+        {"usuarios": usuarios, "empleados": empleados, "roles": ROLES.items()}
     )
 
 
@@ -101,8 +100,10 @@ def lista_usuarios(request):
 def auditoria_usuario(request, id_usuario):
     usuario = get_object_or_404(Usuario, id_usuario=id_usuario)
     auditoria = AuditoriaUsuario.objects.filter(usuario_afectado=usuario).order_by('-fecha')
+
     return render(
         request,
         "usuarios/auditoria_usuario.html",
         {"usuario": usuario, "auditoria": auditoria}
     )
+
