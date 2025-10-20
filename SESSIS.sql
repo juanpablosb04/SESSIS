@@ -15,8 +15,10 @@ CREATE TABLE Empleado (
     cedula VARCHAR(50) NOT NULL UNIQUE,
     telefono VARCHAR(50),
     direccion VARCHAR(250),
-    fecha_contratacion DATE NOT NULL
+    fecha_contratacion DATE NOT NULL,
+    estado BIT NOT NULL DEFAULT 1
 );
+
 
 -- ==============================
 -- TABLA REPORTE INCIDENTES

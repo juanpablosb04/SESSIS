@@ -5,26 +5,37 @@ import re
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 from django.contrib import messages
-from .models import Empleado, EmpleadosAuditoria   # 👈 importa también la auditoría
+from .models import Empleado, EmpleadosAuditoria
 from config.decorators import role_required
 from .models import (
     Empleado,
-    EmpleadosAuditoria,          # auditoría de empleados (ya la tenías)
-    HorasExtras,                 # registros de horas extra
-    HorasExtrasAuditoria,        # 👈 auditoría de horas extra (asegúrate de tener este modelo)
+    EmpleadosAuditoria,
+    HorasExtras,
+    HorasExtrasAuditoria,
 )
 
 # =========================
 # Utilidades
 # =========================
 def _to_decimal(val: str) -> Decimal:
-    """
-    Convierte '3,5' o '3.5' a Decimal('3.5').
-    Lanza InvalidOperation si no es válido.
-    """
     if val is None:
         raise InvalidOperation()
     return Decimal(str(val).strip().replace(",", "."))
+
+def _parse_bool(value, fallback=False):
+    if value is None:
+        return fallback
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, int):
+        return value != 0
+    if isinstance(value, str):
+        value = value.strip().lower()
+        if value in ("1", "true", "t", "yes", "y", "on", "activo", "active"):
+            return True
+        if value in ("0", "false", "f", "no", "n", "off", "inactivo", "inactive"):
+            return False
+    return fallback
 
 
 # =========================
@@ -104,19 +115,28 @@ def empleados_view(request):
 
                 messages.success(request, "✏️ Empleado editado correctamente.", extra_tags='editar')
 
-
-
-        # -------- ELIMINAR --------
-        elif action == "eliminar":
+            # ---------------- CAMBIAR ESTADO (Activo/Inactivo) ----------------
+        elif action == "cambiar_estado":
             empleado_id = request.POST.get("empleado_id")
             empleado = get_object_or_404(Empleado, id_empleado=empleado_id)
-            empleado._usuario_email = request.session.get("usuario_email")
-            empleado.delete()
 
-            messages.success(request, "🗑️ Empleado eliminado correctamente.", extra_tags='eliminar')
+            # Si el form envía 'estado' lo usamos; si no, hacemos toggle
+            raw = request.POST.get("estado", request.POST.get("activo"))
+            nuevo_estado = _parse_bool(raw, fallback=not empleado.estado)
 
+            empleado.estado = nuevo_estado
+            empleado._usuario_email = request.session.get("usuario_email")  # para auditoría (si lo usas igual que clientes)
+            empleado.save()
 
-        return redirect("empleados")
+            messages.success(
+                request,
+                f"🔁 Estado del empleado actualizado a {'Activo' if nuevo_estado else 'Inactivo'} correctamente",
+                extra_tags='editar'
+            )
+
+            # Redirige siempre para evitar re-envío del form
+            return redirect("empleados")
+
 
     return render(request, "empleados/empleados.html", {"empleados": empleados})
 

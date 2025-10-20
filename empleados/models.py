@@ -10,10 +10,12 @@ class Empleado(models.Model):
     telefono = models.CharField(max_length=50, db_collation='Modern_Spanish_CI_AS', blank=True, null=True)
     direccion = models.CharField(max_length=250, db_collation='Modern_Spanish_CI_AS', blank=True, null=True)
     fecha_contratacion = models.DateField()
+    estado = models.BooleanField(default=True)
 
     class Meta:
         managed = False
         db_table = 'Empleado'
+
 
 
 class EmpleadosAuditoria(models.Model):

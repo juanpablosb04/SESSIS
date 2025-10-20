@@ -124,92 +124,99 @@
       </div>
 
       <!-- Listado -->
-      <div class="w-full max-w-[1300px] p-6">
-        <!--Listado de Empleado -->
+<div class="w-full max-w-[1300px] p-6">
+  <!--Listado de Empleado -->
+  <h2 class="text-xl font-bold text-gray-200 mt-8 mb-4">Lista de Empleados</h2>
+  
+  <div class="overflow-x-auto">
+    {% if messages %}
+      {% for message in messages %}
+        {% if 'editar' in message.tags or 'eliminar' in message.tags or 'cambiar_estado' in message.tags %}
+          {% if 'success' in message.tags %}
+            <div class="alert-success2">{{ message }}</div>
+          {% else %}
+            <div class="alert-error2">{{ message }}</div>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
 
-        <h2 class="text-xl font-bold text-gray-200 mt-8 mb-4">Lista de Empleados</h2>
-        
-        <div class="overflow-x-auto">
-        {% if messages %}
-        {% for message in messages %}
-        {% if 'editar' in message.tags or 'eliminar' in message.tags %}
-        {% if 'success' in message.tags %}
-        <div class="alert-success2">{{ message }}</div>
-        {% else %}
-        <div class="alert-error2">{{ message }}</div>
-        {% endif %}
-        {% endif %}
+    <table class="min-w-full bg-gray-800 rounded-lg overflow-hidden">
+      <thead class="bg-gray-700 text-gray-200">
+        <tr>
+          <th class="px-4 py-2 text-left">Nombre</th>
+          <th class="px-4 py-2 text-left">Correo</th>
+          <th class="px-4 py-2 text-left">Cédula</th>
+          <th class="px-4 py-2 text-left">Teléfono</th>
+          <th class="px-4 py-2 text-left">Dirección</th>
+          <th class="px-4 py-2 text-left">Fecha Contratación</th>
+          <th class="px-4 py-2 text-left">Estado</th>
+          <th class="px-4 py-2 text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="text-gray-300">
+        {% for empleado in empleados %}
+        <tr class="border-b border-gray-700">
+          <td class="px-4 py-2">{{ empleado.nombre_completo }}</td>
+          <td class="px-4 py-2">{{ empleado.email }}</td>
+          <td class="px-4 py-2">{{ empleado.cedula }}</td>
+          <td class="px-4 py-2">{{ empleado.telefono|default:"—" }}</td>
+          <td class="px-4 py-2">{{ empleado.direccion|default:"—" }}</td>
+          <td class="px-4 py-2">{{ empleado.fecha_contratacion|date:"Y-m-d" }}</td>
+          <td class="px-4 py-2">
+            {% if empleado.estado %}
+              <span class="px-2 py-1 rounded bg-green-600 text-white text-xs">Activo</span>
+            {% else %}
+              <span class="px-2 py-1 rounded bg-red-600 text-white text-xs">Inactivo</span>
+            {% endif %}
+          </td>
+          <td class="px-4 py-2">
+            <div class="flex flex-nowrap justify-center gap-2">
+
+              <!-- Editar con data-* (escapado seguro) -->
+              <button
+                class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
+                data-id="{{ empleado.id_empleado }}"
+                data-nombre="{{ empleado.nombre_completo|escapejs }}"
+                data-email="{{ empleado.email|escapejs }}"
+                data-cedula="{{ empleado.cedula|escapejs }}"
+                data-telefono="{{ empleado.telefono|default_if_none:''|escapejs }}"
+                data-direccion="{{ empleado.direccion|default_if_none:''|escapejs }}"
+                data-fecha="{{ empleado.fecha_contratacion|date:'Y-m-d' }}"
+                onclick="abrirModalDesdeDataset(this)"
+              >
+                Editar
+              </button>
+
+              <!-- Activar / Inactivar (toggle; no enviamos 'estado' para que la vista alterne) -->
+              <form method="POST" action="{% url 'empleados' %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="cambiar_estado">
+                <input type="hidden" name="empleado_id" value="{{ empleado.id_empleado }}">
+                <button type="submit"
+                        class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded whitespace-nowrap">
+                  {% if empleado.estado %} Inactivar {% else %} Activar {% endif %}
+                </button>
+              </form>
+
+              <!-- Auditoría -->
+              <a href="{% url 'auditoria_empleado' empleado.id_empleado %}"
+                 class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">
+                Auditoría
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" class="px-4 py-2 text-center text-gray-400">No hay empleados registrados</td>
+        </tr>
         {% endfor %}
-        {% endif %}
-          <table class="min-w-full bg-gray-800 rounded-lg overflow-hidden">
-            <thead class="bg-gray-700 text-gray-200">
-              <tr>
-                <th class="px-4 py-2 text-left">Nombre</th>
-                <th class="px-4 py-2 text-left">Correo</th>
-                <th class="px-4 py-2 text-left">Cédula</th>
-                <th class="px-4 py-2 text-left">Teléfono</th>
-                <th class="px-4 py-2 text-left">Dirección</th>
-                <th class="px-4 py-2 text-left">Fecha Contratación</th>
-                <th class="px-4 py-2 text-center">Acciones</th>
-              </tr>
-            </thead>
-            <tbody class="text-gray-300">
-              {% for empleado in empleados %}
-              <tr class="border-b border-gray-700">
-                <td class="px-4 py-2">{{ empleado.nombre_completo }}</td>
-                <td class="px-4 py-2">{{ empleado.email }}</td>
-                <td class="px-4 py-2">{{ empleado.cedula }}</td>
-                <td class="px-4 py-2">{{ empleado.telefono|default:"—" }}</td>
-                <td class="px-4 py-2">{{ empleado.direccion|default:"—" }}</td>
-                <td class="px-4 py-2">{{ empleado.fecha_contratacion|date:"Y-m-d" }}</td>
-                <td class="px-4 py-2">
-                  <div class="flex flex-nowrap justify-center gap-2">
-
-                    <!-- Editar con data-* (escapado seguro) -->
-                    <button
-                      class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
-                      data-id="{{ empleado.id_empleado }}"
-                      data-nombre="{{ empleado.nombre_completo|escapejs }}"
-                      data-email="{{ empleado.email|escapejs }}"
-                      data-cedula="{{ empleado.cedula|escapejs }}"
-                      data-telefono="{{ empleado.telefono|default_if_none:''|escapejs }}"
-                      data-direccion="{{ empleado.direccion|default_if_none:''|escapejs }}"
-                      data-fecha="{{ empleado.fecha_contratacion|date:'Y-m-d' }}"
-                      onclick="abrirModalDesdeDataset(this)"
-                    >
-                      Editar
-                    </button>
-
-                    <!-- Eliminar -->
-                    <form method="POST" onsubmit="return confirmarEliminar()">
-                      {% csrf_token %}
-                      <input type="hidden" name="action" value="eliminar">
-                      <input type="hidden" name="empleado_id" value="{{ empleado.id_empleado }}">
-                      <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">
-                        Eliminar
-                      </button>
-                    </form>
-
-                    <!-- Auditoría -->
-                    <a href="{% url 'auditoria_empleado' empleado.id_empleado %}"
-                       class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">
-                      Auditoría
-                    </a>
-                  </div>
-                </td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="7" class="px-4 py-2 text-center text-gray-400">No hay empleados registrados</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-    </div>
+      </tbody>
+    </table>
   </div>
+</div>
+
 
   <!-- Modal Editar -->
   <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
