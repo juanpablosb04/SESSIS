@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registro de Asistencia</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-image: url('static/Img/registrarAsistenciaFondo.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+  </style>
+</head>
+<body class="bg-gray-900">
+  <div id="navbar"></div>
+
+  <div class="flex items-center justify-center mt-8">
+    <div class="w-full max-w-3xl bg-gray-800 rounded-lg shadow-md p-8">
+      <h2 class="text-2xl font-bold text-gray-200 mb-6 text-center">Registro de Asistencia</h2>
+      
+      <form id="formAsistencia" class="flex flex-col space-y-4 text-gray-200">
+        
+        <div>
+          <label class="block mb-1 font-semibold">Fecha</label>
+          <input type="date" class="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+        </div>
+
+        <div>
+          <label class="block mb-1 font-semibold">Cantidad de oficiales</label>
+          <input type="number" id="cantidadOficiales" min="1" max="20" class="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+        </div>
+
+        <div id="nombresOficialesContainer" class="space-y-2"></div>
+
+        <div>
+          <label class="block mb-1 font-semibold">Turno de ingreso</label>
+          <select class="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            <option value="">Seleccione un turno</option>
+            <option value="06-14">06:00 a 14:00</option>
+            <option value="14-22">14:00 a 22:00</option>
+            <option value="22-06">22:00 a 06:00</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block mb-1 font-semibold">Ubicación del puesto</label>
+          <input type="text" class="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+        </div>
+
+        <div>
+          <label class="block mb-1 font-semibold">Observaciones</label>
+          <textarea rows="3" class="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+        </div>
+
+        <div class="flex justify-center space-x-4 mt-6">
+          <button type="submit"
+            class="w-1/2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded font-semibold transition">
+            Registrar Asistencia
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+  const cantidadInput = document.getElementById('cantidadOficiales');
+  const container = document.getElementById('nombresOficialesContainer');
+
+  cantidadInput.addEventListener('input', () => {
+    container.innerHTML = '';
+    const cantidad = parseInt(cantidadInput.value);
+    if (!isNaN(cantidad) && cantidad > 0 && cantidad <= 20) {
+      for (let i = 1; i <= cantidad; i++) {
+        const labelCodigo = document.createElement('label');
+        labelCodigo.textContent = `Código del Oficial ${i}`;
+        labelCodigo.className = 'block mt-4 font-semibold';
+
+        const inputCodigo = document.createElement('input');
+        inputCodigo.type = 'text';
+        inputCodigo.placeholder = `Código del Oficial ${i}`;
+        inputCodigo.className = 'w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500';
+        inputCodigo.required = true;
+
+        const labelNombre = document.createElement('label');
+        labelNombre.textContent = `Nombre del Oficial ${i}`;
+        labelNombre.className = 'block mt-2 font-semibold';
+
+        const inputNombre = document.createElement('input');
+        inputNombre.type = 'text';
+        inputNombre.placeholder = `Nombre del Oficial ${i}`;
+        inputNombre.className = 'w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500';
+        inputNombre.required = true;
+
+        container.appendChild(labelCodigo);
+        container.appendChild(inputCodigo);
+        container.appendChild(labelNombre);
+        container.appendChild(inputNombre);
+      }
+    }
+  });
+</script>
+<script>
+  document.getElementById("formAsistencia").addEventListener("submit", function(event) {
+    event.preventDefault(); // Evita que recargue la página
+
+    const ahora = new Date();
+    const hora = ahora.toLocaleTimeString(); // Hora en formato local
+
+    alert(`Gracias, buen turno.\nHora de ingreso: ${hora}`);
+    
+    // Aquí podrías enviar el formulario al backend si lo necesitas
+    // this.submit();  // Descomentar si quieres que se envíe después del mensaje
+  });
+</script>
+
+
+
+  <script src="/static/JS/navbarEmpleados.js"></script>
+</body>
+</html>

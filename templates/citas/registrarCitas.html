@@ -1,0 +1,83 @@
+{% load static %} 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrar Cita</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; }
+    .fondo {
+      background-image: url("{% static 'Img/empleadosFondo.png' %}");
+      background-size: cover;
+      background-position: center;
+      min-height: 1080px;
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-900">
+
+{% include "includes/navbar.html" %}
+
+<div class="fondo p-8 flex flex-col items-center">
+
+  <!-- FORMULARIO REGISTRO CITA -->
+  <div id="formulario-cita" class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7 mb-10">
+    <h2 class="text-2xl font-bold text-gray-200 mb-4">Registrar Cita</h2>
+    <form method="POST" action="" class="space-y-4">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="crear">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- CLIENTE -->
+        <div>
+          <label for="id_cliente" class="text-gray-200 font-semibold">Cliente</label>
+          <select name="id_cliente" id="id_cliente" required class="p-2 rounded bg-gray-700 text-white w-full">
+            <option value="">Seleccione Cliente</option>
+            {% for cliente in clientes %}
+              <option value="{{ cliente.id_cliente }}">{{ cliente.nombre_completo }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- FECHA -->
+        <div>
+          <label for="fecha_cita" class="text-gray-200 font-semibold">Fecha de la Cita</label>
+          <input type="date" name="fecha_cita" id="fecha_cita" required class="p-2 rounded bg-gray-700 text-white w-full">
+        </div>
+
+        <!-- HORA INICIO -->
+        <div>
+          <label for="hora_inicio" class="text-gray-200 font-semibold">Hora de Inicio</label>
+          <input type="time" name="hora_inicio" id="hora_inicio" class="p-2 rounded bg-gray-700 text-white w-full">
+        </div>
+
+        <!-- HORA FINALIZACIÓN -->
+        <div>
+          <label for="hora_finalizacion" class="text-gray-200 font-semibold">Hora de Finalización</label>
+          <input type="time" name="hora_finalizacion" id="hora_finalizacion" class="p-2 rounded bg-gray-700 text-white w-full">
+        </div>
+
+        <!-- MOTIVO -->
+        <div class="md:col-span-2">
+          <label for="motivo" class="text-gray-200 font-semibold">Motivo</label>
+          <textarea name="motivo" id="motivo" placeholder="Motivo de la cita" class="p-2 rounded bg-gray-700 text-white w-full"></textarea>
+        </div>
+
+        <!-- DESCRIPCIÓN -->
+        <div class="md:col-span-2">
+          <label for="descripcion" class="text-gray-200 font-semibold">Descripción</label>
+          <textarea name="descripcion" id="descripcion" placeholder="Descripción de la cita" class="p-2 rounded bg-gray-700 text-white w-full"></textarea>
+        </div>
+      </div>
+
+      <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4">
+        Registrar Cita
+      </button>
+    </form>
+  </div>
+
+</div>
+
+</body>
+</html>

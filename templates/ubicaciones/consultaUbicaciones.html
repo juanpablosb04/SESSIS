@@ -1,0 +1,185 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ubicaciones Registradas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
+    .fondo {
+      background-image: url("{% static 'Img/consultaUbicacionFondo.png' %}");
+      background-size: cover;
+      background-position: center;
+      min-height: 100vh;
+    }
+
+    .alert-error {
+      background-color: rgba(255, 0, 0, 0.15);
+      color: #4dff4d;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-success {
+      background-color: rgba(0, 128, 0, 0.15);
+      color: #4dff4d;
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+    
+  </style>
+</head>
+
+<body class="bg-gray-900 text-gray-200">
+  <div class="fondo">
+
+    {% include "includes/navbar.html" %}
+
+    <main class="flex flex-col items-center mt-10 px-4">
+      <section class="w-full max-w-6xl bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-lg p-10 border border-gray-700">
+        <h2 class="text-3xl font-bold mb-8 text-white tracking-wide border-b border-gray-600 pb-3">
+          Ubicaciones Registradas
+        </h2>
+
+        {% if messages %}
+        {% for message in messages %}
+        {% if 'editar' in message.tags or 'eliminar' in message.tags %}
+        {% if 'success' in message.tags %}
+        <div class="alert-success">{{ message }}</div>
+        {% else %}
+        <div class="alert-error">{{ message }}</div>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+
+        <!-- Lista de ubicaciones -->
+        <div class="space-y-6">
+          {% for ubicacion in ubicaciones %}
+          <div
+            class="flex items-center bg-gray-700 hover:bg-gray-600 transition-colors duration-200 rounded-xl shadow p-5">
+            
+            <!-- Imagen -->
+            <div class="w-36 h-36 flex-shrink-0 overflow-hidden rounded-lg bg-gray-600 mr-6">
+              {% if ubicacion.imagen_url %}
+              <img src="{{ ubicacion.imagen_url }}" alt="Imagen de {{ ubicacion.nombre }}"
+                class="w-full h-full object-cover">
+              {% else %}
+              <div class="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+                Sin imagen
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Información -->
+            <div class="flex-1">
+              <h3 class="text-xl font-semibold text-white mb-1">{{ ubicacion.nombre }}</h3>
+              <p class="text-gray-300">Tipo: <span class="text-gray-100">{{ ubicacion.tipo|default:"No definido" }}</span></p>
+              <p class="text-gray-300">Dirección: <span class="text-gray-100">{{ ubicacion.direccion }}</span></p>
+            </div>
+
+            <!-- Botones -->
+            <div class="flex flex-col gap-2 ml-4">
+              <button
+                class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition"
+                onclick="openEditModal('{{ ubicacion.id_ubicacion }}', '{{ ubicacion.nombre }}', '{{ ubicacion.tipo }}', '{{ ubicacion.direccion }}', '{{ ubicacion.imagen_url }}')">
+                Editar
+              </button>
+
+              <form method="POST" action="">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="eliminar">
+                <input type="hidden" name="ubicacion_id" value="{{ ubicacion.id_ubicacion }}">
+                <button type="submit"
+                  class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition">
+                  Eliminar
+                </button>
+              </form>
+            </div>
+          </div>
+          {% empty %}
+          <p class="text-gray-400 text-center mt-10">No hay ubicaciones registradas.</p>
+          {% endfor %}
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal -->
+    <div id="editModal"
+      class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50">
+      <div class="bg-gray-800 rounded-2xl shadow-xl w-full max-w-md p-6 border border-gray-700">
+        <h3 class="text-2xl font-bold text-white mb-5 border-b border-gray-600 pb-2">Editar Ubicación</h3>
+        <form method="POST" id="editForm">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="editar">
+          <input type="hidden" name="ubicacion_id" id="modal_ubicacion_id">
+
+          <label class="block mb-2 text-gray-300">Nombre</label>
+          <input type="text" name="nombre" id="modal_nombre"
+            class="w-full mb-4 p-2 rounded-md bg-gray-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+          <label class="block mb-2 text-gray-300">Tipo</label>
+          <input type="text" name="tipo" id="modal_tipo"
+            class="w-full mb-4 p-2 rounded-md bg-gray-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+          <label class="block mb-2 text-gray-300">Dirección</label>
+          <input type="text" name="direccion" id="modal_direccion"
+            class="w-full mb-4 p-2 rounded-md bg-gray-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+          <label class="block mb-2 text-gray-300">URL Imagen</label>
+          <input type="text" name="imagen_url" id="modal_imagen_url"
+            class="w-full mb-6 p-2 rounded-md bg-gray-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+          <div class="flex justify-end space-x-3">
+            <button type="button"
+              class="bg-gray-600 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded-lg transition"
+              onclick="closeEditModal()">Cancelar</button>
+            <button type="submit"
+              class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function openEditModal(id, nombre, tipo, direccion, imagen_url) {
+      document.getElementById('modal_ubicacion_id').value = id;
+      document.getElementById('modal_nombre').value = nombre;
+      document.getElementById('modal_tipo').value = tipo;
+      document.getElementById('modal_direccion').value = direccion;
+      document.getElementById('modal_imagen_url').value = imagen_url;
+      document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.add('hidden');
+    }
+  </script>
+</body>
+
+</html>
