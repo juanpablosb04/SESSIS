@@ -11,6 +11,57 @@
       background-image:url("{% static 'Img/clientesFondo.png' %}");
       background-size:cover;background-position:center;min-height:100vh;
     }
+    .alert-error {
+      background-color: rgba(255, 0, 0, 0.15);
+      color: #ff4d4d;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-success {
+      background-color: rgba(0, 128, 0, 0.15);
+      color: #4dff4d;
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-error2 {
+      background-color: rgba(255, 0, 0, 0.15);
+      color: #1f2937;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-success2 {
+      background-color: rgba(0, 128, 0, 0.15);
+      color: #1f2937;
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
   </style>
 </head>
 <body class="text-gray-200">
@@ -18,23 +69,20 @@
 
   <div class="fondo p-8 flex flex-col items-center">
 
-    {% if messages %}
-      <div class="w-full max-w-[1000px] mb-6">
-        {% for message in messages %}
-          <div class="p-3 mb-2 rounded
-            {% if message.tags == 'success' %} bg-green-600
-            {% elif message.tags == 'error' %} bg-red-600
-            {% elif message.tags == 'warning' %} bg-yellow-500 text-black
-            {% else %} bg-gray-800 {% endif %}">
-            {{ message }}
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
-
     <!-- Formulario: Registrar horas extras -->
     <div class="w-full max-w-[850px] bg-gray-800/95 rounded-lg shadow-md p-7 mb-10">
       <h2 class="text-2xl font-bold text-gray-200 mb-4">Registrar Horas Extras</h2>
+      {% if messages %}
+        {% for message in messages %}
+        {% if 'crear' in message.tags %}
+        {% if 'success' in message.tags %}
+        <div class="alert-success">{{ message }}</div>
+        {% else %}
+        <div class="alert-error">{{ message }}</div>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
       <form method="POST" action="{% url 'horasExtras' %}" class="flex flex-col">
         {% csrf_token %}
         <input type="hidden" name="action" value="crear">
@@ -86,7 +134,17 @@
     <!-- Historial de horas extras -->
     <div class="w-full max-w-[1000px] bg-gray-800/95 rounded-lg shadow-md p-7 mt-2">
       <h2 class="text-2xl font-bold text-gray-200 mb-4">Historial de Horas Extras</h2>
-
+      {% if messages %}
+      {% for message in messages %}
+        {% if 'editar' in message.tags or 'eliminar' in message.tags or 'cambiar_estado' in message.tags %}
+          {% if 'success' in message.tags %}
+            <div class="alert-success">{{ message }}</div>
+          {% else %}
+            <div class="alert-error">{{ message }}</div>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
       <div class="overflow-x-auto">
         <table class="min-w-full text-left border border-gray-600">
           <thead class="bg-gray-700 text-gray-200">

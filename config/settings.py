@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'inventarios',
     'ubicaciones',
     'citas',
+    'asistencia',
 ]
 
 MIDDLEWARE = [
@@ -86,7 +87,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'mssql',
         'NAME': 'SESSIS',
-        'USER': '',      # vacío porque usas Trusted_Connection
+        'USER': '',
         'PASSWORD': '',
         'HOST': '',
         'PORT': '',

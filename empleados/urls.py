@@ -10,4 +10,5 @@ urlpatterns = [
     path( "auditoria/horas-extras/<int:empleado_id>/", views.auditoria_horas_extras_por_empleado, 
          name="auditoria_horas_extras_por_empleado", ),
     path('mis-horas-extras/', views.consultar_horas_extras_oficial, name='consultarHorasExtras'),
+    path('verAsistenciaOficiales/', views.ver_asistencia_Empleados, name='verAsistenciaOficiales'),
 ]

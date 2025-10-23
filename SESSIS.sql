@@ -6,6 +6,26 @@ USE SESSIS;
 GO
 
 -- ==============================
+-- TABLA ROLES
+-- ==============================
+CREATE TABLE Roles (
+    id_rol INT PRIMARY KEY IDENTITY(1,1),
+    nombre_rol VARCHAR(100) NOT NULL,
+    descripcion VARCHAR(250)
+);
+
+-- ==============================
+-- TABLA UBICACIONES
+-- ==============================
+CREATE TABLE Ubicaciones (
+    id_ubicacion INT PRIMARY KEY IDENTITY(1,1),
+    nombre VARCHAR(200) NOT NULL, 
+    tipo VARCHAR(50),                    
+    direccion VARCHAR(250) NOT NULL,
+    imagen_url VARCHAR(500) NULL
+);
+
+-- ==============================
 -- TABLA EMPLEADO
 -- ==============================
 CREATE TABLE Empleado (
@@ -19,6 +39,45 @@ CREATE TABLE Empleado (
     estado BIT NOT NULL DEFAULT 1
 );
 
+-- ==============================
+-- TABLA CLIENTES
+-- ==============================
+CREATE TABLE Clientes (
+    id_cliente INT PRIMARY KEY IDENTITY(1,1),
+    nombre_completo VARCHAR(200) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    cedula VARCHAR(50) NOT NULL UNIQUE,
+    telefono VARCHAR(50),
+    id_ubicacion INT,
+    estado BIT NOT NULL DEFAULT 1,
+    FOREIGN KEY (id_ubicacion) REFERENCES Ubicaciones(id_ubicacion)
+);
+
+-- ==============================
+-- TABLA INVENTARIO
+-- ==============================
+CREATE TABLE Inventario (
+    id_inventario VARCHAR(50) PRIMARY KEY,
+    nombre VARCHAR(150) NOT NULL,
+    descripcion VARCHAR(250),
+    estado VARCHAR(50),
+    id_ubicacion INT NOT NULL,
+    FOREIGN KEY (id_ubicacion) REFERENCES Ubicaciones(id_ubicacion)
+);
+
+-- ==============================
+-- TABLA USUARIOS
+-- ==============================
+CREATE TABLE Usuarios (
+    id_usuario INT PRIMARY KEY IDENTITY(1,1),
+    id_empleado INT NOT NULL,
+    id_rol INT NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    password VARCHAR(150) NOT NULL,
+    estado VARCHAR(50),
+    FOREIGN KEY (id_empleado) REFERENCES Empleado(id_empleado),
+    FOREIGN KEY (id_rol) REFERENCES Roles(id_rol)
+);
 
 -- ==============================
 -- TABLA REPORTE INCIDENTES
@@ -37,12 +96,13 @@ CREATE TABLE ReporteIncidentes (
 CREATE TABLE Asistencia (
     id_asistencia INT PRIMARY KEY IDENTITY(1,1),
     id_empleado INT NOT NULL,
-    cantidad_oficiales INT,
     turno_ingreso DATETIME NOT NULL,
     turno_salida DATETIME,
-    ubicacion VARCHAR(150),
+    id_ubicacion INT NOT NULL,
     observaciones VARCHAR(250),
-    FOREIGN KEY (id_empleado) REFERENCES Empleado(id_empleado)
+    estado VARCHAR(50),
+    FOREIGN KEY (id_empleado) REFERENCES Empleado(id_empleado),
+    FOREIGN KEY (id_ubicacion) REFERENCES Ubicaciones(id_ubicacion)
 );
 
 -- ==============================
@@ -59,65 +119,6 @@ CREATE TABLE HorasExtras (
 );
 
 -- ==============================
--- TABLA UBICACIONES
--- ==============================
-CREATE TABLE Ubicaciones (
-    id_ubicacion INT PRIMARY KEY IDENTITY(1,1),
-    nombre VARCHAR(200) NOT NULL, 
-    tipo VARCHAR(50),                    
-    direccion VARCHAR(250) NOT NULL,
-    imagen_url VARCHAR(500) NULL
-);
-
--- ==============================
--- TABLA CLIENTES
--- ==============================
-CREATE TABLE Clientes (
-    id_cliente INT PRIMARY KEY IDENTITY(1,1),
-    nombre_completo VARCHAR(200) NOT NULL,
-    email VARCHAR(150) NOT NULL UNIQUE,
-    cedula VARCHAR(50) NOT NULL UNIQUE,
-    telefono VARCHAR(50),
-    id_ubicacion INT,                      -- FK a Ubicaciones
-    FOREIGN KEY (id_ubicacion) REFERENCES Ubicaciones(id_ubicacion)
-);
-
--- ==============================
--- TABLA INVENTARIO
--- ==============================
-CREATE TABLE Inventario (
-    id_inventario VARCHAR(50) PRIMARY KEY,
-    nombre VARCHAR(150) NOT NULL,
-    descripcion VARCHAR(250),
-    estado VARCHAR(50),
-    id_ubicacion INT NOT NULL,            -- FK a Ubicaciones
-    FOREIGN KEY (id_ubicacion) REFERENCES Ubicaciones(id_ubicacion)
-);
-
--- ==============================
--- TABLA ROLES
--- ==============================
-CREATE TABLE Roles (
-    id_rol INT PRIMARY KEY IDENTITY(1,1),
-    nombre_rol VARCHAR(100) NOT NULL,
-    descripcion VARCHAR(250)
-);
-
--- ==============================
--- TABLA USUARIOS
--- ==============================
-CREATE TABLE Usuarios (
-    id_usuario INT PRIMARY KEY IDENTITY(1,1),
-    id_empleado INT NOT NULL,
-    id_rol INT NOT NULL,
-    email VARCHAR(150) NOT NULL UNIQUE,
-    password VARCHAR(150) NOT NULL,
-    estado VARCHAR(50),
-    FOREIGN KEY (id_empleado) REFERENCES Empleado(id_empleado),
-    FOREIGN KEY (id_rol) REFERENCES Roles(id_rol)
-);
-
--- ==============================
 -- TABLA CITAS
 -- ==============================
 CREATE TABLE Citas (
@@ -130,8 +131,7 @@ CREATE TABLE Citas (
     descripcion VARCHAR(250),
     FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente)
 );
-
-
+GO
 
 -- ==============================
 -- TABLAS DE AUDITORIA
@@ -187,14 +187,12 @@ CREATE TABLE [dbo].[Usuarios_Auditoria_TB](
     -- FK: Usuario afectado
     CONSTRAINT FK_UsuariosAuditoria_UsuarioAfectado 
         FOREIGN KEY ([usuario_afectado_id]) 
-        REFERENCES [dbo].[Usuarios] ([id_usuario])
-        ON DELETE SET NULL,
+        REFERENCES [dbo].[Usuarios] ([id_usuario]),
 
     -- FK: Usuario que realiza la acción
     CONSTRAINT FK_UsuariosAuditoria_UsuarioAccion 
         FOREIGN KEY ([usuario_accion_id]) 
         REFERENCES [dbo].[Usuarios] ([id_usuario])
-        ON DELETE SET NULL
 );
 GO
 
