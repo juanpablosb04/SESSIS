@@ -76,8 +76,7 @@
             <th class="p-3 text-left">Hora Salida</th>
             <th class="p-3 text-left">Ubicación</th>
             <th class="p-3 text-left">Observaciones</th>
-            <th class="p-3 text-left">Estado</th>
-            <th class="p-3 text-left">Acciones</th>
+            <th class="p-3 text-left w-32">Estado</th>
           </tr>
         </thead>
         <tbody class="bg-gray-800">
@@ -90,17 +89,6 @@
             <td class="p-3">{{ a.id_ubicacion.nombre }}</td>
             <td class="p-3">{{ a.observaciones|default:"" }}</td>
             <td class="p-3">{{ a.estado }}</td>
-            <td class="p-3 space-x-2">
-              <button type="button"
-                onclick="abrirModalEditar('{{ a.id_asistencia }}', '{{ a.observaciones|escapejs }}')"
-                class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">
-                <i class="fas fa-edit"></i> Editar
-              </button>
-              <button type="button" onclick="abrirModalEliminar('{{ a.id_asistencia }}')"
-                class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">
-                <i class="fas fa-trash"></i> Eliminar
-              </button>
-            </td>
           </tr>
           {% empty %}
           <tr>
@@ -112,68 +100,6 @@
     </div>
 
   </div>
-
-  <!-- Modal Editar Observaciones -->
-  <div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-    <div class="bg-white text-gray-800 rounded-lg p-6 w-full max-w-lg">
-      <h3 class="text-xl font-bold mb-4">Editar Observaciones</h3>
-      <form method="POST" id="formEditar">
-        {% csrf_token %}
-        <input type="hidden" name="id_asistencia" id="modal_id_asistencia">
-        <input type="hidden" name="accion" value="editar">
-        <textarea name="observaciones" id="modal_observaciones" rows="4" class="w-full border rounded p-2"></textarea>
-        <div class="text-right mt-4 space-x-2">
-          <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Guardar</button>
-          <button type="button" onclick="cerrarModalEditar()"
-            class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Cancelar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal Eliminar -->
-  <div id="modalEliminar" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-    <div class="bg-white text-gray-800 rounded-lg p-6 text-center max-w-sm">
-      <p id="mensajeEliminar" class="text-lg font-semibold text-gray-800"></p>
-      <div class="mt-4 space-x-2">
-        <button onclick="confirmarEliminar()"
-          class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Confirmar</button>
-        <button onclick="cerrarModalEliminar()"
-          class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    let asistenciaEditarId = null;
-    let asistenciaEliminarId = null;
-
-    function abrirModalEditar(id, observaciones) {
-      asistenciaEditarId = id;
-      document.getElementById('modal_id_asistencia').value = id;
-      document.getElementById('modal_observaciones').value = observaciones || "";
-      document.getElementById('modalEditar').classList.remove('hidden');
-    }
-    function cerrarModalEditar() {
-      document.getElementById('modalEditar').classList.add('hidden');
-      asistenciaEditarId = null;
-    }
-
-    function abrirModalEliminar(id) {
-      asistenciaEliminarId = id;
-      document.getElementById('mensajeEliminar').textContent = `¿Desea eliminar el registro de asistencia con ID ${id}?`;
-      document.getElementById('modalEliminar').classList.remove('hidden');
-    }
-    function cerrarModalEliminar() {
-      document.getElementById('modalEliminar').classList.add('hidden');
-      asistenciaEliminarId = null;
-    }
-    function confirmarEliminar() {
-      if (asistenciaEliminarId) {
-        document.getElementById('formEliminar_' + asistenciaEliminarId)?.submit();
-      }
-    }
-  </script>
 
 </body>
 

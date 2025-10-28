@@ -60,17 +60,14 @@ def registrar_asistencia_view(request):
 
 @role_required(["Oficial"])
 def asistencias_activas_view(request):
-    # Obtener el empleado logueado
     usuario_email = request.session.get("usuario_email")
     empleado = get_object_or_404(Empleado, email=usuario_email)
 
-    # Solo las asistencias activas (estado "En curso")
     asistencias = Asistencia.objects.filter(
         id_empleado=empleado,
         estado='En curso'
     ).order_by('turno_ingreso')
 
-    # Procesar POST
     if request.method == "POST":
         accion = request.POST.get("accion")
         id_asistencia = request.POST.get("id_asistencia")
