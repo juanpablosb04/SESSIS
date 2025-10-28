@@ -104,8 +104,8 @@
         <thead class="bg-gray-700">
           <tr>
             <th class="p-3 text-left">Fecha</th>
-            <th class="p-3 text-left">Código y Nombre</th>
-            <th class="p-3 text-left">Turno</th>
+            <th class="p-3 text-left">Nombre</th>
+            <th class="p-3 text-left">Hora de entrada</th>
             <th class="p-3 text-left">Ubicación</th>
             <th class="p-3 text-left">Observaciones</th>
             <th class="p-3 text-left">Acción</th>
@@ -114,8 +114,8 @@
         <tbody class="bg-gray-800">
           {% for a in asistencias %}
           <tr class="border-t border-gray-700 hover:bg-gray-700 transition">
-            <td class="p-3">{{ a.turno_ingreso|date:"Y-m-d H:i" }}</td>
-            <td class="p-3">{{ a.id_empleado.codigo }} - {{ a.id_empleado.nombre }}</td>
+            <td class="p-3">{{ a.turno_ingreso|date:"d-m-Y H:i" }}</td>
+            <td class="p-3">{{ a.id_empleado.nombre_completo }}</td>
             <td class="p-3">{{ a.turno_ingreso|date:"H:i" }} - {% if a.turno_salida %}{{ a.turno_salida|date:"H:i" }}{%
               else %}--:--{% endif %}</td>
             <td class="p-3">{{ a.id_ubicacion.nombre }}</td>

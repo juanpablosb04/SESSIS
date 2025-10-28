@@ -266,11 +266,6 @@ def horas_extras_admin(request):
 # =====================================================
 @role_required(["Administrador"])
 def ver_asistencia_Empleados(request):
-
-    # =========================
-    # Filtrado por GET
-    # =========================
-
     empleados = Empleado.objects.all().order_by('nombre_completo')
     asistencias = Asistencia.objects.select_related('id_empleado', 'id_ubicacion').all().order_by('-turno_ingreso')
 
@@ -291,7 +286,8 @@ def ver_asistencia_Empleados(request):
 
     context = {
         "empleados": empleados,
-        "asistencias": asistencias
+        "asistencias": asistencias,
+        "empleado_seleccionado": empleado_id,
     }
     return render(request, "empleados/verAsistenciaOficiales.html", context)
 

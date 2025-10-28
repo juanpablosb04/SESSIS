@@ -1,163 +1,180 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ver Asistencia</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     body {
-      background-image: url('static/Img/verAsistenciaOficialesFondo.png');
+      background-image: url("{% static 'Img/verAsistenciaOficialesFondo.png' %}");
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
     }
   </style>
 </head>
-<body class="bg-gray-900 min-h-screen text-gray-200">
-{% include "includes/navbar.html" %}
 
-<div class="max-w-6xl mx-auto py-10 px-6">
+<body class="text-gray-200">
+  {% include "includes/navbar.html" %}
 
-  <h2 class="text-3xl font-bold mb-6 text-center text-black">Ver Asistencia</h2>
+  <div class="max-w-6xl mx-auto py-10 px-6">
 
-  <!-- Filtros -->
-  <form method="GET" class="flex flex-col md:flex-row gap-4 mb-6 items-end">
-    <div class="flex flex-col">
-      <label for="empleado" class="font-semibold mb-1">Seleccionar Empleado</label>
-      <select name="id_empleado" id="empleado" class="p-2 rounded bg-gray-700 text-white">
-        <option value="">Todos</option>
-        {% for emp in empleados %}
-          <option value="{{ emp.id_empleado }}" {% if emp.id_empleado|stringformat:"s" == request.GET.id_empleado %}selected{% endif %}>
+    <h2 class="text-3xl font-bold mb-6 text-center text-black">Ver Asistencia</h2>
+
+    <!-- Filtros -->
+    <form method="GET" class="flex flex-col md:flex-row gap-4 mb-6 items-end">
+      <div class="flex flex-col">
+        <label for="empleado" class="font-semibold mb-1 text-black">Seleccionar Empleado</label>
+        <select name="id_empleado" id="empleado" class="p-2 rounded bg-gray-700 text-white">
+          <option value="">Todos</option>
+          {% for emp in empleados %}
+          <option value="{{ emp.id_empleado }}" {% if empleado_id|stringformat:"s" == emp.id_empleado|stringformat:"s" %}selected{% endif %}>
             {{ emp.nombre_completo }}
           </option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <div class="flex flex-col">
-      <label for="fecha_inicio" class="font-semibold mb-1">Fecha Inicio</label>
-      <input type="date" id="fecha_inicio" name="fecha_inicio" class="p-2 rounded bg-gray-700 text-white" value="{{ request.GET.fecha_inicio }}">
-    </div>
-
-    <div class="flex flex-col">
-      <label for="fecha_fin" class="font-semibold mb-1">Fecha Fin</label>
-      <input type="date" id="fecha_fin" name="fecha_fin" class="p-2 rounded bg-gray-700 text-white" value="{{ request.GET.fecha_fin }}">
-    </div>
-
-    <div>
-      <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold">Filtrar</button>
-    </div>
-    
-    
-  </form>
-
-
-  <!-- Tabla de asistencia -->
-  <div class="overflow-x-auto">
-    <table class="min-w-full border border-gray-700 rounded shadow">
-      <thead class="bg-gray-700">
-        <tr>
-          <th class="p-3 text-left">Fecha</th>
-          <th class="p-3 text-left">Empleado</th>
-          <th class="p-3 text-left">Hora Entrada</th>
-          <th class="p-3 text-left">Hora Salida</th>
-          <th class="p-3 text-left">Ubicación</th>
-          <th class="p-3 text-left">Observaciones</th>
-          <th class="p-3 text-left">Estado</th>
-          <th class="p-3 text-left">Acciones</th>
-        </tr>
-      </thead>
-      <tbody class="bg-gray-800">
-        {% for a in asistencias %}
-        <tr class="border-t border-gray-700 hover:bg-gray-700 transition">
-          <td class="p-3">{{ a.turno_ingreso|date:"Y-m-d" }}</td>
-          <td class="p-3">{{ a.id_empleado.codigo }} - {{ a.id_empleado.nombre_completo }}</td>
-          <td class="p-3">{{ a.turno_ingreso|date:"H:i" }}</td>
-          <td class="p-3">{% if a.turno_salida %}{{ a.turno_salida|date:"H:i" }}{% else %}--:--{% endif %}</td>
-          <td class="p-3">{{ a.id_ubicacion.nombre }}</td>
-          <td class="p-3">{{ a.observaciones|default:"" }}</td>
-          <td class="p-3">{{ a.estado }}</td>
-          <td class="p-3 space-x-2">
-            <button type="button" onclick="abrirModalEditar('{{ a.id_asistencia }}', '{{ a.observaciones|escapejs }}')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">
-              <i class="fas fa-edit"></i> Editar
-            </button>
-            <button type="button" onclick="abrirModalEliminar('{{ a.id_asistencia }}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">
-              <i class="fas fa-trash"></i> Eliminar
-            </button>
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="8" class="p-3 text-center">No se encontraron registros</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-
-</div>
-
-<!-- Modal Editar Observaciones -->
-<div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-  <div class="bg-white text-gray-800 rounded-lg p-6 w-full max-w-lg">
-    <h3 class="text-xl font-bold mb-4">Editar Observaciones</h3>
-    <form method="POST" id="formEditar">
-      {% csrf_token %}
-      <input type="hidden" name="id_asistencia" id="modal_id_asistencia">
-      <input type="hidden" name="accion" value="editar">
-      <textarea name="observaciones" id="modal_observaciones" rows="4" class="w-full border rounded p-2"></textarea>
-      <div class="text-right mt-4 space-x-2">
-        <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Guardar</button>
-        <button type="button" onclick="cerrarModalEditar()" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Cancelar</button>
+          {% endfor %}
+        </select>
       </div>
-    </form>
-  </div>
-</div>
 
-<!-- Modal Eliminar -->
-<div id="modalEliminar" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-  <div class="bg-white text-gray-800 rounded-lg p-6 text-center max-w-sm">
-    <p id="mensajeEliminar" class="text-lg font-semibold text-gray-800"></p>
-    <div class="mt-4 space-x-2">
-      <button onclick="confirmarEliminar()" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Confirmar</button>
-      <button onclick="cerrarModalEliminar()" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Cancelar</button>
+      <div class="flex flex-col">
+        <label for="fecha_inicio" class="font-semibold mb-1 text-black">Fecha Inicio</label>
+        <input type="date" id="fecha_inicio" name="fecha_inicio" class="p-2 rounded bg-gray-700 text-white"
+          value="{{ request.GET.fecha_inicio }}">
+      </div>
+
+      <div class="flex flex-col">
+        <label for="fecha_fin" class="font-semibold mb-1 text-black">Fecha Fin</label>
+        <input type="date" id="fecha_fin" name="fecha_fin" class="p-2 rounded bg-gray-700 text-white"
+          value="{{ request.GET.fecha_fin }}">
+      </div>
+
+      <div class="flex gap-2">
+        <button type="submit"
+          class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold">Filtrar</button>
+        <a href="{% url 'verAsistenciaOficiales' %}"
+          class="px-4 py-2 bg-gray-500 hover:bg-gray-600 rounded text-white font-semibold">
+          Resetear
+        </a>
+      </div>
+
+
+
+    </form>
+
+
+    <!-- Tabla de asistencia -->
+    <div class="overflow-x-auto">
+      <table class="min-w-full border border-gray-700 rounded shadow">
+        <thead class="bg-gray-700">
+          <tr>
+            <th class="p-3 text-left w-32">Fecha</th>
+            <th class="p-3 text-left">Empleado</th>
+            <th class="p-3 text-left">Hora Entrada</th>
+            <th class="p-3 text-left">Hora Salida</th>
+            <th class="p-3 text-left">Ubicación</th>
+            <th class="p-3 text-left">Observaciones</th>
+            <th class="p-3 text-left">Estado</th>
+            <th class="p-3 text-left">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="bg-gray-800">
+          {% for a in asistencias %}
+          <tr class="border-t border-gray-700 hover:bg-gray-700 transition">
+            <td class="p-3">{{ a.turno_ingreso|date:"d-m-Y" }}</td>
+            <td class="p-3">{{ a.id_empleado.cedula }} - {{ a.id_empleado.nombre_completo }}</td>
+            <td class="p-3">{{ a.turno_ingreso|date:"H:i" }}</td>
+            <td class="p-3">{% if a.turno_salida %}{{ a.turno_salida|date:"H:i" }}{% else %}--:--{% endif %}</td>
+            <td class="p-3">{{ a.id_ubicacion.nombre }}</td>
+            <td class="p-3">{{ a.observaciones|default:"" }}</td>
+            <td class="p-3">{{ a.estado }}</td>
+            <td class="p-3 space-x-2">
+              <button type="button"
+                onclick="abrirModalEditar('{{ a.id_asistencia }}', '{{ a.observaciones|escapejs }}')"
+                class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">
+                <i class="fas fa-edit"></i> Editar
+              </button>
+              <button type="button" onclick="abrirModalEliminar('{{ a.id_asistencia }}')"
+                class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">
+                <i class="fas fa-trash"></i> Eliminar
+              </button>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="p-3 text-center">No se encontraron registros</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- Modal Editar Observaciones -->
+  <div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white text-gray-800 rounded-lg p-6 w-full max-w-lg">
+      <h3 class="text-xl font-bold mb-4">Editar Observaciones</h3>
+      <form method="POST" id="formEditar">
+        {% csrf_token %}
+        <input type="hidden" name="id_asistencia" id="modal_id_asistencia">
+        <input type="hidden" name="accion" value="editar">
+        <textarea name="observaciones" id="modal_observaciones" rows="4" class="w-full border rounded p-2"></textarea>
+        <div class="text-right mt-4 space-x-2">
+          <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Guardar</button>
+          <button type="button" onclick="cerrarModalEditar()"
+            class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Cancelar</button>
+        </div>
+      </form>
     </div>
   </div>
-</div>
 
-<script>
-let asistenciaEditarId = null;
-let asistenciaEliminarId = null;
+  <!-- Modal Eliminar -->
+  <div id="modalEliminar" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white text-gray-800 rounded-lg p-6 text-center max-w-sm">
+      <p id="mensajeEliminar" class="text-lg font-semibold text-gray-800"></p>
+      <div class="mt-4 space-x-2">
+        <button onclick="confirmarEliminar()"
+          class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Confirmar</button>
+        <button onclick="cerrarModalEliminar()"
+          class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Cancelar</button>
+      </div>
+    </div>
+  </div>
 
-function abrirModalEditar(id, observaciones){
-  asistenciaEditarId = id;
-  document.getElementById('modal_id_asistencia').value = id;
-  document.getElementById('modal_observaciones').value = observaciones || "";
-  document.getElementById('modalEditar').classList.remove('hidden');
-}
-function cerrarModalEditar(){
-  document.getElementById('modalEditar').classList.add('hidden');
-  asistenciaEditarId = null;
-}
+  <script>
+    let asistenciaEditarId = null;
+    let asistenciaEliminarId = null;
 
-function abrirModalEliminar(id){
-  asistenciaEliminarId = id;
-  document.getElementById('mensajeEliminar').textContent = `¿Desea eliminar el registro de asistencia con ID ${id}?`;
-  document.getElementById('modalEliminar').classList.remove('hidden');
-}
-function cerrarModalEliminar(){
-  document.getElementById('modalEliminar').classList.add('hidden');
-  asistenciaEliminarId = null;
-}
-function confirmarEliminar(){
-  if(asistenciaEliminarId){
-    document.getElementById('formEliminar_' + asistenciaEliminarId)?.submit();
-  }
-}
-</script>
+    function abrirModalEditar(id, observaciones) {
+      asistenciaEditarId = id;
+      document.getElementById('modal_id_asistencia').value = id;
+      document.getElementById('modal_observaciones').value = observaciones || "";
+      document.getElementById('modalEditar').classList.remove('hidden');
+    }
+    function cerrarModalEditar() {
+      document.getElementById('modalEditar').classList.add('hidden');
+      asistenciaEditarId = null;
+    }
+
+    function abrirModalEliminar(id) {
+      asistenciaEliminarId = id;
+      document.getElementById('mensajeEliminar').textContent = `¿Desea eliminar el registro de asistencia con ID ${id}?`;
+      document.getElementById('modalEliminar').classList.remove('hidden');
+    }
+    function cerrarModalEliminar() {
+      document.getElementById('modalEliminar').classList.add('hidden');
+      asistenciaEliminarId = null;
+    }
+    function confirmarEliminar() {
+      if (asistenciaEliminarId) {
+        document.getElementById('formEliminar_' + asistenciaEliminarId)?.submit();
+      }
+    }
+  </script>
 
 </body>
+
 </html>

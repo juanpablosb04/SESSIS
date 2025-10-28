@@ -22,7 +22,7 @@ def determinar_turno_actual():
 @role_required(["Oficial"])
 def registrar_asistencia_view(request):
     ubicaciones = Ubicaciones.objects.all().order_by('nombre')
-    today = timezone.localdate().strftime('%Y-%m-%d')  # <- convertir a string
+    today = timezone.localdate().strftime('%Y-%m-%d')
 
     if request.method == "POST":
         id_ubicacion = request.POST.get("id_ubicacion", "").strip()
@@ -37,7 +37,7 @@ def registrar_asistencia_view(request):
             nueva_asistencia = Asistencia.objects.create(
                 id_empleado=empleado,
                 id_ubicacion=ubicacion,
-                turno_ingreso=timezone.now(),
+                turno_ingreso=datetime.now(),
                 observaciones=observaciones or None,
                 estado='En curso'
             )
@@ -87,6 +87,6 @@ def asistencias_activas_view(request):
             asistencia.save()
             messages.success(request, "✅ Observaciones actualizadas correctamente", extra_tags="crear")
 
-        return redirect("consultarAsistencia")  # Asegúrate de usar el nombre correcto en urls.py
+        return redirect("consultarAsistencia")
 
     return render(request, "asistencia/consultarAsistencia.html", {"asistencias": asistencias})
