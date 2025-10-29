@@ -345,22 +345,28 @@ def consultar_horas_extras_oficial(request):
             "Contacta al administrador para vincular tu usuario con un empleado."
         )
         registros = []
-        total_horas = Decimal("0")
-        ultima_actualizacion = None
+        total_horas_aprobadas = Decimal("0")
+        ultima_actualizacion = timezone.now().date()
     else:
-        registros = (HorasExtras.objects
-                     .select_related("empleado")
-                     .filter(empleado=empleado)
-                     .order_by("-fecha", "-id_hora_extra"))
+        # Traer TODOS los registros del oficial para la tabla
+        registros = (
+            HorasExtras.objects
+            .select_related("empleado")
+            .filter(empleado=empleado)
+            .order_by("-fecha", "-id_hora_extra")
+        )
 
-        # total de horas (maneja None -> 0)
-        total_horas = registros.aggregate(
-            total=Coalesce(Sum("cantidad_horas"), Decimal("0"))
-        )["total"]
+        # Sumar SOLO las horas que estén Aprobadas
+        total_horas_aprobadas = (
+            HorasExtras.objects
+            .filter(empleado=empleado, estado__iexact="Aprobado")
+            .aggregate(suma=Sum("cantidad_horas"))
+            .get("suma") or Decimal("0")
+        )
 
-        # última actualización (registro más reciente por fecha/id)
+        # Fecha del registro más reciente para "Última actualización"
         ultimo = registros.first()
-        ultima_actualizacion = ultimo.fecha if ultimo else None
+        ultima_actualizacion = ultimo.fecha if ultimo else timezone.now().date()
 
     return render(
         request,
@@ -368,7 +374,7 @@ def consultar_horas_extras_oficial(request):
         {
             "empleado": empleado,
             "registros": registros,
-            "total_horas": total_horas,
+            "total_horas": total_horas_aprobadas,      # <- ya filtrado por Aprobado
             "ultima_actualizacion": ultima_actualizacion,
         },
     )
