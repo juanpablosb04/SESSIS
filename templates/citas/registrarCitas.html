@@ -6,20 +6,30 @@
   <title>Registrar Cita</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    html, body { margin: 0; padding: 0; height: 100%; }
-    .fondo {
-      background-image: url("{% static 'Img/empleadosFondo.png' %}");
-      background-size: cover;
-      background-position: center;
-      min-height: 1080px;
-    }
+
+    body {
+            background-image: url("{% static 'Img/fondoCitas.jpg' %}");
+                       
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            
+            padding-top: 4rem; 
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a1a;
+        }
   </style>
+
+  {% include "includes/navbar.html" %}
+
 </head>
 <body class="bg-white text-gray-900">
 
-{% include "includes/navbar.html" %}
 
-<div class="fondo p-8 flex flex-col items-center">
+
+<div class="flex flex-col items-center justify-start py-8">
 
   <!-- FORMULARIO REGISTRO CITA -->
   <div id="formulario-cita" class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7 mb-10">

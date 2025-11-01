@@ -9,17 +9,18 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="/static/JS/navbar.js"></script>
   <style>
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-    }
+     body {
+      background-image: url("{% static 'Img/fondoInventario.jpg' %}");
 
-    .fondo {
-      background-image: url("{% static 'Img/inventarioFondo.png' %}");
       background-size: cover;
-      height: 90vh;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      min-height: 100vh;
+
+      padding-top: 4rem;
+      font-family: 'Inter', sans-serif;
+      background-color: #1a1a1a;
     }
 
     .alert-error {
@@ -75,15 +76,14 @@
     }
 
   </style>
+
+  {% include "includes/navbar.html" %}
+
 </head>
 
 <body>
 
-  {% include "includes/navbar.html" %}
-
-  <div class="fondo">
-    <div class="flex flex-col items-center justify-center mt-8 dark">
-
+    <div class="flex flex-col items-center justify-start py-8">
       <!-- CREAR INVENTARIO -->
       <div class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7">
         <h2 class="text-2xl font-bold text-gray-200 mb-4">Registro de equipo de inventario</h2>
@@ -235,7 +235,6 @@
           </div>
         </form>
       </div>
-    </div>
   </div>
 
   <script>

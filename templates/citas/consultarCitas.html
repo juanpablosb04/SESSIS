@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,67 +9,75 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    html, body { margin: 0; padding: 0; height: 100%; }
-    .fondo {
-      background-image: url("{% static 'Img/verCitasFondo.png' %}");
+    body {
+      background-image: url("{% static 'Img/fondoCitas.jpg' %}");
+
       background-size: cover;
-      background-repeat: no-repeat;
       background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
       min-height: 100vh;
-      width: 100%;
+
+      padding-top: 4rem;
+      font-family: 'Inter', sans-serif;
+      background-color: #1a1a1a;
     }
   </style>
-</head>
-<body>
   {% include "includes/navbar.html" %}
+</head>
 
-  <div class="fondo">
-    <div class="flex flex-col items-center pt-10 pb-20">
-      <h3 class="text-[22px] mb-[10px] font-bold text-black">Lista de Citas</h3>
+<body>
 
-      <!-- Tabla de citas -->
-      <table class="table-auto max-w-[1350px] text-left border-collapse border border-gray-600 text-gray-200 bg-gray-900 bg-opacity-80 backdrop-blur-md rounded-[20px] overflow-hidden">
-        <thead class="bg-gray-700">
-          <tr>
-            <th class="border border-gray-600 px-4 py-2">Cédula</th>
-            <th class="border border-gray-600 px-4 py-2">Nombre</th>
-            <th class="border border-gray-600 px-4 py-2">Correo</th>
-            <th class="border border-gray-600 px-4 py-2">Teléfono</th>
-            <th class="border border-gray-600 px-4 py-2">Fecha</th>
-            <th class="border border-gray-600 px-4 py-2">Hora inicio</th>
-            <th class="border border-gray-600 px-4 py-2">Hora finalización</th>
-            <th class="border border-gray-600 px-4 py-2">Motivo</th>
-            <th class="border border-gray-600 px-4 py-2">Descripción</th>
-            <th class="border border-gray-600 px-4 py-2">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for cita in citas %}
-          <tr class="bg-gray-800 hover:bg-gray-700" data-id="{{ cita.id_cita }}">
-            <td class="border px-4 py-2">{{ cita.cliente.cedula }}</td>
-            <td class="border px-4 py-2 cliente" data-id="{{ cita.cliente.id_cliente }}">{{ cita.cliente.nombre_completo }}</td>
-            <td class="border px-4 py-2">{{ cita.cliente.email }}</td>
-            <td class="border px-4 py-2">{{ cita.cliente.telefono }}</td>
-            <td class="border px-4 py-2 fecha">{{ cita.fecha_cita|date:"Y-m-d" }}</td>
-            <td class="border px-4 py-2 hora_inicio">{{ cita.hora_inicio }}</td>
-            <td class="border px-4 py-2 hora_finalizacion">{{ cita.hora_finalizacion }}</td>
-            <td class="border px-4 py-2 motivo">{{ cita.motivo }}</td>
-            <td class="border px-4 py-2 descripcion">{{ cita.descripcion }}</td>
-            <td class="border px-4 py-2 flex gap-2">
-              <button onclick="abrirModal('{{ cita.id_cita }}')"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-2 rounded">
-                <i class="fas fa-edit"></i> Editar
-              </button>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="10" class="text-center text-gray-400 p-4">No hay citas registradas</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+  <div class="flex flex-col items-center justify-start py-8">
+
+    <h3 class="inline-block text-[22px] font-bold text-white px-5 py-2 rounded-md shadow-lg">
+      Lista de Citas
+    </h3>
+
+    <!-- Tabla de citas -->
+    <table
+      class="table-auto max-w-[1350px] text-left border-collapse border border-gray-600 text-gray-200 bg-gray-900 bg-opacity-80 backdrop-blur-md rounded-[20px] overflow-hidden">
+      <thead class="bg-gray-700">
+        <tr>
+          <th class="border border-gray-600 px-4 py-2">Cédula</th>
+          <th class="border border-gray-600 px-4 py-2">Nombre</th>
+          <th class="border border-gray-600 px-4 py-2">Correo</th>
+          <th class="border border-gray-600 px-4 py-2">Teléfono</th>
+          <th class="border border-gray-600 px-4 py-2">Fecha</th>
+          <th class="border border-gray-600 px-4 py-2">Hora inicio</th>
+          <th class="border border-gray-600 px-4 py-2">Hora finalización</th>
+          <th class="border border-gray-600 px-4 py-2">Motivo</th>
+          <th class="border border-gray-600 px-4 py-2">Descripción</th>
+          <th class="border border-gray-600 px-4 py-2">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cita in citas %}
+        <tr class="bg-gray-800 hover:bg-gray-700" data-id="{{ cita.id_cita }}">
+          <td class="border px-4 py-2">{{ cita.cliente.cedula }}</td>
+          <td class="border px-4 py-2 cliente" data-id="{{ cita.cliente.id_cliente }}">{{ cita.cliente.nombre_completo
+            }}</td>
+          <td class="border px-4 py-2">{{ cita.cliente.email }}</td>
+          <td class="border px-4 py-2">{{ cita.cliente.telefono }}</td>
+          <td class="border px-4 py-2 fecha">{{ cita.fecha_cita|date:"Y-m-d" }}</td>
+          <td class="border px-4 py-2 hora_inicio">{{ cita.hora_inicio }}</td>
+          <td class="border px-4 py-2 hora_finalizacion">{{ cita.hora_finalizacion }}</td>
+          <td class="border px-4 py-2 motivo">{{ cita.motivo }}</td>
+          <td class="border px-4 py-2 descripcion">{{ cita.descripcion }}</td>
+          <td class="border px-4 py-2 flex gap-2">
+            <button onclick="abrirModal('{{ cita.id_cita }}')"
+              class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-2 rounded">
+              <i class="fas fa-edit"></i> Editar
+            </button>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="10" class="text-center text-gray-400 p-4">No hay citas registradas</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 
   <!-- Modal de edición -->
@@ -86,7 +95,8 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block font-medium">Cliente</label>
-            <select id="edit_cliente" name="id_cliente" class="w-full rounded px-3 py-2 bg-gray-700 text-white border border-gray-600" required>
+            <select id="edit_cliente" name="id_cliente"
+              class="w-full rounded px-3 py-2 bg-gray-700 text-white border border-gray-600" required>
               {% for cliente in clientes %}
               <option value="{{ cliente.id_cliente }}">{{ cliente.nombre_completo }}</option>
               {% endfor %}
@@ -95,33 +105,40 @@
 
           <div>
             <label class="block font-medium">Fecha</label>
-            <input type="date" id="edit_fecha" name="fecha_cita" class="w-full rounded px-3 py-2 bg-gray-700 text-white border border-gray-600" required>
+            <input type="date" id="edit_fecha" name="fecha_cita"
+              class="w-full rounded px-3 py-2 bg-gray-700 text-white border border-gray-600" required>
           </div>
 
           <div>
             <label class="block font-medium">Hora Inicio</label>
-            <input type="time" id="edit_hora_inicio" name="hora_inicio" class="w-full rounded px-3 py-2 bg-gray-700 text-white border border-gray-600">
+            <input type="time" id="edit_hora_inicio" name="hora_inicio"
+              class="w-full rounded px-3 py-2 bg-gray-700 text-white border border-gray-600">
           </div>
 
           <div>
             <label class="block font-medium">Hora Finalización</label>
-            <input type="time" id="edit_hora_finalizacion" name="hora_finalizacion" class="w-full rounded px-3 py-2 bg-gray-700 text-white border border-gray-600">
+            <input type="time" id="edit_hora_finalizacion" name="hora_finalizacion"
+              class="w-full rounded px-3 py-2 bg-gray-700 text-white border border-gray-600">
           </div>
 
           <div class="md:col-span-2">
             <label class="block font-medium">Motivo</label>
-            <input type="text" id="edit_motivo" name="motivo" class="w-full rounded px-3 py-2 bg-gray-700 text-white border border-gray-600" required>
+            <input type="text" id="edit_motivo" name="motivo"
+              class="w-full rounded px-3 py-2 bg-gray-700 text-white border border-gray-600" required>
           </div>
 
           <div class="md:col-span-2">
             <label class="block font-medium">Descripción</label>
-            <textarea id="edit_descripcion" name="descripcion" class="w-full rounded px-3 py-2 bg-gray-700 text-white border border-gray-600" required></textarea>
+            <textarea id="edit_descripcion" name="descripcion"
+              class="w-full rounded px-3 py-2 bg-gray-700 text-white border border-gray-600" required></textarea>
           </div>
         </div>
 
         <div class="flex justify-end gap-2 mt-4">
-          <button type="button" onclick="cerrarModal()" class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-white">Cancelar</button>
-          <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-white">Guardar Cambios</button>
+          <button type="button" onclick="cerrarModal()"
+            class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-white">Cancelar</button>
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-white">Guardar
+            Cambios</button>
         </div>
       </form>
     </div>
@@ -153,4 +170,5 @@
     }
   </script>
 </body>
+
 </html>
