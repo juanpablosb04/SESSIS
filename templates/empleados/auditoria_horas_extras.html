@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,7 +9,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .fondo {
-      background-image: url("{% static 'Img/clientesFondo.png' %}");
+      background-image: url('/static/Img/fondo.jpg');
       background-size: cover;
       background-position: center;
       min-height: 100vh;
@@ -16,24 +17,26 @@
   </style>
 
   {% include "includes/navbar.html" %}
-  
+
 </head>
 
 <body class="bg-gray-900 text-gray-200 min-h-screen fondo">
 
-  
+
 
   <div class="p-8 max-w-7xl mx-auto">
-    <!-- TÍTULO PRINCIPAL -->
-    <h1 class="text-3xl font-bold mb-4">Auditoría de Horas Extras</h1>
+    <div class="max-w-6xl mx-auto px-6 mb-6">
+      <div class="bg-gray-800/90 border border-gray-700 rounded-xl shadow-lg p-6">
+        <h1 class="text-3xl font-bold mb-4 text-white">Auditoría de Horas Extras</h1>
 
-    <!-- SUBTÍTULO / INFO EMPLEADO -->
-    <p class="text-gray-300 mb-6">
-      <span class="font-semibold">Empleado:</span>
-      {{ empleado.nombre_completo|default:"—" }} ({{ empleado.cedula|default:"—" }})<br>
-      <span class="font-semibold">Correo:</span>
-      {{ empleado.email|default:"—" }}
-    </p>
+        <p class="text-gray-200">
+          <span class="font-semibold text-white">Empleado:</span>
+          {{ empleado.nombre_completo|default:"—" }} ({{ empleado.cedula|default:"—" }})<br>
+          <span class="font-semibold text-white">Correo:</span>
+          {{ empleado.email|default:"—" }}
+        </p>
+      </div>
+    </div>
 
     <!-- TARJETA OSCURA CON TABLA -->
     <div class="overflow-x-auto bg-gray-800/90 backdrop-blur rounded-lg shadow-md p-6">
@@ -68,32 +71,32 @@
             <!-- Acción (CREAR / MODIFICAR / ELIMINAR) -->
             <td class="p-2 whitespace-nowrap">
               {% with ac=a.accion|upper %}
-                {% if ac == "CREAR" %}
-                  <span class="bg-green-600 px-2 py-1 rounded text-white text-xs font-semibold">
-                    CREAR
-                  </span>
-                {% elif ac == "MODIFICAR" or ac == "EDITAR" %}
-                  <span class="bg-yellow-500 px-2 py-1 rounded text-white text-xs font-semibold">
-                    MODIFICAR
-                  </span>
-                {% elif ac == "ELIMINAR" %}
-                  <span class="bg-red-600 px-2 py-1 rounded text-white text-xs font-semibold">
-                    ELIMINAR
-                  </span>
-                {% else %}
-                  <span class="bg-gray-600 px-2 py-1 rounded text-white text-xs font-semibold">
-                    {{ a.accion }}
-                  </span>
-                {% endif %}
+              {% if ac == "CREAR" %}
+              <span class="bg-green-600 px-2 py-1 rounded text-white text-xs font-semibold">
+                CREAR
+              </span>
+              {% elif ac == "MODIFICAR" or ac == "EDITAR" %}
+              <span class="bg-yellow-500 px-2 py-1 rounded text-white text-xs font-semibold">
+                MODIFICAR
+              </span>
+              {% elif ac == "ELIMINAR" %}
+              <span class="bg-red-600 px-2 py-1 rounded text-white text-xs font-semibold">
+                ELIMINAR
+              </span>
+              {% else %}
+              <span class="bg-gray-600 px-2 py-1 rounded text-white text-xs font-semibold">
+                {{ a.accion }}
+              </span>
+              {% endif %}
               {% endwith %}
             </td>
 
             <!-- Usuario que hizo el cambio -->
             <td class="p-2 whitespace-nowrap">
               {% if a.usuario_email %}
-                {{ a.usuario_email }}
+              {{ a.usuario_email }}
               {% else %}
-                <span class="italic text-gray-400">Sistema</span>
+              <span class="italic text-gray-400">Sistema</span>
               {% endif %}
             </td>
 
@@ -105,36 +108,36 @@
             <!-- Cantidad de horas -->
             <td class="p-2 whitespace-nowrap">
               {% if a.cantidad_horas is not None %}
-                {{ a.cantidad_horas|floatformat:"-2" }}
+              {{ a.cantidad_horas|floatformat:"-2" }}
               {% else %}
-                —
+              —
               {% endif %}
             </td>
 
             <!-- Estado snapshot (Aprobado / En revisión / Rechazado ...) -->
             <td class="p-2 whitespace-nowrap">
               {% if a.estado %}
-                {% with est=a.estado|lower %}
-                  {% if est == "aprobado" %}
-                    <span class="bg-green-600 px-2 py-1 rounded text-white text-xs font-semibold">
-                      Aprobado
-                    </span>
-                  {% elif est == "rechazado" %}
-                    <span class="bg-red-600 px-2 py-1 rounded text-white text-xs font-semibold">
-                      Rechazado
-                    </span>
-                  {% elif est == "en revisión" or est == "en revision" or est == "pendiente" %}
-                    <span class="bg-yellow-500 px-2 py-1 rounded text-black text-xs font-semibold">
-                      En revisión
-                    </span>
-                  {% else %}
-                    <span class="bg-gray-600 px-2 py-1 rounded text-white text-xs font-semibold">
-                      {{ a.estado }}
-                    </span>
-                  {% endif %}
-                {% endwith %}
+              {% with est=a.estado|lower %}
+              {% if est == "aprobado" %}
+              <span class="bg-green-600 px-2 py-1 rounded text-white text-xs font-semibold">
+                Aprobado
+              </span>
+              {% elif est == "rechazado" %}
+              <span class="bg-red-600 px-2 py-1 rounded text-white text-xs font-semibold">
+                Rechazado
+              </span>
+              {% elif est == "en revisión" or est == "en revision" or est == "pendiente" %}
+              <span class="bg-yellow-500 px-2 py-1 rounded text-black text-xs font-semibold">
+                En revisión
+              </span>
               {% else %}
-                <span class="text-gray-400 text-sm">—</span>
+              <span class="bg-gray-600 px-2 py-1 rounded text-white text-xs font-semibold">
+                {{ a.estado }}
+              </span>
+              {% endif %}
+              {% endwith %}
+              {% else %}
+              <span class="text-gray-400 text-sm">—</span>
               {% endif %}
             </td>
 
@@ -157,12 +160,11 @@
     <!-- Boton Volver -->
     <div class="mt-6 flex flex-col sm:flex-row gap-4">
       <a href="{% url 'horasExtras' %}"
-         class="inline-flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
+        class="inline-flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
         <span>⬅</span> Volver a Horas Extras
       </a>
     </div>
   </div>
 </body>
+
 </html>
-
-

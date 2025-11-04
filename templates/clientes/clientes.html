@@ -9,7 +9,7 @@
   <style>
 
     body {
-            background-image: url("{% static 'Img/fondoClientes.jpg' %}");
+            background-image: url('/static/Img/fondo.jpg');
                        
             background-size: cover;
             background-position: center;
@@ -108,7 +108,7 @@
     </div>
 
     <!-- Tabla de clientes -->
-    <div class="w-full max-w-[1150px] bg-gray-800/95 rounded-lg shadow-md p-7">
+    <div class="w-full max-w-[1550px] bg-gray-800/95 rounded-lg shadow-md p-7">
       <h2 class="text-2xl font-bold text-gray-200 mb-4">Lista de Clientes</h2>
 
       <div class="overflow-x-auto">
@@ -151,9 +151,9 @@
                 </td>
                 <td class="p-2">
                   {% if cliente.estado %}
-                    <span class="px-2 py-1 rounded bg-green-600 text-white text-xs">Activo</span>
+                    <span class="inline-flex items-center justify-center px-3 py-[6px] rounded-md bg-green-600 text-white text-sm font-medium min-w-[90px] text-center">Activo</span>
                   {% else %}
-                    <span class="px-2 py-1 rounded bg-red-600 text-white text-xs">Inactivo</span>
+                    <span class="inline-flex items-center justify-center px-3 py-[6px] rounded-md bg-green-600 text-white text-sm font-medium min-w-[90px] text-center">Inactivo</span>
                   {% endif %}
                 </td>
                 <td class="p-2">

@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     body {
-      background-image: url('/static/Img/consultaAsistencia.jpg');
+      background-image: url('/static/Img/fondo.jpg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -67,7 +67,6 @@
       font-weight: 500;
       backdrop-filter: blur(10px);
     }
-
   </style>
 </head>
 
@@ -76,77 +75,105 @@
   {% include "includes/navbar.html" %}
 
   <div class="max-w-6xl mx-auto py-10 px-6">
-    <h2 class="text-3xl font-bold mb-6 text-center text-black">Ver Asistencia</h2>
-    {% if messages %}
-        {% for message in messages %}
-        {% if 'crear' in message.tags %}
-        {% if 'success' in message.tags %}
-        <div class="alert-success">{{ message }}</div>
-        {% else %}
-        <div class="alert-error">{{ message }}</div>
-        {% endif %}
-        {% endif %}
-        {% endfor %}
-        {% endif %}
-        {% if messages %}
-      {% for message in messages %}
-        {% if 'editar' in message.tags or 'eliminar' in message.tags or 'cambiar_estado' in message.tags %}
-          {% if 'success' in message.tags %}
-            <div class="alert-success2">{{ message }}</div>
-          {% else %}
-            <div class="alert-error2">{{ message }}</div>
-          {% endif %}
-        {% endif %}
-      {% endfor %}
-    {% endif %}
-    <div class="overflow-x-auto">
-      <table class="min-w-full border border-gray-700 rounded shadow">
-        <thead class="bg-gray-700">
-          <tr>
-            <th class="p-3 text-left">Fecha</th>
-            <th class="p-3 text-left">Nombre</th>
-            <th class="p-3 text-left">Hora de entrada</th>
-            <th class="p-3 text-left">Ubicación</th>
-            <th class="p-3 text-left">Observaciones</th>
-            <th class="p-3 text-left">Acción</th>
-          </tr>
-        </thead>
-        <tbody class="bg-gray-800">
-          {% for a in asistencias %}
-          <tr class="border-t border-gray-700 hover:bg-gray-700 transition">
-            <td class="p-3">{{ a.turno_ingreso|date:"d-m-Y H:i" }}</td>
-            <td class="p-3">{{ a.id_empleado.nombre_completo }}</td>
-            <td class="p-3">{{ a.turno_ingreso|date:"H:i" }} - {% if a.turno_salida %}{{ a.turno_salida|date:"H:i" }}{%
-              else %}--:--{% endif %}</td>
-            <td class="p-3">{{ a.id_ubicacion.nombre }}</td>
-            <td class="p-3">{{ a.observaciones|default:"" }}</td>
-            <td class="p-3 flex gap-2">
-              <!-- Botón Salida -->
-              <form method="POST">
-                {% csrf_token %}
-                <input type="hidden" name="id_asistencia" value="{{ a.id_asistencia }}">
-                <input type="hidden" name="accion" value="salida">
-                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded">
-                  Marcar salida
-                </button>
-              </form>
 
-              <!-- Botón Editar Observaciones -->
-              <button type="button"
-                onclick="abrirModalEditar('{{ a.id_asistencia }}', '{{ a.observaciones|escapejs }}')"
-                class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-1 rounded">
-                Editar
-              </button>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="6" class="p-3 text-center">No hay turnos activos</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <!-- Mensajes -->
+    {% if messages %}
+    {% for message in messages %}
+    {% if 'crear' in message.tags %}
+    {% if 'success' in message.tags %}
+    <div class="alert-success">{{ message }}</div>
+    {% else %}
+    <div class="alert-error">{{ message }}</div>
+    {% endif %}
+    {% endif %}
+    {% endfor %}
+
+    {% for message in messages %}
+    {% if 'editar' in message.tags or 'eliminar' in message.tags or 'cambiar_estado' in message.tags %}
+    {% if 'success' in message.tags %}
+    <div class="alert-success2">{{ message }}</div>
+    {% else %}
+    <div class="alert-error2">{{ message }}</div>
+    {% endif %}
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+
+    <!-- Tabla -->
+    <div class="w-full max-w-[1550px] bg-gray-800/95 rounded-lg shadow-md p-7">
+      <h2 class="text-2xl font-bold text-gray-200 mb-4">Ver Asistencia</h2>
+
+      <div class="overflow-x-auto">
+
+        <table class="min-w-full table-fixed text-left border border-gray-600">
+          <thead class="bg-gray-700 text-gray-200">
+            <tr>
+              <th class="p-2">Fecha</th>
+              <th class="p-2">Nombre</th>
+              <th class="p-2">Hora</th>
+              <th class="p-2">Ubicación</th>
+              <th class="p-2">Observaciones</th>
+              <th class="p-2 text-center">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody class="text-gray-300">
+            {% for a in asistencias %}
+            <tr class="border-b border-gray-700">
+
+              <td class="p-2">{{ a.turno_ingreso|date:"d-m-Y" }}</td>
+
+              <td class="p-2">{{ a.id_empleado.nombre_completo }}</td>
+
+              <td class="p-2">
+                {{ a.turno_ingreso|date:"H:i" }} -
+                {% if a.turno_salida %}
+                {{ a.turno_salida|date:"H:i" }}
+                {% else %}
+                --:--
+                {% endif %}
+              </td>
+
+              <td class="p-2">{{ a.id_ubicacion.nombre }}</td>
+
+              <td class="p-2">{{ a.observaciones|default:"—" }}</td>
+
+              <td class="p-2 min-w-[250px]">
+                <div class="flex flex-nowrap justify-center gap-2">
+
+                  <!-- Botón salida -->
+                  <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="id_asistencia" value="{{ a.id_asistencia }}">
+                    <input type="hidden" name="accion" value="salida">
+                    <button type="submit"
+                      class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded whitespace-nowrap">
+                      Salida
+                    </button>
+                  </form>
+
+                  <!-- Botón editar -->
+                  <button type="button"
+                    onclick="abrirModalEditar('{{ a.id_asistencia }}', '{{ a.observaciones|escapejs }}')"
+                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded whitespace-nowrap">
+                    Editar
+                  </button>
+
+                </div>
+              </td>
+            </tr>
+
+            {% empty %}
+            <tr>
+              <td colspan="6" class="p-4 text-center text-gray-400">No hay registros</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
+
+
 
     <!-- Modal Editar Observaciones -->
     <div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">

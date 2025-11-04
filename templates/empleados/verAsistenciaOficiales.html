@@ -10,107 +10,102 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     body {
-            background-image: url("{% static 'Img/fondoVerAsistenciaOficiales.jpg' %}");
-                       
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            min-height: 100vh;
-            
-            padding-top: 4rem; 
-            font-family: 'Inter', sans-serif;
-            background-color: #1a1a1a;
-        }
+      background-image: url('/static/Img/fondo.jpg');
+
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      min-height: 100vh;
+
+      padding-top: 4rem;
+      font-family: 'Inter', sans-serif;
+      background-color: #1a1a1a;
+    }
   </style>
 
   {% include "includes/navbar.html" %}
-  
+
 </head>
 
-<body class="text-gray-200">
-  
-
+<body class="text-gray-200 bg-gray-900 min-h-screen">
   <div class="max-w-6xl mx-auto py-10 px-6">
 
-    <h2 class="text-3xl font-bold mb-6 text-center text-white">Ver Asistencia</h2>
+    <h2 class="text-3xl font-bold mb-6 text-center text-black">Ver Asistencia</h2>
 
-    <!-- Filtros -->
-    <form method="GET" class="flex flex-col md:flex-row gap-4 mb-6 items-end">
-      <div class="flex flex-col">
-        <label for="empleado" class="font-semibold mb-1 text-white">Seleccionar Empleado</label>
-        <select name="id_empleado" id="empleado" class="p-2 rounded bg-gray-700 text-white">
-          <option value="">Todos</option>
-          {% for emp in empleados %}
-          <option value="{{ emp.id_empleado }}" {% if empleado_id|stringformat:"s" == emp.id_empleado|stringformat:"s" %}selected{% endif %}>
-            {{ emp.nombre_completo }}
-          </option>
-          {% endfor %}
-        </select>
+    <div class="bg-gray-800/90 border border-gray-700 rounded-xl shadow-2xl p-8">
+
+      <form method="GET" class="flex flex-col md:flex-row gap-4 mb-8 items-end">
+        <div class="flex flex-col">
+          <label for="empleado" class="font-semibold mb-1 text-gray-200">Seleccionar Empleado</label>
+          <select name="id_empleado" id="empleado" class="p-2 rounded bg-gray-700 border border-gray-600 text-white">
+            <option value="">Todos</option>
+            {% for emp in empleados %}
+            <option value="{{ emp.id_empleado }}" {% if empleado_id|stringformat:"s" == emp.id_empleado|stringformat:"s" %}selected{% endif %}>
+              {{ emp.nombre_completo }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="flex flex-col">
+          <label for="fecha_inicio" class="font-semibold mb-1 text-gray-200">Fecha Inicio</label>
+          <input type="date" id="fecha_inicio" name="fecha_inicio"
+            class="p-2 rounded bg-gray-700 border border-gray-600 text-white" value="{{ request.GET.fecha_inicio }}">
+        </div>
+
+        <div class="flex flex-col">
+          <label for="fecha_fin" class="font-semibold mb-1 text-gray-200">Fecha Fin</label>
+          <input type="date" id="fecha_fin" name="fecha_fin"
+            class="p-2 rounded bg-gray-700 border border-gray-600 text-white" value="{{ request.GET.fecha_fin }}">
+        </div>
+
+        <div class="flex gap-2">
+          <button type="submit"
+            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold transition duration-150">Filtrar</button>
+          <a href="{% url 'verAsistenciaOficiales' %}"
+            class="px-4 py-2 bg-gray-500 hover:bg-gray-600 rounded text-white font-semibold transition duration-150">
+            Resetear
+          </a>
+        </div>
+      </form>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-left border border-gray-700 bg-gray-900 rounded-lg">
+          <thead class="bg-gray-700 text-gray-200">
+            <tr>
+              <th class="px-4 py-3">Fecha</th>
+              <th class="px-4 py-3">Empleado</th>
+              <th class="px-4 py-3">Hora Entrada</th>
+              <th class="px-4 py-3">Hora Salida</th>
+              <th class="px-4 py-3">Ubicación</th>
+              <th class="px-4 py-3">Observaciones</th>
+              <th class="px-4 py-3 text-center">Estado</th>
+            </tr>
+          </thead>
+
+          <tbody class="text-gray-300">
+            {% for a in asistencias %}
+            <tr class="border-b border-gray-700 hover:bg-gray-700/50 transition">
+              <td class="px-4 py-2 whitespace-nowrap">{{ a.turno_ingreso|date:"d-m-Y" }}</td>
+              <td class="px-4 py-2">{{ a.id_empleado.cedula }} - {{ a.id_empleado.nombre_completo }}</td>
+              <td class="px-4 py-2">{{ a.turno_ingreso|date:"H:i" }}</td>
+              <td class="px-4 py-2">{% if a.turno_salida %}{{ a.turno_salida|date:"H:i" }}{% else %}--:--{% endif %}
+              </td>
+              <td class="px-4 py-2">{{ a.id_ubicacion.nombre }}</td>
+              <td class="px-4 py-2">{{ a.observaciones|default:"" }}</td>
+              <td class="px-4 py-2 text-center">{{ a.estado }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="p-4 text-center text-gray-400">No se encontraron registros</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
-
-      <div class="flex flex-col">
-        <label for="fecha_inicio" class="font-semibold mb-1 text-white">Fecha Inicio</label>
-        <input type="date" id="fecha_inicio" name="fecha_inicio" class="p-2 rounded bg-gray-700 text-white"
-          value="{{ request.GET.fecha_inicio }}">
-      </div>
-
-      <div class="flex flex-col">
-        <label for="fecha_fin" class="font-semibold mb-1 text-white">Fecha Fin</label>
-        <input type="date" id="fecha_fin" name="fecha_fin" class="p-2 rounded bg-gray-700 text-white"
-          value="{{ request.GET.fecha_fin }}">
-      </div>
-
-      <div class="flex gap-2">
-        <button type="submit"
-          class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold">Filtrar</button>
-        <a href="{% url 'verAsistenciaOficiales' %}"
-          class="px-4 py-2 bg-gray-500 hover:bg-gray-600 rounded text-white font-semibold">
-          Resetear
-        </a>
-      </div>
-
-
-
-    </form>
-
-
-    <!-- Tabla de asistencia -->
-    <div class="overflow-x-auto">
-      <table class="min-w-full border border-gray-700 rounded shadow">
-        <thead class="bg-gray-700">
-          <tr>
-            <th class="p-3 text-left w-32">Fecha</th>
-            <th class="p-3 text-left">Empleado</th>
-            <th class="p-3 text-left">Hora Entrada</th>
-            <th class="p-3 text-left">Hora Salida</th>
-            <th class="p-3 text-left">Ubicación</th>
-            <th class="p-3 text-left">Observaciones</th>
-            <th class="p-3 text-left w-32">Estado</th>
-          </tr>
-        </thead>
-        <tbody class="bg-gray-800">
-          {% for a in asistencias %}
-          <tr class="border-t border-gray-700 hover:bg-gray-700 transition">
-            <td class="p-3">{{ a.turno_ingreso|date:"d-m-Y" }}</td>
-            <td class="p-3">{{ a.id_empleado.cedula }} - {{ a.id_empleado.nombre_completo }}</td>
-            <td class="p-3">{{ a.turno_ingreso|date:"H:i" }}</td>
-            <td class="p-3">{% if a.turno_salida %}{{ a.turno_salida|date:"H:i" }}{% else %}--:--{% endif %}</td>
-            <td class="p-3">{{ a.id_ubicacion.nombre }}</td>
-            <td class="p-3">{{ a.observaciones|default:"" }}</td>
-            <td class="p-3">{{ a.estado }}</td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="8" class="p-3 text-center">No se encontraron registros</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
     </div>
-
   </div>
-
 </body>
 
 </html>

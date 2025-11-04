@@ -9,7 +9,7 @@
   <style>
 
     body {
-            background-image: url("{% static 'Img/fondoHorasExtras.jpg' %}");
+            background-image: url('/static/Img/fondo.jpg');
                        
             background-size: cover;
             background-position: center;
@@ -38,32 +38,6 @@
     .alert-success {
       background-color: rgba(0, 128, 0, 0.15);
       color: #4dff4d;
-      border: 1px solid rgba(0, 128, 0, 0.3);
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 10px;
-      text-align: center;
-      font-size: 14px;
-      font-weight: 500;
-      backdrop-filter: blur(10px);
-    }
-
-    .alert-error2 {
-      background-color: rgba(255, 0, 0, 0.15);
-      color: #1f2937;
-      border: 1px solid rgba(255, 0, 0, 0.3);
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 10px;
-      text-align: center;
-      font-size: 14px;
-      font-weight: 500;
-      backdrop-filter: blur(10px);
-    }
-
-    .alert-success2 {
-      background-color: rgba(0, 128, 0, 0.15);
-      color: #1f2937;
       border: 1px solid rgba(0, 128, 0, 0.3);
       border-radius: 10px;
       padding: 12px;
@@ -170,16 +144,16 @@
               <tr class="border-b border-gray-700">
                 <td class="p-2">{{ r.empleado.nombre_completo }}</td>
                 <td class="p-2">{{ r.fecha|date:"d/m/Y" }}</td>
-                <td class="p-2">{{ r.cantidad_horas|floatformat:"-2" }}</td>
+                <td class="p-2 text-center">{{ r.cantidad_horas|floatformat:"-2" }}</td>
                 <td class="p-2">{{ r.justificacion|default:"—" }}</td>
                 <td class="p-2">
                   {% with est=r.estado|lower %}
                     {% if est == "aprobado" %}
-                      <span class="px-2 py-1 rounded bg-green-600 text-white text-xs">Aprobado</span>
+                      <span class="inline-flex items-center justify-center px-3 py-[6px] rounded-md bg-green-600 text-white text-sm font-medium min-w-[90px] text-center">Aprobado</span>
                     {% elif est == "en revisión" or est == "en revision" or est == "pendiente" %}
-                      <span class="px-2 py-1 rounded bg-yellow-500 text-black text-xs">En revisión</span>
+                      <span class="inline-flex items-center justify-center px-3 py-[6px] rounded-md bg-yellow-600 text-white text-sm font-medium min-w-[90px] text-center">En revisión</span>
                     {% elif est == "rechazado" %}
-                      <span class="px-2 py-1 rounded bg-red-600 text-white text-xs">Rechazado</span>
+                      <span class="inline-flex items-center justify-center px-3 py-[6px] rounded-md bg-red-600 text-white text-sm font-medium min-w-[90px] text-center">Rechazado</span>
                     {% else %}
                       <span class="px-2 py-1 rounded bg-gray-600 text-white text-xs">{{ r.estado }}</span>
                     {% endif %}
