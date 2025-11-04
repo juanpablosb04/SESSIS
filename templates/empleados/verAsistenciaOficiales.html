@@ -1,4 +1,5 @@
 {% load static %}
+{% load tz %}
 <!DOCTYPE html>
 <html lang="es">
 
@@ -11,13 +12,11 @@
   <style>
     body {
       background-image: url('/static/Img/fondo.jpg');
-
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
       background-attachment: fixed;
       min-height: 100vh;
-
       padding-top: 4rem;
       font-family: 'Inter', sans-serif;
       background-color: #1a1a1a;
@@ -25,7 +24,6 @@
   </style>
 
   {% include "includes/navbar.html" %}
-
 </head>
 
 <body class="text-gray-200 bg-gray-900 min-h-screen">
@@ -35,13 +33,15 @@
 
     <div class="bg-gray-800/90 border border-gray-700 rounded-xl shadow-2xl p-8">
 
+      <!-- Filtros -->
       <form method="GET" class="flex flex-col md:flex-row gap-4 mb-8 items-end">
         <div class="flex flex-col">
           <label for="empleado" class="font-semibold mb-1 text-gray-200">Seleccionar Empleado</label>
           <select name="id_empleado" id="empleado" class="p-2 rounded bg-gray-700 border border-gray-600 text-white">
             <option value="">Todos</option>
             {% for emp in empleados %}
-            <option value="{{ emp.id_empleado }}" {% if empleado_id|stringformat:"s" == emp.id_empleado|stringformat:"s" %}selected{% endif %}>
+            <option value="{{ emp.id_empleado }}"
+              {% if empleado_id|stringformat:"s" == emp.id_empleado|stringformat:"s" %}selected{% endif %}>
               {{ emp.nombre_completo }}
             </option>
             {% endfor %}
@@ -51,25 +51,47 @@
         <div class="flex flex-col">
           <label for="fecha_inicio" class="font-semibold mb-1 text-gray-200">Fecha Inicio</label>
           <input type="date" id="fecha_inicio" name="fecha_inicio"
-            class="p-2 rounded bg-gray-700 border border-gray-600 text-white" value="{{ request.GET.fecha_inicio }}">
+                 class="p-2 rounded bg-gray-700 border border-gray-600 text-white"
+                 value="{{ fecha_inicio }}">
         </div>
 
         <div class="flex flex-col">
           <label for="fecha_fin" class="font-semibold mb-1 text-gray-200">Fecha Fin</label>
           <input type="date" id="fecha_fin" name="fecha_fin"
-            class="p-2 rounded bg-gray-700 border border-gray-600 text-white" value="{{ request.GET.fecha_fin }}">
+                 class="p-2 rounded bg-gray-700 border border-gray-600 text-white"
+                 value="{{ fecha_fin }}">
         </div>
 
         <div class="flex gap-2">
           <button type="submit"
-            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold transition duration-150">Filtrar</button>
+                  class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold transition duration-150">
+            Filtrar
+          </button>
+
           <a href="{% url 'verAsistenciaOficiales' %}"
-            class="px-4 py-2 bg-gray-500 hover:bg-gray-600 rounded text-white font-semibold transition duration-150">
+             class="px-4 py-2 bg-gray-500 hover:bg-gray-600 rounded text-white font-semibold transition duration-150">
             Resetear
           </a>
+
+          <!-- Descargar Excel  -->
+          <a href="{% url 'verAsistenciaOficialesExport' %}?id_empleado={{ empleado_id }}&fecha_inicio={{ fecha_inicio }}&fecha_fin={{ fecha_fin }}"
+             class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-white font-semibold transition duration-150 flex items-center gap-2"
+             title="Descargar Excel">
+            <i class="fa-solid fa-file-excel"></i>
+            EXCEL
+          </a>
+
+          <!-- Descargar PDF -->
+          <a href="{% url 'verAsistenciaOficialesExportPDF' %}?id_empleado={{ empleado_id }}&fecha_inicio={{ fecha_inicio }}&fecha_fin={{ fecha_fin }}"
+              class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-white font-semibold transition duration-150 flex items-center gap-2"
+              title="Descargar PDF">
+            <i class="fa-solid fa-file-pdf"></i>
+                PDF
+            </a>
         </div>
       </form>
 
+      <!-- Tabla -->
       <div class="overflow-x-auto">
         <table class="min-w-full text-left border border-gray-700 bg-gray-900 rounded-lg">
           <thead class="bg-gray-700 text-gray-200">
@@ -87,10 +109,11 @@
           <tbody class="text-gray-300">
             {% for a in asistencias %}
             <tr class="border-b border-gray-700 hover:bg-gray-700/50 transition">
-              <td class="px-4 py-2 whitespace-nowrap">{{ a.turno_ingreso|date:"d-m-Y" }}</td>
+              <td class="px-4 py-2 whitespace-nowrap">{{ a.turno_ingreso|localtime|date:"d-m-Y" }}</td>
               <td class="px-4 py-2">{{ a.id_empleado.cedula }} - {{ a.id_empleado.nombre_completo }}</td>
-              <td class="px-4 py-2">{{ a.turno_ingreso|date:"H:i" }}</td>
-              <td class="px-4 py-2">{% if a.turno_salida %}{{ a.turno_salida|date:"H:i" }}{% else %}--:--{% endif %}
+              <td class="px-4 py-2">{{ a.turno_ingreso|localtime|date:"H:i" }}</td>
+              <td class="px-4 py-2">
+                {% if a.turno_salida %}{{ a.turno_salida|localtime|date:"H:i" }}{% else %}--:--{% endif %}
               </td>
               <td class="px-4 py-2">{{ a.id_ubicacion.nombre }}</td>
               <td class="px-4 py-2">{{ a.observaciones|default:"" }}</td>
@@ -104,8 +127,8 @@
           </tbody>
         </table>
       </div>
+
     </div>
   </div>
 </body>
-
 </html>
