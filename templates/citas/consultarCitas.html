@@ -55,8 +55,7 @@
         {% for cita in citas %}
         <tr class="bg-gray-800 hover:bg-gray-700" data-id="{{ cita.id_cita }}">
           <td class="border px-4 py-2">{{ cita.cliente.cedula }}</td>
-          <td class="border px-4 py-2 cliente" data-id="{{ cita.cliente.id_cliente }}">{{ cita.cliente.nombre_completo
-            }}</td>
+          <td class="border px-4 py-2 cliente" data-id="{{ cita.cliente.id_cliente }}">{{ cita.cliente.nombre_completo}}</td>
           <td class="border px-4 py-2">{{ cita.cliente.email }}</td>
           <td class="border px-4 py-2">{{ cita.cliente.telefono }}</td>
           <td class="border px-4 py-2 fecha">{{ cita.fecha_cita|date:"Y-m-d" }}</td>

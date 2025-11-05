@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.utils import timezone
 from .models import Cita
 from clientes.models import Clientes
 
@@ -6,13 +7,18 @@ from clientes.models import Clientes
 # REGISTRAR CITAS
 # ======================================================
 def registrar_citas(request):
+    if not request.session.get("usuario_id"):
+        return redirect("login")
+
     if request.method == "POST":
         action = request.POST.get("action")
         if action == "crear":
             fecha = request.POST.get("fecha_cita")
             if fecha:
+                # Crear cita asociada al usuario que la registra
                 Cita.objects.create(
                     cliente_id=int(request.POST["id_cliente"]),
+                    usuario_id=request.session["usuario_id"],  # Asociar usuario logueado
                     fecha_cita=fecha,
                     hora_inicio=request.POST.get("hora_inicio") or None,
                     hora_finalizacion=request.POST.get("hora_finalizacion") or None,
@@ -24,38 +30,56 @@ def registrar_citas(request):
     clientes = Clientes.objects.all()
     return render(request, "citas/registrarCitas.html", {"clientes": clientes})
 
+
 # ======================================================
 # CONSULTAR, EDITAR Y ELIMINAR CITAS
 # ======================================================
 def consultar_citas(request):
+    if not request.session.get("usuario_id"):
+        return redirect("login")
+
+    usuario_id = request.session.get("usuario_id")
+    now = timezone.localtime()
+    today = now.date()
+    current_time = now.time()
+
+    # =========================
+    # Acciones POST: editar o eliminar
+    # =========================
     if request.method == "POST":
         action = request.POST.get("action")
 
         if action == "editar":
             cita = get_object_or_404(Cita, id_cita=request.POST.get("cita_id"))
 
-            # Solo actualizar fecha si viene valor
             fecha = request.POST.get("fecha_cita")
             if fecha:
                 cita.fecha_cita = fecha
 
             cita.cliente_id = int(request.POST.get("id_cliente"))
-
-            # Solo sobrescribimos horas si vienen valores
-            hora_inicio = request.POST.get("hora_inicio")
-            if hora_inicio:
-                cita.hora_inicio = hora_inicio
-
-            hora_finalizacion = request.POST.get("hora_finalizacion")
-            if hora_finalizacion:
-                cita.hora_finalizacion = hora_finalizacion
-
+            cita.hora_inicio = request.POST.get("hora_inicio") or None
+            cita.hora_finalizacion = request.POST.get("hora_finalizacion") or None
             cita.motivo = request.POST.get("motivo")
             cita.descripcion = request.POST.get("descripcion")
             cita.save()
 
             return redirect('citas:consultarCitas')
 
-    citas = Cita.objects.all()
+        elif action == "eliminar":
+            cita = get_object_or_404(Cita, id_cita=request.POST.get("cita_id"))
+            cita.delete()
+            return redirect('citas:consultarCitas')
+
+    # =========================
+    # Filtrar solo citas activas para este usuario
+    # =========================
+    citas_activas = (
+        Cita.objects.filter(usuario_id=usuario_id, fecha_cita__gt=today) |
+        Cita.objects.filter(usuario_id=usuario_id, fecha_cita=today, hora_finalizacion__gte=current_time)
+    )
+
     clientes = Clientes.objects.all()
-    return render(request, "citas/consultarCitas.html", {"citas": citas, "clientes": clientes})
+    return render(request, "citas/consultarCitas.html", {
+        "citas": citas_activas,
+        "clientes": clientes
+    })
