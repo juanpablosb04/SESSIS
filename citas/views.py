@@ -2,10 +2,12 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from .models import Cita
 from clientes.models import Clientes
+from config.decorators import role_required
 
 # ======================================================
 # REGISTRAR CITAS
 # ======================================================
+@role_required(["Administrador"])
 def registrar_citas(request):
     if not request.session.get("usuario_id"):
         return redirect("login")
@@ -34,6 +36,7 @@ def registrar_citas(request):
 # ======================================================
 # CONSULTAR, EDITAR Y ELIMINAR CITAS
 # ======================================================
+@role_required(["Administrador"])
 def consultar_citas(request):
     if not request.session.get("usuario_id"):
         return redirect("login")
