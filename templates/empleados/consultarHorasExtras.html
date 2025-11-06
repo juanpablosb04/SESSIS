@@ -6,11 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mis Horas Extras</title>
   <script src="https://cdn.tailwindcss.com"></script>
-
   <style>
     html, body{
       margin:0; padding:0; height:100%;
-      background-image: url("{% static 'Img/consultarHorasExtrasFondo.png' %}");
+      background-image: url("{% static 'Img/fondoSecundario.jpg' %}");
       background-size: cover; background-repeat: no-repeat; background-position: center;
       min-height: 100vh; width: 100%;
     }
@@ -82,11 +81,11 @@
               <td class="py-3 px-4 border-t border-gray-700">
                 {% with e=r.estado|lower %}
                   {% if e == "aprobado" %}
-                    <span class="px-2 py-1 rounded bg-green-600 text-white text-xs">Aprobado</span>
+                    <span class="inline-flex items-center justify-center w-[95px] px-3 py-[6px] rounded-md bg-green-600 text-white text-sm font-medium">Aprobado</span>
                   {% elif e == "rechazado" %}
-                    <span class="px-2 py-1 rounded bg-red-600 text-white text-xs">Rechazado</span>
+                    <span class="inline-flex items-center justify-center w-[95px] px-3 py-[6px] rounded-md bg-red-600 text-white text-sm font-medium">Rechazado</span>
                   {% else %}
-                    <span class="px-2 py-1 rounded bg-yellow-500 text-black text-xs">Pendiente</span>
+                    <span class="inline-flex items-center justify-center w-[95px] px-3 py-[6px] rounded-md bg-yellow-600 text-white text-sm font-medium">Pendiente</span>
                   {% endif %}
                 {% endwith %}
               </td>
@@ -103,7 +102,7 @@
     </div>
 
     <!-- Nota -->
-    <p class="mt-4 text-sm text-gray-300">
+    <p class="mt-4 text-lm text-black">
       Vista de solo lectura. Si notas algún error, comunícate con administracion.
     </p>
   </div>

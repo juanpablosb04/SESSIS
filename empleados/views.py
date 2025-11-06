@@ -370,7 +370,7 @@ def consultar_horas_extras_oficial(request):
 
     return render(
         request,
-        "Empleado/consultarHorasExtras.html",
+        "empleados/consultarHorasExtras.html",
         {
             "empleado": empleado,
             "registros": registros,

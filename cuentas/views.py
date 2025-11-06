@@ -9,6 +9,7 @@ import smtplib
 import string
 import random
 from django.db.models import Q
+from datetime import date
 
 
 # ======================================================
@@ -35,65 +36,31 @@ def user_login(request):
     return render(request, "cuentas/index.html")
 
 
-# ======================================================
-# INICIO (notificación de citas activas)
-# ======================================================
 def inicio(request):
-    # Verificar sesión
-    if not request.session.get("usuario_id"):
+
+    usuario_id = request.session.get("usuario_id")
+    if not usuario_id:
         return redirect("login")
+    
+    from datetime import date
+    hoy = date.today()
 
-    notificacion = {
-        "estado": "ok",
-        "cantidad": 0,
-        "mensaje": None,
-    }
+    citas_hoy = Cita.objects.filter(
+        usuario_id=usuario_id,
+        fecha_cita=hoy
+    ).count()
 
-    try:
-        usuario_id = request.session.get("usuario_id")
-        rol = request.session.get("usuario_rol")
+    # Mostrar solo una vez por sesión
+    mostrar_toast = False
+    if citas_hoy > 0 and not request.session.get("toast_mostrado", False):
+        mostrar_toast = True
+        request.session["toast_mostrado"] = True
 
-        now = timezone.localtime()
-        today = now.date()
-        current_time = now.time()
+    return render(request, "cuentas/inicio.html", {
+        "citas_hoy": citas_hoy,
+        "mostrar_toast": mostrar_toast,
+    })
 
-        # ===============================
-        # Filtrar citas activas
-        # ===============================
-        if rol == "Administrador":
-            # Administrador ve todas las citas activas
-            citas_activas = Cita.objects.filter(
-                Q(fecha_cita__gt=today) |
-                Q(fecha_cita=today, hora_finalizacion__gte=current_time)
-            )
-        else:
-            # Usuario normal ve solo sus propias citas activas
-            citas_activas = Cita.objects.filter(
-                Q(usuario_id=usuario_id) & (
-                    Q(fecha_cita__gt=today) |
-                    Q(fecha_cita=today, hora_finalizacion__gte=current_time)
-                )
-            )
-
-        cantidad = citas_activas.count()
-        notificacion["cantidad"] = cantidad
-
-        # ===============================
-        # Mensaje personalizado
-        # ===============================
-        if cantidad == 0:
-            notificacion["estado"] = "sin_citas"
-            notificacion["mensaje"] = "No tienes citas activas."
-        else:
-            notificacion["estado"] = "ok"
-            notificacion["mensaje"] = f"Tienes {cantidad} cita{'s' if cantidad != 1 else ''} activa{'s' if cantidad != 1 else ''}."
-
-    except Exception as e:
-        print("Error al cargar citas:", e)
-        notificacion["estado"] = "error"
-        notificacion["mensaje"] = "No fue posible cargar las citas."
-
-    return render(request, "cuentas/inicio.html", {"notificacion_citas": notificacion})
 
 
 # ======================================================

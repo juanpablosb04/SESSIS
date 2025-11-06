@@ -89,7 +89,7 @@ DATABASES = {
         'NAME': 'SESSIS',
         'USER': '',
         'PASSWORD': '',
-        'HOST': 'AKILES08CR\\SQLEXPRESS',
+        'HOST': '',
         'PORT': '',
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
@@ -125,7 +125,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Costa_Rica'
 
 USE_I18N = True
 

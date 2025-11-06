@@ -124,9 +124,10 @@
         <table class="min-w-full text-left border border-gray-600">
           <thead class="bg-gray-700 text-gray-200">
             <tr>
-              <th class="p-2">ID</th>
+              <th class="p-2">ID del Equipo</th>
               <th class="p-2">Nombre</th>
               <th class="p-2">Descripción</th>
+              <th class="p-2">Estado</th>
               <th class="p-2">Ubicación</th>
               <th class="p-2 text-center">Acciones</th>
             </tr>
@@ -139,6 +140,7 @@
               <td class="p-2 whitespace-nowrap">{{ inv.id_inventario }}</td>
               <td class="p-2">{{ inv.nombre }}</td>
               <td class="p-2">{{ inv.descripcion }}</td>
+              <td class="p-2">{{ inv.estado }}</td>
               <td class="p-2">{{ inv.id_ubicacion.nombre }}</td>
 
               <!-- ACCIONES -->

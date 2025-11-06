@@ -124,12 +124,15 @@ CREATE TABLE HorasExtras (
 CREATE TABLE Citas (
     id_cita INT PRIMARY KEY IDENTITY(1,1),
     id_cliente INT NOT NULL,
+    id_usuario INT NOT NULL,
     fecha_cita DATE NOT NULL,
     hora_inicio TIME NOT NULL,
     hora_finalizacion TIME,
     motivo VARCHAR(200),
     descripcion VARCHAR(250),
-    FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente)
+
+    FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente),
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
 );
 GO
 
