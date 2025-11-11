@@ -1,0 +1,287 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Empleados SES</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-image: url("{% static 'Img/fondo.jpg' %}");
+
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      min-height: 100vh;
+
+      padding-top: 4rem;
+      font-family: 'Inter', sans-serif;
+      background-color: #1a1a1a;
+    }
+
+    .alert-error {
+      background-color: rgba(255, 0, 0, 0.15);
+      color: #ff4d4d;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-success {
+      background-color: rgba(0, 128, 0, 0.15);
+      color: #4dff4d;
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+  </style>
+
+  {% include "includes/navbar.html" %}
+
+</head>
+
+<body class="text-gray-200">
+
+  <div class="flex flex-col items-center justify-start py-8">
+
+    <!-- Formulario de Registro -->
+    <div class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7 mb-10">
+      <h2 class="text-2xl font-bold text-gray-200 mb-4">Registro de empleado</h2>
+      {% if messages %}
+      {% for message in messages %}
+      {% if 'crear' in message.tags %}
+      {% if 'success' in message.tags %}
+      <div class="alert-success">{{ message }}</div>
+      {% else %}
+      <div class="alert-error">{{ message }}</div>
+      {% endif %}
+      {% endif %}
+      {% endfor %}
+      {% endif %}
+      <form method="POST" class="flex flex-col">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="crear">
+
+        <div class="flex space-x-4 mb-4">
+          <input name="nombre_completo" placeholder="Nombre completo" type="text"
+            class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-full focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition" />
+        </div>
+
+        <input name="email" placeholder="Correo Electrónico" type="email"
+          class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 mb-4 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition" />
+
+        <div class="flex space-x-4 mb-4">
+          <input name="cedula" placeholder="Cédula" type="text"
+            class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition" />
+          <input name="telefono" placeholder="Teléfono" type="text"
+            class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition" />
+        </div>
+
+        <input name="direccion" placeholder="Dirección" type="text"
+          class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 mb-4 focus:bg-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition" />
+
+        <label for="fecha_contratacion" class="text-sm mb-2 text-gray-200">Fecha de Contratación</label>
+        <input name="fecha_contratacion" id="fecha_contratacion" type="date"
+          class="bg-gray-700 text-gray-200 border-0 rounded-md p-2" />
+
+        <button type="submit"
+          class="bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-bold py-2 px-4 rounded-md mt-4 hover:from-indigo-600 hover:to-blue-600 transition">
+          Registrar
+        </button>
+      </form>
+    </div>
+
+    <!-- Listado -->
+    <div class="w-full max-w-[1150px] bg-gray-800/95 rounded-lg shadow-md p-7">
+      <h2 class="text-2xl font-bold text-gray-200 mb-4">Lista de Empleados</h2>
+
+      <div class="overflow-x-auto">
+
+        {% if messages %}
+        {% for message in messages %}
+        {% if 'editar' in message.tags or 'eliminar' in message.tags or 'cambiar_estado' in message.tags %}
+        {% if 'success' in message.tags %}
+        <div class="alert-success">{{ message }}</div>
+        {% else %}
+        <div class="alert-error">{{ message }}</div>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+
+        <table class="min-w-full table-fixed text-left border border-gray-600">
+          <thead class="bg-gray-700 text-gray-200">
+            <tr>
+              <th class="p-2">Nombre</th>
+              <th class="p-2">Correo</th>
+              <th class="p-2">Cédula</th>
+              <th class="p-2">Teléfono</th>
+              <th class="p-2 text-center">Estado</th>
+              <th class="p-2 text-center">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody class="text-gray-300">
+            {% for empleado in empleados %}
+            <tr class="border-b border-gray-700">
+              <td class="p-2">{{ empleado.nombre_completo }}</td>
+              <td class="p-2">{{ empleado.email }}</td>
+              <td class="p-2">{{ empleado.cedula }}</td>
+              <td class="p-2">{{ empleado.telefono|default:"—" }}</td>
+
+              <td class="p-2 text-center">
+                {% if empleado.estado %}
+                <span
+                  class="inline-flex items-center justify-center w-[95px] px-3 py-[6px] rounded-md bg-green-600 text-white text-sm font-medium">
+                  Activo
+                </span>
+                {% else %}
+                <span
+                  class="inline-flex items-center justify-center w-[95px] px-3 py-[6px] rounded-md bg-red-600 text-white text-sm font-medium">
+                  Inactivo
+                </span>
+                {% endif %}
+              </td>
+
+              <td class="p-2 min-w-[260px]">
+                <div class="flex flex-nowrap justify-center gap-2">
+
+                  <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded whitespace-nowrap"
+                    data-id="{{ empleado.id_empleado }}" data-nombre="{{ empleado.nombre_completo|escapejs }}"
+                    data-email="{{ empleado.email|escapejs }}" data-cedula="{{ empleado.cedula|escapejs }}"
+                    data-telefono="{{ empleado.telefono|default_if_none:''|escapejs }}"
+                    data-direccion="{{ empleado.direccion|default_if_none:''|escapejs }}"
+                    data-fecha="{{ empleado.fecha_contratacion|date:'Y-m-d' }}" onclick="abrirModalDesdeDataset(this)">
+                    Editar
+                  </button>
+
+                  <form method="POST" action="{% url 'empleados' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="cambiar_estado">
+                    <input type="hidden" name="empleado_id" value="{{ empleado.id_empleado }}">
+                    <button type="submit"
+                      class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded whitespace-nowrap **w-[100px]**">
+                      {% if empleado.estado %} Inactivar {% else %} Activar {% endif %}
+                    </button>
+                  </form>
+
+                  <a href="{% url 'auditoria_empleado' empleado.id_empleado %}"
+                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded whitespace-nowrap">
+                    Auditoría
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="8" class="p-4 text-center text-gray-400">No hay empleados registrados</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+
+    <!-- Modal Editar -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+      <div class="bg-gray-900 rounded-lg p-6 w-full max-w-lg">
+        <h3 class="text-xl font-bold mb-4 text-white">Editar Empleado</h3>
+        <form id="form-editar" class="flex flex-col space-y-4" method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="editar">
+          <input type="hidden" name="empleado_id" id="id_empleado">
+
+          <input name="nombre_completo" id="edit_nombre" placeholder="Nombre completo" type="text"
+            class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 focus:bg-gray-600" />
+
+          <input name="email" id="edit_email" placeholder="Correo Electrónico" type="email"
+            class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 focus:bg-gray-600" />
+
+          <input name="cedula" id="edit_cedula" placeholder="Cédula" type="text"
+            class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 focus:bg-gray-600" />
+
+          <input name="telefono" id="edit_telefono" placeholder="Teléfono" type="text"
+            class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 focus:bg-gray-600" />
+
+          <input name="direccion" id="edit_direccion" placeholder="Dirección" type="text"
+            class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 focus:bg-gray-600" />
+
+          <input name="fecha_contratacion" id="edit_fecha" type="date"
+            class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 focus:bg-gray-600" />
+
+          <div class="flex justify-end gap-2 pt-4">
+            <button type="button" onclick="cerrarModal()"
+              class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-1 px-4 rounded">
+              Cancelar
+            </button>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-4 rounded">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <script>
+
+        function abrirModalDesdeDataset(btn) {
+          document.getElementById('modal').classList.remove('hidden');
+          document.getElementById('modal').classList.add('flex');
+
+          document.getElementById('id_empleado').value = btn.dataset.id || '';
+          document.getElementById('edit_nombre').value = btn.dataset.nombre || '';
+          document.getElementById('edit_email').value = btn.dataset.email || '';
+          document.getElementById('edit_cedula').value = btn.dataset.cedula || '';
+          document.getElementById('edit_telefono').value = btn.dataset.telefono || '';
+          document.getElementById('edit_direccion').value = btn.dataset.direccion || '';
+          document.getElementById('edit_fecha').value = btn.dataset.fecha || '';
+        }
+
+        function cerrarModal() {
+          const m = document.getElementById('modal');
+          m.classList.add('hidden');
+          m.classList.remove('flex');
+
+          function abrirModal(id, nombre, email, cedula, telefono, direccion, fecha) {
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('modal').classList.add('flex');
+
+            document.getElementById('id_empleado').value = id;
+            document.getElementById('edit_nombre').value = nombre;
+            document.getElementById('edit_email').value = email;
+            document.getElementById('edit_cedula').value = cedula;
+            document.getElementById('edit_telefono').value = telefono;
+            document.getElementById('edit_direccion').value = direccion;
+            document.getElementById('edit_fecha').value = fecha;
+          }
+
+          function cerrarModal() {
+            document.getElementById('modal').classList.add('hidden');
+            document.getElementById('modal').classList.remove('flex');
+
+          }
+
+          function confirmarEliminar() {
+            return confirm("¿Seguro que quieres eliminar este empleado?");
+          }
+
+        }
+      </script>
+</body>
+
+</html>

@@ -1,0 +1,280 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Horas Extras</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+
+    body {
+            background-image: url('/static/Img/fondo.jpg');
+                       
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            
+            padding-top: 4rem; 
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a1a;
+        }
+
+    .alert-error {
+      background-color: rgba(255, 0, 0, 0.15);
+      color: #ff4d4d;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-success {
+      background-color: rgba(0, 128, 0, 0.15);
+      color: #4dff4d;
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+  </style>
+  {% include "includes/navbar.html" %}
+</head>
+
+    <body class="text-gray-200 flex flex-col items-center py-8">
+  
+    <div class="w-full max-w-[850px] bg-gray-800/95 rounded-lg shadow-md p-7 mb-10 mt-12">
+      <h2 class="text-2xl font-bold text-gray-200 mb-4">Registrar Horas Extras</h2>
+      {% if messages %}
+        {% for message in messages %}
+        {% if 'crear' in message.tags %}
+        {% if 'success' in message.tags %}
+        <div class="alert-success">{{ message }}</div>
+        {% else %}
+        <div class="alert-error">{{ message }}</div>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+      <form method="POST" action="{% url 'horasExtras' %}" class="flex flex-col">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="crear">
+
+        <div class="mb-4">
+          <label class="block text-sm mb-1 text-gray-300">Empleado</label>
+          <select name="empleado_id" class="w-full p-2 rounded bg-gray-700 text-white" required>
+            <option value="">-- Seleccione un empleado --</option>
+            {% for e in empleados %}
+              <option value="{{ e.id_empleado }}">{{ e.nombre_completo }} — {{ e.cedula }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="flex flex-col md:flex-row md:space-x-4 mb-4">
+          <div class="w-full md:w-1/2">
+            <label class="block text-sm mb-1 text-gray-300">Fecha</label>
+            <input type="date" name="fecha" class="w-full p-2 rounded bg-gray-700 text-white" required>
+          </div>
+          <div class="w-full md:w-1/2 mt-3 md:mt-0">
+            <label class="block text-sm mb-1 text-gray-300">Cantidad de horas</label>
+            <input type="number" name="cantidad_horas" min="0.5" step="0.5" max="24"
+                   class="w-full p-2 rounded bg-gray-700 text-white" placeholder="Ej: 1, 2, 3.5" required>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm mb-1 text-gray-300">Justificación</label>
+          <textarea name="justificacion" rows="3" class="w-full p-2 rounded bg-gray-700 text-white"
+                    placeholder="Detalle breve de la razón de las horas extras..."></textarea>
+        </div>
+
+        <div class="mb-5">
+          <label class="block text-sm mb-1 text-gray-300">Estado</label>
+          <select name="estado" class="w-full p-2 rounded bg-gray-700 text-white">
+            <option value="PENDIENTE">Pendiente</option>
+            <option value="APROBADO">Aprobado</option>
+          </select>
+        </div>
+
+        <button type="submit"
+                class="bg-gradient-to-r from-green-500 to-green-700 text-white font-bold py-2 px-4 rounded hover:from-green-600 hover:to-green-800 transition">
+          Registrar
+        </button>
+      </form>
+    </div>
+
+    <!-- Historial de horas extras -->
+    <div class="w-full max-w-[1000px] bg-gray-800/95 rounded-lg shadow-md p-7 mt-2">
+      <h2 class="text-2xl font-bold text-gray-200 mb-4">Historial de Horas Extras</h2>
+      {% if messages %}
+      {% for message in messages %}
+        {% if 'editar' in message.tags or 'eliminar' in message.tags or 'cambiar_estado' in message.tags %}
+          {% if 'success' in message.tags %}
+            <div class="alert-success">{{ message }}</div>
+          {% else %}
+            <div class="alert-error">{{ message }}</div>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-left border border-gray-600">
+          <thead class="bg-gray-700 text-gray-200">
+            <tr>
+              <th class="p-2">Empleado</th>
+              <th class="p-2">Fecha</th>
+              <th class="p-2">Horas</th>
+              <th class="p-2">Justificación</th>
+              <th class="p-2">Estado</th>
+              <th class="p-2 text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="text-gray-300">
+            {% for r in registros %}
+              <tr class="border-b border-gray-700">
+                <td class="p-2">{{ r.empleado.nombre_completo }}</td>
+                <td class="p-2">{{ r.fecha|date:"d/m/Y" }}</td>
+                <td class="p-2 text-center">{{ r.cantidad_horas|floatformat:"-2" }}</td>
+                <td class="p-2">{{ r.justificacion|default:"—" }}</td>
+                <td class="p-2">
+                  {% with est=r.estado|lower %}
+                    {% if est == "aprobado" %}
+                      <span class="inline-flex items-center justify-center px-3 py-[6px] rounded-md bg-green-600 text-white text-sm font-medium min-w-[90px] text-center">Aprobado</span>
+                    {% elif est == "en revisión" or est == "en revision" or est == "pendiente" %}
+                      <span class="inline-flex items-center justify-center px-3 py-[6px] rounded-md bg-yellow-600 text-white text-sm font-medium min-w-[90px] text-center">En revisión</span>
+                    {% elif est == "rechazado" %}
+                      <span class="inline-flex items-center justify-center px-3 py-[6px] rounded-md bg-red-600 text-white text-sm font-medium min-w-[90px] text-center">Rechazado</span>
+                    {% else %}
+                      <span class="px-2 py-1 rounded bg-gray-600 text-white text-xs">{{ r.estado }}</span>
+                    {% endif %}
+                  {% endwith %}
+                </td>
+                <td class="p-2">
+                  <div class="flex flex-nowrap justify-center gap-2">
+                    <!-- Editar -->
+                    <button
+                      class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded whitespace-nowrap"
+                      data-id="{{ r.id_hora_extra }}"
+                      data-empleado="{{ r.empleado.id_empleado }}"
+                      data-fecha="{{ r.fecha|date:'Y-m-d' }}"
+                      data-horas="{{ r.cantidad_horas }}"
+                      data-just="{{ r.justificacion|default_if_none:''|escapejs }}"
+                      data-estado="{{ r.estado }}"
+                      onclick="abrirModalEditar(
+                        this.dataset.id,
+                        this.dataset.empleado,
+                        this.dataset.fecha,
+                        this.dataset.horas,
+                        this.dataset.just,
+                        this.dataset.estado
+                      )">
+                      Editar
+                    </button>
+
+                    <!-- Auditoría de horas extra por empleado -->
+                    <a href="{% url 'auditoria_horas_extras_por_empleado' r.empleado.id_empleado %}"
+                       class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded whitespace-nowrap">
+                      Auditoría
+                    </a>
+
+                    <!-- (Eliminado) Botón Eliminar: NO se muestra en este módulo -->
+                  </div>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="6" class="p-4 text-center text-gray-400">No hay registros de horas extras.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal Editar -->
+  <div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+    <div class="bg-gray-900 rounded-lg p-6 w-full max-w-lg">
+      <h3 class="text-xl font-bold mb-4 text-white">Editar Registro</h3>
+      <form method="POST" action="{% url 'horasExtras' %}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="editar">
+        <input type="hidden" id="edit_id" name="hora_extra_id">
+
+        <div class="mb-3">
+          <label class="block text-sm mb-1 text-gray-300">Empleado</label>
+          <select id="edit_empleado" name="empleado_id" class="w-full p-2 rounded bg-gray-700 text-white">
+            {% for e in empleados %}
+              <option value="{{ e.id_empleado }}">{{ e.nombre_completo }} — {{ e.cedula }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="flex flex-col md:flex-row md:space-x-4 mb-3">
+          <div class="w-full md:w-1/2">
+            <label class="block text-sm mb-1 text-gray-300">Fecha</label>
+            <input id="edit_fecha" name="fecha" type="date" class="w-full p-2 rounded bg-gray-700 text-white">
+          </div>
+          <div class="w-full md:w-1/2 mt-3 md:mt-0">
+            <label class="block text-sm mb-1 text-gray-300">Horas</label>
+            <input id="edit_horas" name="cantidad_horas" type="number" min="0.5" step="0.5" max="24"
+                   class="w-full p-2 rounded bg-gray-700 text-white">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="block text-sm mb-1 text-gray-300">Justificación</label>
+          <textarea id="edit_just" name="justificacion" rows="3"
+                    class="w-full p-2 rounded bg-gray-700 text-white"></textarea>
+        </div>
+
+        <div class="mb-5">
+          <label class="block text-sm mb-1 text-gray-300">Estado</label>
+          <select id="edit_estado" name="estado" class="w-full p-2 rounded bg-gray-700 text-white">
+            <option value="PENDIENTE">Pendiente</option>
+            <option value="APROBADO">Aprobado</option>
+            <option value="RECHAZADO">Rechazado</option>
+          </select>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="cerrarModalEditar()"
+                  class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-1 px-4 rounded">
+            Cancelar
+          </button>
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-4 rounded">
+            Guardar
+          </button>
+        </div>
+      </form>
+    </div>
+
+  <script>
+    function abrirModalEditar(id, empleado_id, fecha, horas, just, estado){
+      document.getElementById('edit_id').value = id || "";
+      document.getElementById('edit_empleado').value = empleado_id || "";
+      document.getElementById('edit_fecha').value = fecha || "";
+      document.getElementById('edit_horas').value = horas || "";
+      document.getElementById('edit_just').value = just || "";
+      document.getElementById('edit_estado').value = estado || "PENDIENTE";
+      document.getElementById('modalEditar').classList.remove('hidden');
+      document.getElementById('modalEditar').classList.add('flex');
+    }
+    function cerrarModalEditar(){
+      document.getElementById('modalEditar').classList.add('hidden');
+      document.getElementById('modalEditar').classList.remove('flex');
+    }
+  </script>
+</body>
+</html>

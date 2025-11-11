@@ -1,0 +1,253 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventario SES</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/static/JS/navbar.js"></script>
+  <style>
+    body {
+      background-image: url('/static/Img/fondo.jpg');
+
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      min-height: 100vh;
+
+      padding-top: 4rem;
+      font-family: 'Inter', sans-serif;
+      background-color: #1a1a1a;
+    }
+
+    .alert-error {
+      background-color: rgba(255, 0, 0, 0.15);
+      color: #ff4d4d;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-success {
+      background-color: rgba(0, 128, 0, 0.15);
+      color: #4dff4d;
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+  </style>
+
+  {% include "includes/navbar.html" %}
+
+</head>
+
+<body>
+
+  <div class="flex flex-col items-center justify-start py-8">
+    <!-- CREAR INVENTARIO -->
+    <div class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7 mb-10">
+      <h2 class="text-2xl font-bold text-gray-200 mb-4">Registro de equipo de inventario</h2>
+      {% if messages %}
+      {% for message in messages %}
+      {% if 'crear' in message.tags %}
+      {% if 'success' in message.tags %}
+      <div class="alert-success">{{ message }}</div>
+      {% else %}
+      <div class="alert-error">{{ message }}</div>
+      {% endif %}
+      {% endif %}
+      {% endfor %}
+      {% endif %}
+      <form method="POST" class="flex flex-col">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="crear">
+
+        <div class="flex space-x-4 mb-4">
+          <input name="id_inventario" placeholder="ID del equipo de inventario"
+            class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2" type="text" required />
+          <input name="nombre" placeholder="Nombre" class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2"
+            type="text" required />
+        </div>
+
+        <input name="descripcion" placeholder="Descripción"
+          class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 mb-4" type="text" />
+
+        <div class="flex space-x-4 mb-4">
+          <input name="estado" placeholder="Estado" class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2"
+            type="text" />
+          <select name="id_ubicacion" class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2">
+            <option disabled selected>Selecciona ubicación</option>
+            {% for ubic in ubicaciones %}
+            <option value="{{ ubic.id_ubicacion }}">{{ ubic.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <button class="bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-bold py-2 px-4 rounded-md mt-4"
+          type="submit">
+          Registrar al sistema de inventario
+        </button>
+      </form>
+    </div>
+
+    <!-- LISTA INVENTARIOS -->
+    <div class="w-full max-w-[1150px] bg-gray-800/95 rounded-lg shadow-md p-7">
+
+      <h2 class="text-2xl font-bold text-gray-200 mb-4">Lista de Inventario</h2>
+
+      <div class="overflow-x-auto">
+        {% if messages %}
+        {% for message in messages %}
+        {% if 'editar' in message.tags or 'eliminar' in message.tags %}
+        {% if 'success' in message.tags %}
+        <div class="alert-success">{{ message }}</div>
+        {% else %}
+        <div class="alert-error">{{ message }}</div>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+
+        <table class="min-w-full text-left border border-gray-600">
+          <thead class="bg-gray-700 text-gray-200">
+            <tr>
+              <th class="p-2">ID del Equipo</th>
+              <th class="p-2">Nombre</th>
+              <th class="p-2">Descripción</th>
+              <th class="p-2">Estado</th>
+              <th class="p-2">Ubicación</th>
+              <th class="p-2 text-center">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody class="text-gray-300">
+            {% for inv in inventarios %}
+            <tr class="border-b border-gray-700 hover:bg-gray-700/40 transition">
+
+              <td class="p-2 whitespace-nowrap">{{ inv.id_inventario }}</td>
+              <td class="p-2">{{ inv.nombre }}</td>
+              <td class="p-2">{{ inv.descripcion }}</td>
+              <td class="p-2">{{ inv.estado }}</td>
+              <td class="p-2">{{ inv.id_ubicacion.nombre }}</td>
+
+              <!-- ACCIONES -->
+              <td class="p-2 min-w-[230px]">
+                <div class="flex flex-nowrap justify-center gap-2">
+
+                  <!-- EDITAR -->
+                  <button
+                    onclick="abrirModal('{{ inv.id_inventario }}','{{ inv.nombre }}','{{ inv.descripcion }}','{{ inv.estado }}','{{ inv.id_cliente.id_cliente }}')"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded whitespace-nowrap">
+                    Editar
+                  </button>
+
+                  <!-- ELIMINAR -->
+                  <form method="POST" onsubmit="return confirm('¿Seguro que quieres eliminar este inventario?');">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="eliminar">
+                    <input type="hidden" name="inventario_id" value="{{ inv.id_inventario }}">
+                    <button type="submit"
+                      class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded whitespace-nowrap">
+                      Eliminar
+                    </button>
+                  </form>
+
+                </div>
+              </td>
+
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="p-4 text-center text-gray-400">No hay equipos en inventario</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- MODAL EDITAR -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+      <div class="bg-gray-900 rounded-lg p-6 w-full max-w-lg">
+        <h3 class="text-xl font-bold mb-4 text-white">Editar equipo de inventario</h3>
+        <form method="POST" class="flex flex-col space-y-4">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="editar">
+          <input type="hidden" name="inventario_id" id="edit_inventario_id">
+
+          <div class="flex space-x-4">
+            <input id="edit_id_inventario" name="id_inventario" placeholder="ID del Equipo" type="text"
+              class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2" required />
+            <input id="edit_nombre" name="nombre" placeholder="Nombre" type="text"
+              class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2" required />
+          </div>
+
+          <input id="edit_descripcion" name="descripcion" placeholder="Descripción" type="text"
+            class="bg-gray-700 text-gray-200 border-0 rounded-md p-2" />
+
+          <div class="flex space-x-4">
+            <input id="edit_estado" name="estado" placeholder="Estado" type="text"
+              class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2" />
+            <select name="id_ubicacion" class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-1/2">
+              <option disabled selected>Selecciona ubicación</option>
+              {% for ubic in ubicaciones %}
+              <option value="{{ ubic.id_ubicacion }}">{{ ubic.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="flex justify-end gap-2">
+            <button type="button" onclick="cerrarModal()"
+              class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-1 px-4 rounded">
+              Cancelar
+            </button>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-4 rounded">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      function abrirModal(id, nombre, descripcion, estado, cliente_id) {
+        document.getElementById('modal').classList.remove('hidden');
+        document.getElementById('modal').classList.add('flex');
+
+        document.getElementById('edit_inventario_id').value = id;
+        document.getElementById('edit_id_inventario').value = id;
+        document.getElementById('edit_nombre').value = nombre;
+        document.getElementById('edit_descripcion').value = descripcion;
+        document.getElementById('edit_estado').value = estado;
+
+        // Seleccionar el cliente correcto en el select
+        let select = document.getElementById('edit_ubicacion');
+        for (let i = 0; i < select.options.length; i++) {
+          if (select.options[i].value === ubicacion_id) {
+            select.options[i].selected = true;
+            break;
+          }
+        }
+      }
+
+      function cerrarModal() {
+        document.getElementById('modal').classList.add('hidden');
+        document.getElementById('modal').classList.remove('flex');
+      }
+    </script>
+</body>
+
+</html>

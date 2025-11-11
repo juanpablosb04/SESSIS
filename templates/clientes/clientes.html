@@ -1,0 +1,269 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clientes SES</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+
+    body {
+            background-image: url('/static/Img/fondo.jpg');
+                       
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            
+            padding-top: 4rem; 
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a1a;
+        }
+
+    .alert-error {
+      background-color: rgba(255, 0, 0, 0.15);
+      color: #ff4d4d;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-success {
+      background-color: rgba(0, 128, 0, 0.15);
+      color: #4dff4d;
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+
+  </style>
+
+  {% include "includes/navbar.html" %}
+  
+</head>
+
+<body class="text-gray-200 bg-gray-900">
+
+  <div class="flex flex-col items-center justify-start py-8">
+  
+    <!-- Formulario de registro -->
+    <div class="w-full max-w-[850px] bg-gray-800/95 rounded-lg shadow-md p-7 mb-10">
+      <h2 class="text-2xl font-bold text-gray-200 mb-4">Registro de Clientes</h2>
+      {% if messages %}
+        {% for message in messages %}
+        {% if 'crear' in message.tags %}
+        {% if 'success' in message.tags %}
+        <div class="alert-success">{{ message }}</div>
+        {% else %}
+        <div class="alert-error">{{ message }}</div>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+      <form method="POST" action="{% url 'clientes' %}" class="flex flex-col">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="crear">
+
+        <div class="flex flex-col md:flex-row md:space-x-4 mb-4">
+          <input name="nombre" placeholder="Nombre Completo"
+                 class="w-full md:w-1/2 p-2 rounded bg-gray-700 text-white mb-3 md:mb-0" required>
+          <input name="email" placeholder="Email"
+                 class="w-full md:w-1/2 p-2 rounded bg-gray-700 text-white" required>
+        </div>
+
+        <div class="flex flex-col md:flex-row md:space-x-4 mb-4">
+          <input name="cedula" placeholder="Cédula"
+                 class="w-full md:w-1/2 p-2 rounded bg-gray-700 text-white mb-3 md:mb-0" required>
+          <input name="telefono" placeholder="Teléfono"
+                 class="w-full md:w-1/2 p-2 rounded bg-gray-700 text-white">
+        </div>
+
+        <div class="mb-4">
+          <select name="id_ubicacion" class="w-full p-2 rounded bg-gray-700 text-white">
+            <option value="">-- Seleccione una ubicación --</option>
+            {% for u in ubicaciones %}
+              <option value="{{ u.id_ubicacion }}">{{ u.nombre }} - {{ u.tipo }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <button type="submit"
+                class="bg-gradient-to-r from-green-500 to-green-700 text-white font-bold py-2 px-4 rounded hover:from-green-600 hover:to-green-800 transition">
+          Registrar Cliente
+        </button>
+      </form>
+    </div>
+
+    <!-- Tabla de clientes -->
+    <div class="w-full max-w-[1550px] bg-gray-800/95 rounded-lg shadow-md p-7">
+      <h2 class="text-2xl font-bold text-gray-200 mb-4">Lista de Clientes</h2>
+
+      <div class="overflow-x-auto">
+        {% if messages %}
+        {% for message in messages %}
+        {% if 'editar' in message.tags or 'eliminar' in message.tags %}
+        {% if 'success' in message.tags %}
+        <div class="alert-success">{{ message }}</div>
+        {% else %}
+        <div class="alert-error">{{ message }}</div>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        <table class="min-w-full text-left border border-gray-600">
+          <thead class="bg-gray-700 text-gray-200">
+            <tr>
+              <th class="p-2">Nombre</th>
+              <th class="p-2">Email</th>
+              <th class="p-2">Cédula</th>
+              <th class="p-2">Teléfono</th>
+              <th class="p-2">Residencia</th>
+              <th class="p-2">Estado</th>
+              <th class="p-2 text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="text-gray-300">
+            {% for cliente in clientes %}
+              <tr class="border-b border-gray-700">
+                <td class="p-2">{{ cliente.nombre_completo }}</td>
+                <td class="p-2">{{ cliente.email }}</td>
+                <td class="p-2">{{ cliente.cedula }}</td>
+                <td class="p-2">{{ cliente.telefono|default:"—" }}</td>
+                <td class="p-2">
+                  {% if cliente.id_ubicacion %}
+                    {{ cliente.id_ubicacion.nombre }}
+                  {% else %}
+                    <span class="text-gray-400 italic">Sin ubicación</span>
+                  {% endif %}
+                </td>
+                <td class="p-2">
+                  {% if cliente.estado %}
+                    <span class="inline-flex items-center justify-center px-3 py-[6px] rounded-md bg-green-600 text-white text-sm font-medium min-w-[90px] text-center">Activo</span>
+                  {% else %}
+                    <span class="inline-flex items-center justify-center px-3 py-[6px] rounded-md bg-green-600 text-white text-sm font-medium min-w-[90px] text-center">Inactivo</span>
+                  {% endif %}
+                </td>
+                <td class="p-2">
+                  <div class="flex flex-nowrap justify-center gap-2">
+
+                    <!-- Editar -->
+                    <button
+                      class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded whitespace-nowrap"
+                      data-id="{{ cliente.id_cliente }}"
+                      data-nombre="{{ cliente.nombre_completo|escapejs }}"
+                      data-email="{{ cliente.email|escapejs }}"
+                      data-cedula="{{ cliente.cedula|escapejs }}"
+                      data-telefono="{{ cliente.telefono|default_if_none:''|escapejs }}"
+                      data-ubicacion="{% if cliente.id_ubicacion %}{{ cliente.id_ubicacion.id_ubicacion }}{% endif %}"
+                      onclick="abrirModalEditar(
+                        this.dataset.id,
+                        this.dataset.nombre,
+                        this.dataset.email,
+                        this.dataset.cedula,
+                        this.dataset.telefono,
+                        this.dataset.ubicacion
+                      )"
+                    >
+                      Editar
+                    </button>
+
+                    <!-- Activar / Inactivar (toggle; no enviamos 'estado' para que la vista alterne) -->
+                    <form method="POST" action="{% url 'clientes' %}">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="cambiar_estado">
+                      <input type="hidden" name="cliente_id" value="{{ cliente.id_cliente }}">
+                      <button type="submit"
+                              class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded whitespace-nowrap">
+                        {% if cliente.estado %} Inactivar {% else %} Activar {% endif %}
+                      </button>
+                    </form>
+
+                    <!-- Auditoría -->
+                    <a href="{% url 'auditoria_cliente' cliente.id_cliente %}"
+                       class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded whitespace-nowrap">
+                      Auditoría
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="7" class="p-4 text-center text-gray-400">No hay clientes registrados.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+ 
+</div>
+
+  <!-- Modal Editar -->
+  <div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+    <div class="bg-gray-900 rounded-lg p-6 w-full max-w-lg">
+      <h3 class="text-xl font-bold mb-4 text-white">Editar Cliente</h3>
+      <form method="POST" action="{% url 'clientes' %}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="editar">
+        <input type="hidden" id="edit_id" name="cliente_id">
+
+        <input id="edit_nombre" name="nombre" placeholder="Nombre Completo"
+               class="w-full p-2 rounded bg-gray-700 text-white mb-3">
+        <input id="edit_email" name="email" placeholder="Email"
+               class="w-full p-2 rounded bg-gray-700 text-white mb-3">
+        <input id="edit_cedula" name="cedula" placeholder="Cédula"
+               class="w-full p-2 rounded bg-gray-700 text-white mb-3">
+        <input id="edit_telefono" name="telefono" placeholder="Teléfono"
+               class="w-full p-2 rounded bg-gray-700 text-white mb-3">
+
+        <select id="edit_ubicacion" name="id_ubicacion" class="w-full p-2 rounded bg-gray-700 text-white mb-3">
+          <option value="">-- Seleccione una ubicación --</option>
+          {% for u in ubicaciones %}
+            <option value="{{ u.id_ubicacion }}">{{ u.nombre }} - {{ u.tipo }}</option>
+          {% endfor %}
+        </select>
+
+        <div class="flex justify-end gap-2 pt-4">
+          <button type="button" onclick="cerrarModalEditar()"
+                  class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-1 px-4 rounded">
+            Cancelar
+          </button>
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-4 rounded">
+            Guardar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function abrirModalEditar(id, nombre, email, cedula, telefono, id_ubicacion) {
+      document.getElementById('edit_id').value = id || "";
+      document.getElementById('edit_nombre').value = nombre || "";
+      document.getElementById('edit_email').value = email || "";
+      document.getElementById('edit_cedula').value = cedula || "";
+      document.getElementById('edit_telefono').value = telefono || "";
+      document.getElementById('edit_ubicacion').value = id_ubicacion || "";
+      document.getElementById('modalEditar').classList.remove('hidden');
+      document.getElementById('modalEditar').classList.add('flex');
+    }
+    function cerrarModalEditar() {
+      document.getElementById('modalEditar').classList.add('hidden');
+      document.getElementById('modalEditar').classList.remove('flex');
+    }
+  </script>
+</body>
+</html>

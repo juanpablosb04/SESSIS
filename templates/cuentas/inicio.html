@@ -1,0 +1,142 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Open sans', sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      background-color: black;
+      background-image: url('https://images.unsplash.com/photo-1617940673880-038ac787aa32?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1470');
+      background-size: cover;
+    }
+
+    @keyframes fade-in-down {
+      0% {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-fade-in-down {
+      animation: fade-in-down 0.7s ease-out;
+    }
+
+    .toast-enter {
+      opacity: 0;
+      transform: translateX(30px);
+      transition: all 0.5s ease;
+    }
+
+    .toast-show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .toast-hide {
+      opacity: 0;
+      transform: translateX(50px);
+    }
+  </style>
+</head>
+
+<body>
+
+  {% include "includes/navbar.html" %}
+
+  <div id="infoInicio" class="flex justify-center">
+    <div id="cuadroInicio"
+      class="h-[auto] w-[1050px] bg-white/10 backdrop-blur-[10px] rounded-[10px] border border-black/25 p-[45px] text-center mt-[95px] overflow-y-auto">
+
+      <h2 class="text-[30px] font-bold text-[#621729] mb-2">Bienvenido al sistema de SES</h2>
+
+      <h3 class="text-[20px] italic mb-4 text-black">“La seguridad no es solo nuestro trabajo, es nuestra vocación.”
+      </h3>
+
+      <p class="text-[18px] leading-relaxed text-black">
+        En el mundo cambiante de hoy, ser parte de la seguridad privada no significa solo custodiar un lugar, sino
+        proteger lo más valioso: la tranquilidad, la confianza y la vida de las personas.
+        <br><br>
+        Cada turno que comienzas, cada reporte que completas, cada decisión que tomas, es parte de un propósito mayor.
+        Aquí, no solo vigilamos — brindamos paz. No solo respondemos — prevenimos, actuamos y protegemos.
+        <br><br>
+        Este sistema fue creado para que tu labor sea más ágil, más clara, más fuerte. Porque tú eres parte esencial del
+        engranaje que sostiene la confianza de quienes confían en nosotros.
+        <br><br>
+        Gracias por tu compromiso. Gracias por tu servicio.
+      </p>
+
+      <h4 class="text-[100px] text-[#621729]">
+        <i class="fa-solid fa-globe"></i>
+      </h4>
+
+    </div>
+  </div>
+
+  {% if mostrar_toast %}
+<div id="toastCitas"
+     class="fixed top-6 right-6 z-50 max-w-sm toast-enter backdrop-blur-lg bg-gradient-to-r from-red-700 to-red-500/90 
+            shadow-xl rounded-xl p-5 border border-white/20 text-white flex gap-4">
+
+    <div class="text-3xl">
+      <i class="fa-solid fa-calendar-check"></i>
+    </div>
+
+    <div class="flex-1 text-left">
+      <p class="font-extrabold text-xl tracking-wide">¡Citas para Hoy!</p>
+
+      <p class="text-sm text-gray-100 mt-1">
+        {% if citas_hoy > 0 %}
+          Tienes <strong>{{ citas_hoy }}</strong> cita{% if citas_hoy > 1 %}s{% endif %} programada{% if citas_hoy > 1 %}s{% endif %} hoy.
+        {% else %}
+          No tienes citas para hoy.
+        {% endif %}
+      </p>
+    </div>
+
+    <button onclick="cerrarToast()" class="text-white hover:text-gray-200 transition text-xl">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+</div>
+{% endif %}
+
+
+</body>
+<script>
+  const toast = document.getElementById("toastCitas");
+
+  if (toast) {
+      setTimeout(() => {
+          toast.classList.add("toast-show");
+      }, 100);
+
+      setTimeout(() => {
+          cerrarToast();
+      }, 4000);
+  }
+
+  function cerrarToast() {
+      toast.classList.add("toast-hide");
+      setTimeout(() => toast.style.display = "none", 400);
+  }
+</script>
+
+</html>
