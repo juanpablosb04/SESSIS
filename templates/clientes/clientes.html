@@ -7,12 +7,20 @@
   <title>Clientes SES</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .fondo {
-      background-image: url("{% static 'Img/clientesFondo.png' %}");
-      background-size: cover;
-      background-position: center;
-      min-height: 100vh;
-    }
+
+    body {
+            background-image: url('/static/Img/fondo.jpg');
+                       
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            
+            padding-top: 4rem; 
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a1a;
+        }
 
     .alert-error {
       background-color: rgba(255, 0, 0, 0.15);
@@ -42,13 +50,15 @@
 
 
   </style>
+
+  {% include "includes/navbar.html" %}
+  
 </head>
 
-<body class="text-gray-200">
-  {% include "includes/navbar.html" %}
+<body class="text-gray-200 bg-gray-900">
 
-  <div class="fondo p-8 flex flex-col items-center">
-
+  <div class="flex flex-col items-center justify-start py-8">
+  
     <!-- Formulario de registro -->
     <div class="w-full max-w-[850px] bg-gray-800/95 rounded-lg shadow-md p-7 mb-10">
       <h2 class="text-2xl font-bold text-gray-200 mb-4">Registro de Clientes</h2>
@@ -98,7 +108,7 @@
     </div>
 
     <!-- Tabla de clientes -->
-    <div class="w-full max-w-[1150px] bg-gray-800/95 rounded-lg shadow-md p-7">
+    <div class="w-full max-w-[1550px] bg-gray-800/95 rounded-lg shadow-md p-7">
       <h2 class="text-2xl font-bold text-gray-200 mb-4">Lista de Clientes</h2>
 
       <div class="overflow-x-auto">
@@ -141,9 +151,9 @@
                 </td>
                 <td class="p-2">
                   {% if cliente.estado %}
-                    <span class="px-2 py-1 rounded bg-green-600 text-white text-xs">Activo</span>
+                    <span class="inline-flex items-center justify-center px-3 py-[6px] rounded-md bg-green-600 text-white text-sm font-medium min-w-[90px] text-center">Activo</span>
                   {% else %}
-                    <span class="px-2 py-1 rounded bg-red-600 text-white text-xs">Inactivo</span>
+                    <span class="inline-flex items-center justify-center px-3 py-[6px] rounded-md bg-green-600 text-white text-sm font-medium min-w-[90px] text-center">Inactivo</span>
                   {% endif %}
                 </td>
                 <td class="p-2">
@@ -198,7 +208,8 @@
         </table>
       </div>
     </div>
-  </div>
+ 
+</div>
 
   <!-- Modal Editar -->
   <div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">

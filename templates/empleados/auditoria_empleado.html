@@ -8,16 +8,19 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .fondo {
-      background-image: url("{% static 'Img/empleadosFondo.png' %}");
+      background-image: url('/static/Img/fondo.jpg');
       background-size: cover;
       background-position: center;
       min-height: 100vh;
     }
   </style>
+
+    {% include "includes/navbar.html" %}
+    
 </head>
 <body class="bg-gray-900 text-gray-200 min-h-screen fondo">
 
-  {% include "includes/navbar.html" %}
+
 
   <div class="p-8 max-w-7xl mx-auto">
     <h1 class="text-3xl font-bold mb-4">Auditoría del Empleado</h1>

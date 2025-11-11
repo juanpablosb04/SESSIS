@@ -1,4 +1,5 @@
 # empleados/models.py
+from asistencia.models import Asistencia
 from django.db import models
 
 

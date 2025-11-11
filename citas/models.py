@@ -1,9 +1,11 @@
 from django.db import models
 from clientes.models import Clientes
+from cuentas.models import Usuarios 
 
 class Cita(models.Model):
     id_cita = models.AutoField(primary_key=True)
     cliente = models.ForeignKey(Clientes, on_delete=models.CASCADE, db_column='id_cliente')
+    usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE, db_column='id_usuario') 
     fecha_cita = models.DateField(db_column='fecha_cita')
     hora_inicio = models.TimeField(db_column='hora_inicio')
     hora_finalizacion = models.TimeField(db_column='hora_finalizacion', null=True, blank=True)

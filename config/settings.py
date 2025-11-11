@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'inventarios',
     'ubicaciones',
     'citas',
+    'asistencia',
 ]
 
 MIDDLEWARE = [
@@ -86,7 +87,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'mssql',
         'NAME': 'SESSIS',
-        'USER': '',      # vacío porque usas Trusted_Connection
+        'USER': '',
         'PASSWORD': '',
         'HOST': '',
         'PORT': '',
@@ -124,7 +125,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Costa_Rica'
 
 USE_I18N = True
 

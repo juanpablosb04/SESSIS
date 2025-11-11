@@ -5,8 +5,10 @@ import re
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 from django.contrib import messages
-from .models import Empleado, EmpleadosAuditoria
+from .models import Empleado, EmpleadosAuditoria, Asistencia
 from config.decorators import role_required
+from django.utils import timezone
+from django.db.models import Q
 from .models import (
     Empleado,
     EmpleadosAuditoria,
@@ -160,7 +162,7 @@ def horas_extras_admin(request):
             estado = (request.POST.get("estado") or "").strip()
 
             if not emp_id or not fecha or not horas_raw or not estado:
-                messages.error(request, "⚠️ Empleado, fecha, horas y estado son obligatorios.")
+                messages.error(request, "⚠️ Empleado, fecha, horas y estado son obligatorios.", extra_tags='crear')
                 return redirect("horasExtras")
 
             empleado = get_object_or_404(Empleado, id_empleado=emp_id)
@@ -169,14 +171,14 @@ def horas_extras_admin(request):
             try:
                 horas_dec = Decimal(horas_raw.replace(",", "."))
             except (InvalidOperation, TypeError):
-                messages.error(request, "⚠️ La cantidad de horas no es un número válido.")
+                messages.error(request, "⚠️ La cantidad de horas no es un número válido.", extra_tags='crear')
                 return redirect("horasExtras")
 
             if horas_dec <= 0:
-                messages.error(request, "⚠️ La cantidad de horas debe ser mayor que 0.")
+                messages.error(request, "⚠️ La cantidad de horas debe ser mayor que 0.", extra_tags='crear')
                 return redirect("horasExtras")
             if horas_dec > Decimal("24"):
-                messages.error(request, "⚠️ Máximo permitido: 24 horas por registro.")
+                messages.error(request, "⚠️ Máximo permitido: 24 horas por registro.", extra_tags='crear')
                 return redirect("horasExtras")
 
             ESTADOS = {
@@ -200,7 +202,7 @@ def horas_extras_admin(request):
             registro._usuario_email = request.session.get("usuario_email")
             registro.save()
 
-            messages.success(request, "✅ Horas extras registradas correctamente.")
+            messages.success(request, "✅ Horas extras registradas correctamente.", extra_tags='crear')
             return redirect("horasExtras")
 
         # ---------- EDITAR (opcional, si ya lo usas desde el modal) ----------
@@ -218,7 +220,7 @@ def horas_extras_admin(request):
             try:
                 horas_dec = Decimal(horas_raw.replace(",", "."))
             except (InvalidOperation, TypeError):
-                messages.error(request, "⚠️ La cantidad de horas no es un número válido.")
+                messages.error(request, "⚠️ La cantidad de horas no es un número válido.", extra_tags='editar')
                 return redirect("horasExtras")
 
             ESTADOS = {
@@ -238,12 +240,12 @@ def horas_extras_admin(request):
             registro._usuario_email = request.session.get("usuario_email")
             registro.save()
 
-            messages.success(request, "✏️ Registro actualizado.")
+            messages.success(request, "✏️ Registro actualizado.", extra_tags='editar')
             return redirect("horasExtras")
 
         # ---------- CUALQUIER OTRA ACCIÓN ----------
         else:
-            messages.error(request, "Acción no soportada.")
+            messages.error(request, "Acción no soportada.", extra_tags='editar')
             return redirect("horasExtras")
 
     # GET -> historial para la tabla
@@ -258,6 +260,36 @@ def horas_extras_admin(request):
         "empleados/horasExtras.html",
         {"empleados": empleados, "registros": registros},
     )
+
+# =====================================================
+# Revisar Asistencia de Empleados
+# =====================================================
+@role_required(["Administrador"])
+def ver_asistencia_Empleados(request):
+    empleados = Empleado.objects.all().order_by('nombre_completo')
+    asistencias = Asistencia.objects.select_related('id_empleado', 'id_ubicacion').all().order_by('-turno_ingreso')
+
+    empleado_id = request.GET.get("id_empleado", "").strip()
+    fecha_inicio = request.GET.get("fecha_inicio", "").strip()
+    fecha_fin = request.GET.get("fecha_fin", "").strip()
+
+    filtros = Q()
+    if empleado_id:
+        filtros &= Q(id_empleado__id_empleado=empleado_id)
+    if fecha_inicio:
+        filtros &= Q(turno_ingreso__date__gte=fecha_inicio)
+    if fecha_fin:
+        filtros &= Q(turno_ingreso__date__lte=fecha_fin)
+
+    if filtros:
+        asistencias = asistencias.filter(filtros)
+
+    context = {
+        "empleados": empleados,
+        "asistencias": asistencias,
+        "empleado_seleccionado": empleado_id,
+    }
+    return render(request, "empleados/verAsistenciaOficiales.html", context)
 
 
 # =========================
@@ -298,6 +330,9 @@ def auditoria_horas_extras_por_empleado(request, empleado_id):
         {"empleado": empleado, "logs": logs},
     )
 
+# =========================
+# Consultar horas extras (Oficial)
+
 @role_required(["Oficial"])
 def consultar_horas_extras_oficial(request):
     usuario_email = request.session.get("usuario_email")
@@ -310,30 +345,36 @@ def consultar_horas_extras_oficial(request):
             "Contacta al administrador para vincular tu usuario con un empleado."
         )
         registros = []
-        total_horas = Decimal("0")
-        ultima_actualizacion = None
+        total_horas_aprobadas = Decimal("0")
+        ultima_actualizacion = timezone.now().date()
     else:
-        registros = (HorasExtras.objects
-                     .select_related("empleado")
-                     .filter(empleado=empleado)
-                     .order_by("-fecha", "-id_hora_extra"))
+        # Traer TODOS los registros del oficial para la tabla
+        registros = (
+            HorasExtras.objects
+            .select_related("empleado")
+            .filter(empleado=empleado)
+            .order_by("-fecha", "-id_hora_extra")
+        )
 
-        # total de horas (maneja None -> 0)
-        total_horas = registros.aggregate(
-            total=Coalesce(Sum("cantidad_horas"), Decimal("0"))
-        )["total"]
+        # Sumar SOLO las horas que estén Aprobadas
+        total_horas_aprobadas = (
+            HorasExtras.objects
+            .filter(empleado=empleado, estado__iexact="Aprobado")
+            .aggregate(suma=Sum("cantidad_horas"))
+            .get("suma") or Decimal("0")
+        )
 
-        # última actualización (registro más reciente por fecha/id)
+        # Fecha del registro más reciente para "Última actualización"
         ultimo = registros.first()
-        ultima_actualizacion = ultimo.fecha if ultimo else None
+        ultima_actualizacion = ultimo.fecha if ultimo else timezone.now().date()
 
     return render(
         request,
-        "Empleado/consultarHorasExtras.html",
+        "empleados/consultarHorasExtras.html",
         {
             "empleado": empleado,
             "registros": registros,
-            "total_horas": total_horas,
+            "total_horas": total_horas_aprobadas,      # <- ya filtrado por Aprobado
             "ultima_actualizacion": ultima_actualizacion,
         },
     )

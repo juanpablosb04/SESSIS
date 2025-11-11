@@ -9,7 +9,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .fondo {
-      background-image: url("{% static 'Img/clientesFondo.png' %}");
+      background-image: url('/static/Img/fondo.jpg');
       background-size: cover;
       background-position: center;
       min-height: 100vh;
@@ -21,10 +21,14 @@
   {% include "includes/navbar.html" %}
 
   <div class="p-8 max-w-7xl mx-auto">
-    <h1 class="text-3xl font-bold mb-4">Auditoría del Usuario</h1>
-    <p class="text-gray-300 mb-6">
-      <span class="font-semibold">Usuario:</span> {{ usuario.email }}
+    <div class="max-w-6xl mx-auto px-6 mb-6">
+      <div class="bg-gray-800/90 border border-gray-700 rounded-xl shadow-lg p-6">
+    <h1 class="text-3xl font-bold mb-4 text-white">Auditoría del Usuario</h1>
+    <p class="text-gray-200">
+      <span class="font-semibold text-white">Usuario:</span> {{ usuario.email }}
     </p>
+    </div>
+    </div>
 
     <!-- Tabla de auditoría -->
     <div class="overflow-x-auto bg-gray-800 rounded-lg shadow-md p-6">
