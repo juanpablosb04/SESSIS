@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Clientes, ClientesAuditoria
 from ubicaciones.models import Ubicaciones
+from django.core.paginator import Paginator
 from config.decorators import role_required
 import re
 
@@ -35,6 +36,13 @@ def clientes_view(request):
         .order_by("nombre_completo")
     )
     ubicaciones = Ubicaciones.objects.all().order_by("nombre")
+    
+
+    paginator = Paginator(clientes, 5)
+    page_number = request.GET.get("page")
+    clientes = paginator.get_page(page_number)
+
+
 
     if request.method == "POST":
         action = request.POST.get("action")
@@ -166,14 +174,18 @@ def auditoria_cliente(request, cliente_id):
         return redirect("login")
 
     cliente = get_object_or_404(Clientes, id_cliente=cliente_id)
-    auditoria = ClientesAuditoria.objects.filter(cliente=cliente).order_by("-fecha")
+    auditoria_qs = ClientesAuditoria.objects.filter(cliente=cliente).order_by("-fecha")
+
+    paginator = Paginator(auditoria_qs, 5)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
 
     return render(
         request,
         "clientes/auditoria_cliente.html",
         {
             "cliente": cliente,
-            "auditoria": auditoria,
+            "page_obj": page_obj,
         },
     )
 

@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -17,18 +18,23 @@
 
   {% include "includes/navbar.html" %}
 
-  
+
 </head>
+
 <body class="bg-gray-900 text-gray-200 min-h-screen fondo">
 
-  
+
 
   <div class="p-8 max-w-7xl mx-auto">
-    <h1 class="text-3xl font-bold mb-4">Auditoría del Cliente</h1>
-    <p class="text-gray-300 mb-6">
-      <span class="font-semibold">Cliente:</span>
-      {{ cliente.nombre_completo }} ({{ cliente.cedula }})
-    </p>
+    <div class="max-w-6xl mx-auto px-6 mb-6">
+      <div class="bg-gray-800/90 border border-gray-700 rounded-xl shadow-lg p-6">
+        <h1 class="text-3xl font-bold mb-4 text-white">Auditoría del Cliente</h1>
+        <p class="text-gray-200">
+          <span class="font-semibold">Cliente:</span>
+          {{ cliente.nombre_completo }} - {{ cliente.cedula }}
+        </p>
+      </div>
+    </div>
 
     <div class="overflow-x-auto bg-gray-800/90 backdrop-blur rounded-lg shadow-md p-6">
       <h2 class="text-2xl font-semibold mb-4">Historial de Cambios</h2>
@@ -47,36 +53,39 @@
           </tr>
         </thead>
         <tbody class="text-gray-300">
-          {% for registro in auditoria %}
+          {% for reg in page_obj %}
           <tr class="border-b border-gray-700">
-            <td class="p-2 whitespace-nowrap">{{ registro.fecha|date:"d/m/Y H:i" }}</td>
+            <td class="p-2 whitespace-nowrap">{{ reg.fecha|date:"d/m/Y H:i" }}</td>
+
             <td class="p-2">
-              {% if registro.accion == "CREAR" %}
-                <span class="bg-green-600 px-2 py-1 rounded text-white text-xs">CREAR</span>
-              {% elif registro.accion == "MODIFICAR" %}
-                <span class="bg-yellow-500 px-2 py-1 rounded text-white text-xs">MODIFICAR</span>
-              {% elif registro.accion == "ELIMINAR" %}
-                <span class="bg-red-600 px-2 py-1 rounded text-white text-xs">ELIMINAR</span>
-              {% elif registro.accion == "CAMBIAR_ESTADO" %}
-                <span class="bg-purple-600 px-2 py-1 rounded text-white text-xs">CAMBIAR ESTADO</span>
+              {% if reg.accion == "CREAR" %}
+              <span class="bg-green-600 px-2 py-1 rounded text-white text-xs">CREAR</span>
+              {% elif reg.accion == "MODIFICAR" %}
+              <span class="bg-yellow-500 px-2 py-1 rounded text-white text-xs">MODIFICAR</span>
+              {% elif reg.accion == "ELIMINAR" %}
+              <span class="bg-red-600 px-2 py-1 rounded text-white text-xs">ELIMINAR</span>
+              {% elif reg.accion == "CAMBIAR_ESTADO" %}
+              <span class="bg-purple-600 px-2 py-1 rounded text-white text-xs">CAMBIAR ESTADO</span>
               {% else %}
-                <span class="bg-gray-600 px-2 py-1 rounded text-white text-xs">{{ registro.accion }}</span>
+              <span class="bg-gray-600 px-2 py-1 rounded text-white text-xs">{{ reg.accion }}</span>
               {% endif %}
             </td>
+
             <td class="p-2">
-              {% if registro.usuario and registro.usuario.email %}
-                {{ registro.usuario.email }}
-              {% elif registro.usuario_email %}
-                {{ registro.usuario_email }}
+              {% if reg.usuario and reg.usuario.email %}
+              {{ reg.usuario.email }}
+              {% elif reg.usuario_email %}
+              {{ reg.usuario_email }}
               {% else %}
-                <span class="italic text-gray-400">Sistema</span>
+              <span class="italic text-gray-400">Sistema</span>
               {% endif %}
             </td>
-            <td class="p-2">{{ registro.nombre_completo|default:"—" }}</td>
-            <td class="p-2">{{ registro.email|default:"—" }}</td>
-            <td class="p-2">{{ registro.cedula|default:"—" }}</td>
-            <td class="p-2">{{ registro.telefono|default:"—" }}</td>
-            <td class="p-2">{{ registro.residencia|default:"—" }}</td>
+
+            <td class="p-2">{{ reg.nombre_completo|default:"—" }}</td>
+            <td class="p-2">{{ reg.email|default:"—" }}</td>
+            <td class="p-2">{{ reg.cedula|default:"—" }}</td>
+            <td class="p-2">{{ reg.telefono|default:"—" }}</td>
+            <td class="p-2">{{ reg.residencia|default:"—" }}</td>
           </tr>
           {% empty %}
           <tr>
@@ -86,15 +95,67 @@
           </tr>
           {% endfor %}
         </tbody>
+
       </table>
+
+
+      <!-- PAGINACION -->
+      <div class="flex justify-center mt-6">
+        <nav class="flex items-center space-x-1">
+
+          <!-- BOTÓN PREVIOUS -->
+          {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}"
+            class="px-3 py-1 bg-gray-700 text-gray-200 rounded hover:bg-gray-600">
+            « Anterior
+          </a>
+          {% else %}
+          <span class="px-3 py-1 bg-gray-800 text-gray-500 rounded cursor-not-allowed">
+            « Anterior
+          </span>
+          {% endif %}
+
+          <!-- NÚMEROS DE PÁGINAS -->
+          {% for num in page_obj.paginator.page_range %}
+          {% if num == page_obj.number %}
+          <!-- Página actual -->
+          <span class="px-3 py-1 border border-gray-400 bg-gray-200 text-gray-900 rounded">
+            {{ num }}
+          </span>
+
+          {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %} <!-- Páginas cercanas -->
+            <a href="?page={{ num }}" class="px-3 py-1 bg-gray-700 text-gray-200 rounded hover:bg-gray-600">
+              {{ num }}
+            </a>
+            {% endif %}
+            {% endfor %}
+
+            <!-- BOTÓN NEXT -->
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}"
+              class="px-3 py-1 bg-gray-700 text-gray-200 rounded hover:bg-gray-600">
+              Siguiente »
+            </a>
+            {% else %}
+            <span class="px-3 py-1 bg-gray-800 text-gray-500 rounded cursor-not-allowed">
+              Siguiente »
+            </span>
+            {% endif %}
+
+        </nav>
+      </div>
+
+
+
     </div>
 
     <div class="mt-6">
       <a href="{% url 'clientes' %}"
-         class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+        class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
         <span>⬅</span> Volver a Clientes
       </a>
     </div>
   </div>
 </body>
+
 </html>

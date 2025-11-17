@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     body {
-      background-image: url("{% static 'Img/fondoCitas.jpg' %}");
+      background-image: url("{% static 'Img/fondo.jpg' %}");
 
       background-size: cover;
       background-position: center;
@@ -22,50 +22,78 @@
       font-family: 'Inter', sans-serif;
       background-color: #1a1a1a;
     }
+
+    .alert-error {
+      background-color: rgba(255, 0, 0, 0.15);
+      color: #ff4d4d;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-success {
+      background-color: rgba(0, 128, 0, 0.15);
+      color: #4dff4d;
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
   </style>
   {% include "includes/navbar.html" %}
 </head>
 
-<body>
+<body class="text-gray-200">
 
   <div class="flex flex-col items-center justify-start py-8">
 
-    <h3 class="inline-block text-[22px] font-bold text-white px-5 py-2 rounded-md shadow-lg">
+    <h3 class="inline-block text-[28px] font-bold text-[#292f3a] px-5 py-2">
       Lista de Citas
     </h3>
 
     <!-- Tabla de citas -->
     <table
-      class="table-auto max-w-[1350px] text-left border-collapse border border-gray-600 text-gray-200 bg-gray-900 bg-opacity-80 backdrop-blur-md rounded-[20px] overflow-hidden">
-      <thead class="bg-gray-700">
+      class="table-auto max-w-[1350px] text-left text-gray-200 bg-gray-900 bg-opacity-80 backdrop-blur-md rounded-[20px] overflow-hidden shadow-xl mt-4">
+      
+      <thead class="bg-gray-700 text-gray-100">
         <tr>
-          <th class="border border-gray-600 px-4 py-2">Cédula</th>
-          <th class="border border-gray-600 px-4 py-2">Nombre</th>
-          <th class="border border-gray-600 px-4 py-2">Correo</th>
-          <th class="border border-gray-600 px-4 py-2">Teléfono</th>
-          <th class="border border-gray-600 px-4 py-2">Fecha</th>
-          <th class="border border-gray-600 px-4 py-2">Hora inicio</th>
-          <th class="border border-gray-600 px-4 py-2">Hora finalización</th>
-          <th class="border border-gray-600 px-4 py-2">Motivo</th>
-          <th class="border border-gray-600 px-4 py-2">Descripción</th>
-          <th class="border border-gray-600 px-4 py-2">Acciones</th>
+          <th class="px-4 py-2">Cédula</th>
+          <th class="px-4 py-2">Nombre</th>
+          <th class="px-4 py-2">Correo</th>
+          <th class="px-4 py-2">Teléfono</th>
+          <th class="px-4 py-2">Fecha</th>
+          <th class="px-4 py-2">Hora inicio</th>
+          <th class="px-4 py-2">Hora finalización</th>
+          <th class="px-4 py-2">Motivo</th>
+          <th class="px-4 py-2">Descripción</th>
+          <th class="px-4 py-2">Acciones</th>
         </tr>
       </thead>
-      <tbody>
+
+      <tbody class="divide-y divide-gray-700">
         {% for cita in citas %}
-        <tr class="bg-gray-800 hover:bg-gray-700" data-id="{{ cita.id_cita }}">
-          <td class="border px-4 py-2">{{ cita.cliente.cedula }}</td>
-          <td class="border px-4 py-2 cliente" data-id="{{ cita.cliente.id_cliente }}">{{ cita.cliente.nombre_completo}}</td>
-          <td class="border px-4 py-2">{{ cita.cliente.email }}</td>
-          <td class="border px-4 py-2">{{ cita.cliente.telefono }}</td>
-          <td class="border px-4 py-2 fecha">{{ cita.fecha_cita|date:"Y-m-d" }}</td>
-          <td class="border px-4 py-2 hora_inicio">{{ cita.hora_inicio }}</td>
-          <td class="border px-4 py-2 hora_finalizacion">{{ cita.hora_finalizacion }}</td>
-          <td class="border px-4 py-2 motivo">{{ cita.motivo }}</td>
-          <td class="border px-4 py-2 descripcion">{{ cita.descripcion }}</td>
-          <td class="border px-4 py-2 flex gap-2">
+        <tr class="bg-gray-800 hover:bg-gray-700 transition duration-150" data-id="{{ cita.id_cita }}">
+          <td class="px-4 py-2">{{ cita.cliente.cedula }}</td>
+          <td class="px-4 py-2 cliente" data-id="{{ cita.cliente.id_cliente }}">{{ cita.cliente.nombre_completo}}</td>
+          <td class="px-4 py-2">{{ cita.cliente.email }}</td>
+          <td class="px-4 py-2">{{ cita.cliente.telefono }}</td>
+          <td class="px-4 py-2 fecha">{{ cita.fecha_cita|date:"Y-m-d" }}</td>
+          <td class="px-4 py-2 hora_inicio">{{ cita.hora_inicio }}</td>
+          <td class="px-4 py-2 hora_finalizacion">{{ cita.hora_finalizacion }}</td>
+          <td class="px-4 py-2 motivo">{{ cita.motivo }}</td>
+          <td class="px-4 py-2 descripcion">{{ cita.descripcion }}</td>
+          <td class="px-4 py-2">
             <button onclick="abrirModal('{{ cita.id_cita }}')"
-              class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-2 rounded">
+              class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-3 rounded shadow">
               <i class="fas fa-edit"></i> Editar
             </button>
           </td>
@@ -76,16 +104,20 @@
         </tr>
         {% endfor %}
       </tbody>
+
     </table>
+
   </div>
 
   <!-- Modal de edición -->
   <div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
     <div class="bg-gray-800 rounded-lg shadow-lg w-full max-w-xl p-6 text-white">
+
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-bold">Editar Cita</h2>
         <button onclick="cerrarModal()" class="text-white hover:text-gray-300 text-2xl">&times;</button>
       </div>
+
       <form id="formEditar" method="POST" action="{% url 'citas:consultarCitas' %}">
         {% csrf_token %}
         <input type="hidden" id="edit_id" name="cita_id">
@@ -136,10 +168,14 @@
         <div class="flex justify-end gap-2 mt-4">
           <button type="button" onclick="cerrarModal()"
             class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-white">Cancelar</button>
-          <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-white">Guardar
-            Cambios</button>
+
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-white">
+            Guardar Cambios
+          </button>
         </div>
+
       </form>
+
     </div>
   </div>
 
@@ -168,6 +204,6 @@
       document.getElementById('modalEditar').classList.add('hidden');
     }
   </script>
-</body>
 
+</body>
 </html>

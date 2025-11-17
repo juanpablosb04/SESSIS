@@ -5,6 +5,7 @@ import re
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 from django.contrib import messages
+from django.core.paginator import Paginator
 from .models import Empleado, EmpleadosAuditoria, Asistencia
 from config.decorators import role_required
 from django.utils import timezone
@@ -46,6 +47,11 @@ def _parse_bool(value, fallback=False):
 @role_required(["Administrador"])
 def empleados_view(request):
     empleados = Empleado.objects.all().order_by("nombre_completo")
+
+    paginator = Paginator(empleados, 5)
+    page_number = request.GET.get("page")
+    empleados = paginator.get_page(page_number)
+
 
     if request.method == "POST":
         action = request.POST.get("action")
@@ -249,17 +255,21 @@ def horas_extras_admin(request):
             return redirect("horasExtras")
 
     # GET -> historial para la tabla
-    registros = (
-        HorasExtras.objects
-        .select_related("empleado")
-        .order_by("-fecha", "-id_hora_extra")[:200]
+    registros_qs = (
+    HorasExtras.objects
+    .select_related("empleado")
+    .order_by("-fecha", "-id_hora_extra")
     )
 
+    paginator_registros = Paginator(registros_qs, 5)
+    page_number_reg = request.GET.get("page")
+    registros = paginator_registros.get_page(page_number_reg)
+
     return render(
-        request,
-        "empleados/horasExtras.html",
-        {"empleados": empleados, "registros": registros},
-    )
+    request,
+    "empleados/horasExtras.html",
+    {"empleados": empleados, "registros": registros},
+)
 
 # =====================================================
 # Revisar Asistencia de Empleados
@@ -299,10 +309,15 @@ def ver_asistencia_Empleados(request):
 def auditoria_empleado(request, empleado_id):
     empleado = get_object_or_404(Empleado, id_empleado=empleado_id)
     auditoria = EmpleadosAuditoria.objects.filter(empleado=empleado).order_by("-fecha")
+
+    paginator = Paginator(auditoria, 5)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
     return render(
         request,
         "empleados/auditoria_empleado.html",
-        {"empleado": empleado, "auditoria": auditoria},
+        {"empleado": empleado, "auditoria": auditoria, "page_obj": page_obj},
     )
 
 

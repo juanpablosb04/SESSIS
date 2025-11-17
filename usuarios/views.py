@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from .models import Usuario, AuditoriaUsuario
+from django.core.paginator import Paginator
 from config.decorators import role_required
 from empleados.models import Empleado
 
@@ -86,6 +87,7 @@ def lista_usuarios(request):
 
     usuarios = Usuario.objects.all()
     empleados = Empleado.objects.all()
+    
     return render(
         request,
         "usuarios/usuarios.html",

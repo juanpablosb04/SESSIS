@@ -6,30 +6,53 @@
   <title>Registrar Cita</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-
     body {
-            background-image: url("{% static 'Img/fondoCitas.jpg' %}");
-                       
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            min-height: 100vh;
-            
-            padding-top: 4rem; 
-            font-family: 'Inter', sans-serif;
-            background-color: #1a1a1a;
-        }
+      background-image: url("{% static 'Img/fondo.jpg' %}");
+
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      min-height: 100vh;
+
+      padding-top: 4rem;
+      font-family: 'Inter', sans-serif;
+      background-color: #1a1a1a;
+    }
+
+    .alert-error {
+      background-color: rgba(255, 0, 0, 0.15);
+      color: #ff4d4d;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-success {
+      background-color: rgba(0, 128, 0, 0.15);
+      color: #4dff4d;
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
   </style>
 
   {% include "includes/navbar.html" %}
 
 </head>
-<body class="bg-white text-gray-900">
+<body class="text-gray-200">
 
-
-
-<div class="flex flex-col items-center justify-start py-8">
+  <div class="flex flex-col items-center justify-start py-8">
 
   <!-- FORMULARIO REGISTRO CITA -->
   <div id="formulario-cita" class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7 mb-10">
