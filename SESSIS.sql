@@ -82,13 +82,35 @@ CREATE TABLE Usuarios (
 -- ==============================
 -- TABLA REPORTE INCIDENTES
 -- ==============================
-CREATE TABLE ReporteIncidentes (
-    id_reporte INT PRIMARY KEY IDENTITY(1,1),
-    id_empleado INT NOT NULL,
-    categoria VARCHAR(100),
-    archivo VARCHAR(250),
-    FOREIGN KEY (id_empleado) REFERENCES Empleado(id_empleado)
+CREATE TABLE dbo.ReporteIncidentes (
+    id_reporte     INT IDENTITY(1,1) NOT NULL
+                   CONSTRAINT PK_ReporteIncidentes PRIMARY KEY,
+    id_empleado    INT NOT NULL,            -- FK a dbo.Empleados(id_empleado)
+    categoria      VARCHAR(50) NOT NULL,    -- valores controlados (ver CHECK)
+    descripcion    NVARCHAR(1000) NOT NULL,
+    fecha_evento   DATE NOT NULL,
+    foto           NVARCHAR(400) NULL,      -- ruta relativa en /media (ImageField)
+    creado_por     NVARCHAR(150) NULL,
+    creado_en      DATETIME2(0) NOT NULL
+                   CONSTRAINT DF_ReporteIncidentes_creado_en DEFAULT SYSDATETIME()
 );
+ADD CONSTRAINT FK_ReporteIncidentes_Empleados
+      FOREIGN KEY (id_empleado) REFERENCES dbo.Empleados(id_empleado);
+
+-- CHECK de categorías válidas (ajusta si necesitas más)
+  ADD CONSTRAINT CK_ReporteIncidentes_Categoria
+      CHECK (categoria IN (
+          'accidente-trabajo',
+          'fallo-equipamiento',
+          'incidente-seguridad',
+          'problema-ambiental',
+          'otros-eventos'
+      ));
+
+-- Índices útiles
+CREATE INDEX IX_ReporteIncidentes_Empleado ON dbo.ReporteIncidentes (id_empleado);
+CREATE INDEX IX_ReporteIncidentes_Fecha   ON dbo.ReporteIncidentes (fecha_evento DESC);
+GO
 
 -- ==============================
 -- TABLA ASISTENCIA
