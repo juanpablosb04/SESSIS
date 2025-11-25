@@ -7,38 +7,45 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ver Asistencia</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
   <style>
     body {
-      background-image: url('/static/Img/fondo.jpg');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
       min-height: 100vh;
       padding-top: 4rem;
       font-family: 'Inter', sans-serif;
-      background-color: #1a1a1a;
+      background-color: #f3f4f6;
     }
   </style>
 
   {% include "includes/navbar.html" %}
 </head>
 
-<body class="text-gray-200 bg-gray-900 min-h-screen">
+<body class="text-gray-800 min-h-screen">
+
   <div class="max-w-6xl mx-auto py-10 px-6">
 
-    <h2 class="text-3xl font-bold mb-6 text-center text-black">Ver Asistencia</h2>
+    <!-- Título -->
+    <h2 class="text-3xl font-bold mb-2 text-center text-black">
+      Ver Asistencia
+    </h2>
 
-    <div class="bg-gray-800/90 border border-gray-700 rounded-xl shadow-2xl p-8">
+    <!-- CARD PRINCIPAL -->
+    <div class="bg-white rounded-2xl shadow-lg p-8">
 
-      <!-- Filtros -->
+      <!-- FORMULARIO DE FILTRO -->
       <form method="GET" class="flex flex-col md:flex-row gap-4 mb-8 items-end">
+
+        <!-- SELECT EMPLEADO -->
         <div class="flex flex-col">
-          <label for="empleado" class="font-semibold mb-1 text-gray-200">Seleccionar Empleado</label>
-          <select name="id_empleado" id="empleado" class="p-2 rounded bg-gray-700 border border-gray-600 text-white">
+          <label for="empleado" class="font-semibold mb-1">Seleccionar Empleado</label>
+          <select name="id_empleado" id="empleado"
+            class="p-2 rounded border border-gray-300 bg-white text-gray-800">
             <option value="">Todos</option>
+
             {% for emp in empleados %}
             <option value="{{ emp.id_empleado }}"
               {% if empleado_id|stringformat:"s" == emp.id_empleado|stringformat:"s" %}selected{% endif %}>
@@ -48,87 +55,107 @@
           </select>
         </div>
 
+        <!-- FECHA INICIO -->
         <div class="flex flex-col">
-          <label for="fecha_inicio" class="font-semibold mb-1 text-gray-200">Fecha Inicio</label>
+          <label for="fecha_inicio" class="font-semibold mb-1">Fecha Inicio</label>
           <input type="date" id="fecha_inicio" name="fecha_inicio"
-                 class="p-2 rounded bg-gray-700 border border-gray-600 text-white"
-                 value="{{ fecha_inicio }}">
+            value="{{ fecha_inicio }}"
+            class="p-2 rounded border border-gray-300 bg-white text-gray-800">
         </div>
 
+        <!-- FECHA FIN -->
         <div class="flex flex-col">
-          <label for="fecha_fin" class="font-semibold mb-1 text-gray-200">Fecha Fin</label>
+          <label for="fecha_fin" class="font-semibold mb-1">Fecha Fin</label>
           <input type="date" id="fecha_fin" name="fecha_fin"
-                 class="p-2 rounded bg-gray-700 border border-gray-600 text-white"
-                 value="{{ fecha_fin }}">
+            value="{{ fecha_fin }}"
+            class="p-2 rounded border border-gray-300 bg-white text-gray-800">
         </div>
 
+        <!-- BOTONES -->
         <div class="flex gap-2">
+
           <button type="submit"
-                  class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold transition duration-150">
+            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold transition">
             Filtrar
           </button>
 
           <a href="{% url 'verAsistenciaOficiales' %}"
-             class="px-4 py-2 bg-gray-500 hover:bg-gray-600 rounded text-white font-semibold transition duration-150">
+            class="px-4 py-2 bg-gray-500 hover:bg-gray-600 rounded text-white font-semibold transition">
             Resetear
           </a>
 
-          <!-- Descargar Excel  -->
+          <!-- EXCEL -->
           <a href="{% url 'verAsistenciaOficialesExport' %}?id_empleado={{ empleado_id }}&fecha_inicio={{ fecha_inicio }}&fecha_fin={{ fecha_fin }}"
-             class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-white font-semibold transition duration-150 flex items-center gap-2"
-             title="Descargar Excel">
+            class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-white font-semibold transition flex items-center gap-2"
+            title="Descargar Excel">
             <i class="fa-solid fa-file-excel"></i>
             EXCEL
           </a>
 
-          <!-- Descargar PDF -->
+          <!-- PDF -->
           <a href="{% url 'verAsistenciaOficialesExportPDF' %}?id_empleado={{ empleado_id }}&fecha_inicio={{ fecha_inicio }}&fecha_fin={{ fecha_fin }}"
-              class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-white font-semibold transition duration-150 flex items-center gap-2"
-              title="Descargar PDF">
+            class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-white font-semibold transition flex items-center gap-2"
+            title="Descargar PDF">
             <i class="fa-solid fa-file-pdf"></i>
-                PDF
-            </a>
+            PDF
+          </a>
+
         </div>
+
       </form>
 
-      <!-- Tabla -->
-      <div class="overflow-x-auto">
-        <table class="min-w-full text-left border border-gray-700 bg-gray-900 rounded-lg">
-          <thead class="bg-gray-700 text-gray-200">
+      <!-- TABLA -->
+      <div class="overflow-x-auto rounded-lg border border-gray-300">
+
+        <table class="min-w-full text-left bg-white rounded-lg">
+
+          <thead class="bg-gray-500 text-white border-b border-gray-300">
             <tr>
-              <th class="px-4 py-3">Fecha</th>
-              <th class="px-4 py-3">Empleado</th>
-              <th class="px-4 py-3">Hora Entrada</th>
-              <th class="px-4 py-3">Hora Salida</th>
-              <th class="px-4 py-3">Ubicación</th>
-              <th class="px-4 py-3">Observaciones</th>
-              <th class="px-4 py-3 text-center">Estado</th>
+              <th class="px-4 py-3 font-semibold">Fecha</th>
+              <th class="px-4 py-3 font-semibold">Empleado</th>
+              <th class="px-4 py-3 font-semibold">Hora Entrada</th>
+              <th class="px-4 py-3 font-semibold">Hora Salida</th>
+              <th class="px-4 py-3 font-semibold">Ubicación</th>
+              <th class="px-4 py-3 font-semibold">Observaciones</th>
+              <th class="px-4 py-3 font-semibold text-center">Estado</th>
             </tr>
           </thead>
 
-          <tbody class="text-gray-300">
+          <tbody class="text-gray-800">
+
             {% for a in asistencias %}
-            <tr class="border-b border-gray-700 hover:bg-gray-700/50 transition">
+            <tr class="border-b border-gray-200 hover:bg-gray-100 transition">
               <td class="px-4 py-2 whitespace-nowrap">{{ a.turno_ingreso|localtime|date:"d-m-Y" }}</td>
               <td class="px-4 py-2">{{ a.id_empleado.cedula }} - {{ a.id_empleado.nombre_completo }}</td>
               <td class="px-4 py-2">{{ a.turno_ingreso|localtime|date:"H:i" }}</td>
               <td class="px-4 py-2">
-                {% if a.turno_salida %}{{ a.turno_salida|localtime|date:"H:i" }}{% else %}--:--{% endif %}
+                {% if a.turno_salida %}
+                {{ a.turno_salida|localtime|date:"H:i" }}
+                {% else %}
+                --:--
+                {% endif %}
               </td>
               <td class="px-4 py-2">{{ a.id_ubicacion.nombre }}</td>
               <td class="px-4 py-2">{{ a.observaciones|default:"" }}</td>
               <td class="px-4 py-2 text-center">{{ a.estado }}</td>
             </tr>
+
             {% empty %}
             <tr>
-              <td colspan="7" class="p-4 text-center text-gray-400">No se encontraron registros</td>
+              <td colspan="7" class="p-4 text-center text-gray-500">
+                No se encontraron registros
+              </td>
             </tr>
             {% endfor %}
+
           </tbody>
+
         </table>
+
       </div>
 
     </div>
   </div>
 </body>
+
 </html>
