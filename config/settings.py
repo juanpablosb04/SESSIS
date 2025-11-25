@@ -90,7 +90,7 @@ DATABASES = {
         'NAME': 'SESSIS',
         'USER': '',
         'PASSWORD': '',
-        'HOST': 'AKILES08CR\\SQLEXPRESS',
+        'HOST': '',
         'PORT': '',
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
