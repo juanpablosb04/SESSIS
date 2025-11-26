@@ -99,25 +99,36 @@ def reporte_incidentes_view(request):
 def reportes_incidentes_admin_view(request):
     """
     Listado de todos los reportes con filtros simples para ADMIN.
+
+    Filtros esperados (coinciden con el template HTML):
+      - empleado : id_empleado
+      - ini      : fecha inicio (YYYY-MM-DD)
+      - fin      : fecha fin    (YYYY-MM-DD)
     """
-    qs = ReporteIncidente.objects.select_related("id_empleado").order_by("-fecha_evento", "-id_reporte")
+    qs = (
+        ReporteIncidente.objects
+        .select_related("id_empleado")
+        .order_by("-fecha_evento", "-id_reporte")
+    )
 
-    # Filtros opcionales
-    emp_ced = (request.GET.get("cedula") or "").strip()
-    cat = (request.GET.get("categoria") or "").strip()
-    f_ini = (request.GET.get("fecha_inicio") or "").strip()
-    f_fin = (request.GET.get("fecha_fin") or "").strip()
+    # Parámetros GET que manda el formulario
+    emp_id = (request.GET.get("empleado") or "").strip()
+    f_ini = (request.GET.get("ini") or "").strip()
+    f_fin = (request.GET.get("fin") or "").strip()
 
-    if emp_ced:
-        qs = qs.filter(id_empleado__cedula__icontains=emp_ced)
-    if cat:
-        qs = qs.filter(categoria=cat)
+    # Filtro por empleado (id_empleado)
+    if emp_id:
+        qs = qs.filter(id_empleado_id=emp_id)
+
+    # Filtro por fecha inicio
     if f_ini:
         try:
             fi = datetime.strptime(f_ini, "%Y-%m-%d").date()
             qs = qs.filter(fecha_evento__gte=fi)
         except ValueError:
             pass
+
+    # Filtro por fecha fin
     if f_fin:
         try:
             ff = datetime.strptime(f_fin, "%Y-%m-%d").date()
@@ -125,16 +136,23 @@ def reportes_incidentes_admin_view(request):
         except ValueError:
             pass
 
-    return render(request, "Empleado/reporteIncidentesAdmin.html", {
+    context = {
         "reportes": qs,
-        "filtros": {"cedula": emp_ced, "categoria": cat, "fecha_inicio": f_ini, "fecha_fin": f_fin},
-    })
+        "empleados": Empleado.objects.all().order_by("nombre_completo"),
+        # el template usa request.GET para rellenar valores, no necesita dict extra
+    }
+    return render(request, "Empleado/reporteIncidentesAdmin.html", context)
 
 
 @role_required(["Administrador"])
 def reportes_incidentes_admin_pdf(request):
     """
-    Exporta a PDF la vista ADMIN (con mismos filtros).
+    Exporta a PDF la vista ADMIN (con los mismos filtros que la HTML).
+
+    Parámetros GET:
+      - empleado
+      - ini
+      - fin
     """
     try:
         from reportlab.lib.pagesizes import A4, landscape
@@ -144,23 +162,26 @@ def reportes_incidentes_admin_pdf(request):
     except Exception:
         return HttpResponse("Falta instalar reportlab: pip install reportlab", status=500)
 
-    # Reutilizamos los mismos filtros que la vista HTML
-    qs = ReporteIncidente.objects.select_related("id_empleado").order_by("-fecha_evento", "-id_reporte")
-    emp_ced = (request.GET.get("cedula") or "").strip()
-    cat = (request.GET.get("categoria") or "").strip()
-    f_ini = (request.GET.get("fecha_inicio") or "").strip()
-    f_fin = (request.GET.get("fecha_fin") or "").strip()
+    qs = (
+        ReporteIncidente.objects
+        .select_related("id_empleado")
+        .order_by("-fecha_evento", "-id_reporte")
+    )
 
-    if emp_ced:
-        qs = qs.filter(id_empleado__cedula__icontains=emp_ced)
-    if cat:
-        qs = qs.filter(categoria=cat)
+    emp_id = (request.GET.get("empleado") or "").strip()
+    f_ini = (request.GET.get("ini") or "").strip()
+    f_fin = (request.GET.get("fin") or "").strip()
+
+    if emp_id:
+        qs = qs.filter(id_empleado_id=emp_id)
+
     if f_ini:
         try:
             fi = datetime.strptime(f_ini, "%Y-%m-%d").date()
             qs = qs.filter(fecha_evento__gte=fi)
         except ValueError:
             pass
+
     if f_fin:
         try:
             ff = datetime.strptime(f_fin, "%Y-%m-%d").date()
@@ -172,7 +193,10 @@ def reportes_incidentes_admin_pdf(request):
     doc = SimpleDocTemplate(
         buffer,
         pagesize=landscape(A4),
-        leftMargin=20, rightMargin=20, topMargin=20, bottomMargin=20
+        leftMargin=20,
+        rightMargin=20,
+        topMargin=20,
+        bottomMargin=20,
     )
     styles = getSampleStyleSheet()
     elems = [Paragraph("Reporte de Incidentes (ADMIN)", styles["Title"]), Spacer(1, 10)]
@@ -184,6 +208,7 @@ def reportes_incidentes_admin_pdf(request):
         fecha = r.fecha_evento.strftime("%d/%m/%Y") if r.fecha_evento else "-"
         empleado_txt = f"{getattr(r.id_empleado, 'cedula', '')} - {getattr(r.id_empleado, 'nombre_completo', '')}"
         desc = (r.descripcion or "")[:150]
+
         # Intentar miniatura
         foto_cell = "—"
         if r.foto:
@@ -201,7 +226,7 @@ def reportes_incidentes_admin_pdf(request):
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("FONTSIZE", (0, 0), (-1, 0), 10),
-         ("TEXTCOLOR", (0, 1), (-1, -1), colors.whitesmoke), 
+        ("TEXTCOLOR", (0, 1), (-1, -1), colors.whitesmoke),
         ("GRID", (0, 0), (-1, -1), 0.25, colors.HexColor("#4b5563")),
         ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.HexColor("#111827"), colors.HexColor("#1f2937")]),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
@@ -218,3 +243,4 @@ def reportes_incidentes_admin_pdf(request):
     resp = HttpResponse(pdf, content_type="application/pdf")
     resp["Content-Disposition"] = 'attachment; filename="incidentes_admin.pdf"'
     return resp
+
