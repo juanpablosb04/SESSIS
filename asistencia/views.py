@@ -38,7 +38,7 @@ def registrar_asistencia_view(request):
             nueva_asistencia = Asistencia.objects.create(
                 id_empleado=empleado,
                 id_ubicacion=ubicacion,
-                turno_ingreso=datetime.now(),
+                turno_ingreso=timezone.now(),
                 observaciones=observaciones or None,
                 estado='En curso'
             )

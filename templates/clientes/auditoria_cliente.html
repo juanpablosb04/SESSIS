@@ -68,7 +68,7 @@
   <div class="max-w-6xl mx-auto px-4 py-8">
 
     <!-- CABECERA CLIENTE -->
-    <div class="card p-6 mb-6">
+    <div class="card p-2 mb-2">
       <h1 class="text-3xl font-bold mb-4 text-center">Auditoría del Cliente</h1>
       <p class="text-center mb-1">
         <span class="font-semibold">Cliente:</span>
@@ -81,7 +81,7 @@
     </div>
 
     <!-- TABLA HISTORIAL -->
-    <div class="card p-8">
+    <div class="card p-4">
       <h2 class="text-2xl font-semibold mb-4 text-center">Historial de Cambios</h2>
 
       <div class="overflow-x-auto">
@@ -186,13 +186,10 @@
         </div>
       </div>
 
-      <!-- VOLVER -->
-      <div class="mt-6">
-        <a href="{% url 'clientes' %}"
-           class="inline-flex items-center gap-2 btn btn-primary">
-          <span>⬅</span> Volver a Clientes
-        </a>
-      </div>
+       <!-- BOTÓN VOLVER -->
+    <div class="mt-6 flex justify-center">
+      <a href="{% url 'clientes' %}" class="btn btn-primary">Volver</a>
+    </div>
     </div>
   </div>
 </body>
