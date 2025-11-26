@@ -5,30 +5,79 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Reporte de Incidentes</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="/static/JS/navbar.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
     body{
-      background-image:url('/static/Img/fondo.jpg');
-      background-size:cover;background-position:center;background-repeat:no-repeat;
-      background-attachment:fixed;min-height:100vh;
-      padding-top:4rem;font-family:'Inter',sans-serif;background-color:#1a1a1a;
+      background: #f2f3f5;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding-top: 5rem;
+      color: #1f2937;
     }
-    .alert-error{background:rgba(255,0,0,.15);color:#ff4d4d;border:1px solid rgba(255,0,0,.3);
-      border-radius:10px;padding:12px;margin-bottom:10px;text-align:center;font-size:14px;font-weight:500;backdrop-filter:blur(10px)}
-    .alert-success{background:rgba(0,128,0,.15);color:#4dff4d;border:1px solid rgba(0,128,0,.3);
-      border-radius:10px;padding:12px;margin-bottom:10px;text-align:center;font-size:14px;font-weight:500;backdrop-filter:blur(10px)}
+
+    .card {
+      background: #ffffff;
+      border-radius: 1rem;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .alert-error{
+      background-color: rgba(255, 0, 0, 0.15);
+      color: #ff4d4d;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-success{
+      background-color: rgba(0, 128, 0, 0.15);
+      color: #4dff4d;
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .btn {
+      padding: .6rem 1rem;
+      border-radius: .5rem;
+      font-weight: 600;
+      transition: .2s;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #099268;
+    }
   </style>
 </head>
-<body class="text-gray-200">
 
+<body>
   {% include "includes/navbar.html" %}
 
-  <div class="flex flex-col items-center justify-start py-8">
+  <div class="max-w-6xl mx-auto px-4 py-8">
 
     <!-- FORMULARIO: CREAR REPORTE -->
-    <div class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7 mb-10">
-      <h2 class="text-2xl font-bold text-gray-200 mb-4">Registrar incidente</h2>
+    <div class="card p-8 mb-8">
+      <h2 class="text-3xl font-bold mb-6 text-center">Registrar incidente</h2>
 
       {% if messages %}
         {% for message in messages %}
@@ -42,22 +91,24 @@
         {% endfor %}
       {% endif %}
 
-      <form method="POST" enctype="multipart/form-data" class="flex flex-col">
+      <form method="POST" enctype="multipart/form-data" class="space-y-4">
         {% csrf_token %}
 
-        <div class="flex space-x-4 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Fecha del evento -->
-          <div class="w-1/2">
-            <label for="fecha_evento" class="block text-sm mb-1">Fecha del evento</label>
+          <div>
+            <label for="fecha_evento" class="block text-sm mb-1 text-gray-700">Fecha del evento</label>
             <input id="fecha_evento" name="fecha_evento" type="date"
-                   class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-full" required />
+                   class="border border-gray-300 rounded-md p-2 w-full"
+                   required />
           </div>
 
           <!-- Categoría -->
-          <div class="w-1/2">
-            <label for="categoria" class="block text-sm mb-1">Categoría del incidente</label>
+          <div>
+            <label for="categoria" class="block text-sm mb-1 text-gray-700">Categoría del incidente</label>
             <select id="categoria" name="categoria"
-                    class="bg-gray-700 text-gray-200 border-0 rounded-md p-2 w-full" required>
+                    class="border border-gray-300 rounded-md p-2 w-full"
+                    required>
               <option value="">Seleccionar categoría</option>
               <option value="accidente-trabajo">🔧 Accidente de trabajo</option>
               <option value="fallo-equipamiento">⚙️ Fallo de equipamiento</option>
@@ -69,47 +120,50 @@
         </div>
 
         <!-- Descripción -->
-        <label for="descripcion" class="block text-sm mb-1">Descripción detallada</label>
-        <textarea id="descripcion" name="descripcion" rows="5"
-                  class="bg-gray-700 text-gray-200 border-0 rounded-md p-3 mb-4"
-                  placeholder="Circunstancias, personas involucradas, ubicación exacta, consecuencias y acciones tomadas…" required></textarea>
+        <div>
+          <label for="descripcion" class="block text-sm mb-1 text-gray-700">Descripción detallada</label>
+          <textarea id="descripcion" name="descripcion" rows="5"
+                    class="border border-gray-300 rounded-md p-3 w-full"
+                    placeholder="Circunstancias, personas involucradas, ubicación exacta, consecuencias y acciones tomadas…"
+                    required></textarea>
+        </div>
 
         <!-- Foto única -->
         <div class="mb-2">
-          <label for="foto" class="block text-sm mb-1">Foto del incidente (una sola imagen)</label>
+          <label for="foto" class="block text-sm mb-1 text-gray-700">Foto del incidente (una sola imagen)</label>
           <input id="foto" name="foto" type="file" accept="image/*"
                  class="block w-full text-sm file:mr-4 file:py-2 file:px-4
                         file:rounded-md file:border-0 file:text-sm
                         file:bg-blue-600 file:text-white hover:file:bg-blue-700
-                        bg-gray-800 rounded-md"/>
-          <p class="text-xs text-gray-400 mt-1">Formatos: JPG/PNG. Tamaño recomendado &lt; 5MB.</p>
-          <img id="preview" alt="" class="mt-3 max-h-48 rounded hidden border border-gray-600">
+                        bg-white border border-gray-300 rounded-md"/>
+          <p class="text-xs text-gray-500 mt-1">Formatos: JPG/PNG. Tamaño recomendado &lt; 5MB.</p>
+          <img id="preview" alt="" class="mt-3 max-h-48 rounded hidden border border-gray-300">
         </div>
 
-        <button type="submit"
-                class="bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-bold py-2 px-4 rounded-md mt-4">
+        <button type="submit" class="btn btn-primary bg-green-500 hover:bg-green-600">
           Registrar incidente
         </button>
+
       </form>
     </div>
 
     <!-- LISTA (SOLO LECTURA) -->
-    <div class="w-full max-w-[1150px] bg-gray-800/95 rounded-lg shadow-md p-7">
-      <h2 class="text-2xl font-bold text-gray-200 mb-4">Mis reportes de incidentes</h2>
+    <div class="card p-8">
+      <h2 class="text-2xl font-bold mb-4 text-center">Mis reportes de incidentes</h2>
 
       <div class="overflow-x-auto">
-        <table class="min-w-full text-left border border-gray-600">
-          <thead class="bg-gray-700 text-gray-200">
-            <tr>
-              <th class="p-2 whitespace-nowrap">Fecha</th>
-              <th class="p-2 whitespace-nowrap">Categoría</th>
-              <th class="p-2">Descripción</th>
-              <th class="p-2 whitespace-nowrap">Foto</th>
+        <table class="w-full border border-gray-300 rounded-lg text-sm">
+          <thead class="bg-gray-500 text-white border-b border-gray-300">
+            <tr class="uppercase">
+              <th class="p-2 whitespace-nowrap text-left">Fecha</th>
+              <th class="p-2 whitespace-nowrap text-left">Categoría</th>
+              <th class="p-2 text-left">Descripción</th>
+              <th class="p-2 whitespace-nowrap text-left">Foto</th>
             </tr>
           </thead>
-          <tbody class="text-gray-300">
+          <tbody>
             {% for rep in reportes %}
-            <tr class="border-b border-gray-700 hover:bg-gray-700/40 transition">
+            <tr class="border-b border-gray-200">
               <td class="p-2 whitespace-nowrap">
                 {% if rep.fecha_evento %}{{ rep.fecha_evento|date:"d-m-Y" }}{% else %}-{% endif %}
               </td>
@@ -121,9 +175,8 @@
                 {% if rep.foto and rep.id_reporte %}
                   <a href="{% url 'verFotoIncidente' rep.id_reporte %}"
                      target="_blank"
-                     class="inline-flex items-center gap-2 text-blue-300 hover:text-blue-400"
+                     class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800"
                      title="Ver imagen" rel="noopener noreferrer">
-                    <!-- Icono SVG de imagen (no se muestra la foto en la tabla) -->
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
                          fill="currentColor" class="h-6 w-6">
                       <path d="M4 5a2 2 0 0 0-2 2v10c0 1.1.9 2 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H4zm0 2h16v7.586l-3.293-3.293a1 1 0 0 0-1.414 0L12 15.586l-2.293-2.293a1 1 0 0 0-1.414 0L4 17V7zm3 2a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
@@ -131,13 +184,15 @@
                     <span class="underline">Ver</span>
                   </a>
                 {% else %}
-                  <span class="text-gray-400">Sin foto</span>
+                  <span class="text-gray-500">Sin foto</span>
                 {% endif %}
               </td>
             </tr>
             {% empty %}
             <tr>
-              <td colspan="4" class="p-4 text-center text-gray-400">Aún no has registrado incidentes.</td>
+              <td colspan="4" class="p-4 text-center text-gray-500">
+                Aún no has registrado incidentes.
+              </td>
             </tr>
             {% endfor %}
           </tbody>
@@ -166,3 +221,4 @@
   </script>
 </body>
 </html>
+

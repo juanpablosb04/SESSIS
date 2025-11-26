@@ -5,45 +5,108 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Reportes de Incidentes – Admin</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="/static/JS/navbar.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
     body{
-      background-image:url('/static/Img/fondo.jpg');
-      background-size:cover;background-position:center;background-repeat:no-repeat;
-      background-attachment:fixed;min-height:100vh;
-      padding-top:4rem;font-family:'Inter',sans-serif;background-color:#1a1a1a;
+      background: #f2f3f5;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding-top: 5rem;
+      color: #1f2937;
     }
-    .alert-error{background:rgba(255,0,0,.15);color:#ff4d4d;border:1px solid rgba(255,0,0,.3);
-      border-radius:10px;padding:12px;margin-bottom:10px;text-align:center;font-size:14px;font-weight:500;backdrop-filter:blur(10px)}
-    .alert-success{background:rgba(0,128,0,.15);color:#4dff4d;border:1px solid rgba(0,128,0,.3);
-      border-radius:10px;padding:12px;margin-bottom:10px;text-align:center;font-size:14px;font-weight:500;backdrop-filter:blur(10px)}
+
+    .card {
+      background: #ffffff;
+      border-radius: 1rem;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .alert-error{
+      background-color: rgba(255, 0, 0, 0.15);
+      color: #ff4d4d;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-success{
+      background-color: rgba(0, 128, 0, 0.15);
+      color: #4dff4d;
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .btn {
+      padding: .6rem 1rem;
+      border-radius: .5rem;
+      font-weight: 600;
+      transition: .2s;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #099268;
+    }
+
+    .btn-secondary {
+      background: #6b7280;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #c92a2a;
+    }
   </style>
-  {% include "includes/navbar.html" %}
 </head>
-<body class="text-gray-200">
 
-  <div class="max-w-7xl mx-auto py-8 px-6">
+<body>
+  {% include "includes/navbar.html" %}
 
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-3xl font-bold">Reportes de incidentes (Administrador)</h1>
+  <div class="max-w-6xl mx-auto py-8 px-4">
+
+    <!-- TÍTULO Y BOTÓN PDF -->
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+      <h1 class="text-3xl font-bold">Reportes de incidentes de empleados</h1>
 
       <a
         href="{% url 'reportesIncidentesAdminPDF' %}?empleado={{ request.GET.empleado }}&ini={{ request.GET.ini }}&fin={{ request.GET.fin }}"
         class="inline-flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white font-semibold px-4 py-2 rounded-md"
         title="Descargar PDF"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M19 2H8a2 2 0 0 0-2 2v3H5a2 2 0 0 0-2 2v9a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V4a2 2 0 0 0-2-2Zm-7 2h7v11h-7V4ZM7 9h4v2H7v6h7v2H7a2 2 0 0 1-2-2V11a2 2 0 0 1 2-2Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 2H8a2 2 0 0 0-2 2v3H5a2 2 0 0 0-2 2v9a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V4a2 2 0 0 0-2-2Zm-7 2h7v11h-7V4ZM7 9h4v2H7v6h7v2H7a2 2 0 0 1-2-2V11a2 2 0 0 1 2-2Z"/>
+        </svg>
         Exportar PDF
       </a>
     </div>
 
-    <!-- Filtros (opcionales) -->
-    <form method="get" class="bg-gray-800/90 border border-gray-700 rounded-xl p-4 mb-6">
+    <!-- FILTROS -->
+    <form method="get" class="card p-6 mb-6">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
-          <label class="text-sm block mb-1">Empleado</label>
-          <select name="empleado" class="w-full bg-gray-700 border-0 rounded-md p-2 text-gray-200">
+          <label class="text-sm block mb-1 text-gray-700">Empleado</label>
+          <select name="empleado"
+                  class="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700">
             <option value="">Todos</option>
             {% if empleados %}
               {% for e in empleados %}
@@ -54,22 +117,25 @@
             {% endif %}
           </select>
         </div>
+
         <div>
-          <label class="text-sm block mb-1">Fecha inicio</label>
+          <label class="text-sm block mb-1 text-gray-700">Fecha inicio</label>
           <input type="date" name="ini" value="{{ request.GET.ini }}"
-                 class="w-full bg-gray-700 border-0 rounded-md p-2 text-gray-200">
+                 class="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700">
         </div>
+
         <div>
-          <label class="text-sm block mb-1">Fecha fin</label>
+          <label class="text-sm block mb-1 text-gray-700">Fecha fin</label>
           <input type="date" name="fin" value="{{ request.GET.fin }}"
-                 class="w-full bg-gray-700 border-0 rounded-md p-2 text-gray-200">
+                 class="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700">
         </div>
+
         <div class="flex items-end gap-2">
-          <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-semibold" type="submit">
+          <button class="btn btn-primary" type="submit">
             Filtrar
           </button>
           <a href="{% url 'reportesIncidentesAdmin' %}"
-             class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md font-semibold">
+             class="btn btn-secondary">
             Resetear
           </a>
         </div>
@@ -86,22 +152,24 @@
       {% endfor %}
     {% endif %}
 
-    <!-- Tabla -->
-    <div class="bg-gray-800/95 rounded-lg border border-gray-700 p-4">
+    <!-- TABLA -->
+    <div class="card p-8">
+      <h2 class="text-2xl font-semibold mb-4 text-center">Listado de reportes</h2>
+
       <div class="overflow-x-auto">
-        <table class="min-w-full text-left border border-gray-700">
-          <thead class="bg-gray-700 text-gray-200">
-            <tr>
-              <th class="p-2 whitespace-nowrap">Fecha</th>
-              <th class="p-2 whitespace-nowrap">Empleado</th>
-              <th class="p-2 whitespace-nowrap">Categoría</th>
-              <th class="p-2">Descripción</th>
-              <th class="p-2 whitespace-nowrap">Foto</th>
+        <table class="w-full border border-gray-300 rounded-lg text-sm">
+          <thead class="bg-gray-500 text-white border-b border-gray-300">
+            <tr class="uppercase">
+              <th class="p-2 whitespace-nowrap text-left">Fecha</th>
+              <th class="p-2 whitespace-nowrap text-left">Empleado</th>
+              <th class="p-2 whitespace-nowrap text-left">Categoría</th>
+              <th class="p-2 text-left">Descripción</th>
+              <th class="p-2 whitespace-nowrap text-left">Foto</th>
             </tr>
           </thead>
-          <tbody class="text-gray-300">
+          <tbody>
             {% for rep in reportes %}
-              <tr class="border-b border-gray-700 hover:bg-gray-700/40 transition">
+              <tr class="border-b border-gray-200">
                 <td class="p-2 whitespace-nowrap">
                   {% if rep.fecha_evento %}{{ rep.fecha_evento|date:"d-m-Y" }}{% else %}-{% endif %}
                 </td>
@@ -113,18 +181,20 @@
                 <td class="p-2">
                   {% if rep.foto %}
                     <a href="{{ rep.foto.url }}" target="_blank" rel="noopener noreferrer"
-                       class="inline-flex items-center gap-2">
-                      <img src="{{ rep.foto.url }}" alt="foto" class="h-12 w-12 object-cover rounded border border-gray-600">
+                       class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800">
+                      <img src="{{ rep.foto.url }}" alt="foto" class="h-12 w-12 object-cover rounded border border-gray-300">
                       <span class="underline">Abrir</span>
                     </a>
                   {% else %}
-                    <span class="text-gray-400">Sin foto</span>
+                    <span class="text-gray-500">Sin foto</span>
                   {% endif %}
                 </td>
               </tr>
             {% empty %}
               <tr>
-                <td colspan="5" class="p-4 text-center text-gray-400">No hay reportes para mostrar.</td>
+                <td colspan="5" class="p-4 text-center text-gray-500">
+                  No hay reportes para mostrar.
+                </td>
               </tr>
             {% endfor %}
           </tbody>

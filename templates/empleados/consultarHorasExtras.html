@@ -5,106 +5,130 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mis Horas Extras</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    html, body{
-      margin:0; padding:0; height:100%;
-      background-image: url("{% static 'Img/fondoSecundario.jpg' %}");
-      background-size: cover; background-repeat: no-repeat; background-position: center;
-      min-height: 100vh; width: 100%;
+    body {
+      background: #f2f3f5;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding-top: 5rem;
+      color: #1f2937;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 1rem;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
     }
   </style>
 </head>
-<body class="text-gray-100">
+
+<body>
   {% include "includes/navbar.html" %}
 
-  <div class="flex flex-col items-center mt-10 px-4">
+  <div class="max-w-6xl mx-auto px-4 py-8">
 
     <!-- Título -->
-    <h1 class="text-3xl font-extrabold mb-6 text-center text-[#621729] drop-shadow">
+    <h1 class="text-3xl font-extrabold mb-6 text-center">
       Mis horas extras
     </h1>
 
-   <!-- Resumen -->
-<div class="w-full max-w-[900px] grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-  <div class="bg-gray-800/90 rounded-2xl px-5 py-4 shadow">
-    <p class="text-sm text-gray-300">Registros</p>
-    <p class="text-2xl font-bold">{{ registros|length }}</p>
-  </div>
+    <!-- Resumen -->
+    <div class="card p-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-gray-50 rounded-xl px-5 py-4 border border-gray-200">
+          <p class="text-sm text-gray-500">Registros</p>
+          <p class="text-2xl font-bold text-gray-900">{{ registros|length }}</p>
+        </div>
 
-  <div class="bg-gray-800/90 rounded-2xl px-5 py-4 shadow">
-    <p class="text-sm text-gray-300">Total de horas</p>
-    <p class="text-2xl font-bold">
-      {% if total_horas %}{{ total_horas|floatformat:"-2" }} h{% else %}0 h{% endif %}
-    </p>
-  </div>
+        <div class="bg-gray-50 rounded-xl px-5 py-4 border border-gray-200">
+          <p class="text-sm text-gray-500">Total de horas</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {% if total_horas %}{{ total_horas|floatformat:"-2" }} h{% else %}0 h{% endif %}
+          </p>
+        </div>
 
-  <div class="bg-gray-800/90 rounded-2xl px-5 py-4 shadow">
-    <p class="text-sm text-gray-300">Última actualización</p>
-    <p class="text-2xl font-bold">
-      {% if ultima_actualizacion %}
-        {{ ultima_actualizacion|date:"d/m/Y" }}
-      {% else %}
-        —
-      {% endif %}
-    </p>
-  </div>
-</div>
-
-    <!-- Tabla -->
-    <div class="overflow-x-auto border border-gray-700 rounded-[20px] overflow-hidden w-full max-w-[900px] bg-gray-900/70">
-      <table class="min-w-full">
-        <thead class="bg-gray-800 text-white">
-          <tr>
-            <th class="py-3 px-4 text-left">Cédula</th>
-            <th class="py-3 px-4 text-left">Fecha</th>
-            <th class="py-3 px-4 text-left">Horas</th>
-            <th class="py-3 px-4 text-left">Justificación</th>
-            <th class="py-3 px-4 text-left">Estado</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for r in registros %}
-            <tr class="{% cycle 'bg-gray-900' 'bg-gray-800' %} hover:bg-gray-700 transition-colors">
-              <td class="py-3 px-4 border-t border-gray-700">
-                {{ r.empleado.cedula }}
-              </td>
-              <td class="py-3 px-4 border-t border-gray-700">
-                {{ r.fecha|date:"d/m/Y" }}
-              </td>
-              <td class="py-3 px-4 border-t border-gray-700">
-                {{ r.cantidad_horas|floatformat:"-2" }}
-              </td>
-              <td class="py-3 px-4 border-t border-gray-700">
-                {{ r.justificacion|default:"—" }}
-              </td>
-              <td class="py-3 px-4 border-t border-gray-700">
-                {% with e=r.estado|lower %}
-                  {% if e == "aprobado" %}
-                    <span class="inline-flex items-center justify-center w-[95px] px-3 py-[6px] rounded-md bg-green-600 text-white text-sm font-medium">Aprobado</span>
-                  {% elif e == "rechazado" %}
-                    <span class="inline-flex items-center justify-center w-[95px] px-3 py-[6px] rounded-md bg-red-600 text-white text-sm font-medium">Rechazado</span>
-                  {% else %}
-                    <span class="inline-flex items-center justify-center w-[95px] px-3 py-[6px] rounded-md bg-yellow-600 text-white text-sm font-medium">Pendiente</span>
-                  {% endif %}
-                {% endwith %}
-              </td>
-            </tr>
-          {% empty %}
-            <tr>
-              <td colspan="5" class="py-6 px-4 text-center text-gray-300">
-                Aún no tienes horas extras registradas.
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+        <div class="bg-gray-50 rounded-xl px-5 py-4 border border-gray-200">
+          <p class="text-sm text-gray-500">Última actualización</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {% if ultima_actualizacion %}
+              {{ ultima_actualizacion|date:"d/m/Y" }}
+            {% else %}
+              —
+            {% endif %}
+          </p>
+        </div>
+      </div>
     </div>
 
-    <!-- Nota -->
-    <p class="mt-4 text-lm text-black">
-      Vista de solo lectura. Si notas algún error, comunícate con administracion.
-    </p>
+    <!-- Tabla -->
+    <div class="card p-6">
+      <h2 class="text-2xl font-semibold mb-4 text-center">Detalle de horas</h2>
+
+      <div class="overflow-x-auto">
+        <table class="w-full border border-gray-300 rounded-lg text-sm">
+          <thead class="bg-gray-500 text-white border-b border-gray-300">
+            <tr class="uppercase">
+              <th class="py-3 px-4 text-left">Cédula</th>
+              <th class="py-3 px-4 text-left">Fecha</th>
+              <th class="py-3 px-4 text-left">Horas</th>
+              <th class="py-3 px-4 text-left">Justificación</th>
+              <th class="py-3 px-4 text-left">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in registros %}
+              <tr class="border-b border-gray-200">
+                <td class="py-3 px-4">
+                  {{ r.empleado.cedula }}
+                </td>
+                <td class="py-3 px-4">
+                  {{ r.fecha|date:"d/m/Y" }}
+                </td>
+                <td class="py-3 px-4">
+                  {{ r.cantidad_horas|floatformat:"-2" }}
+                </td>
+                <td class="py-3 px-4">
+                  {{ r.justificacion|default:"—" }}
+                </td>
+                <td class="py-3 px-4">
+                  {% with e=r.estado|lower %}
+                    {% if e == "aprobado" %}
+                      <span class="inline-flex items-center justify-center w-[95px] px-3 py-[6px] rounded-md bg-green-100 text-green-700 text-xs font-semibold">
+                        Aprobado
+                      </span>
+                    {% elif e == "rechazado" %}
+                      <span class="inline-flex items-center justify-center w-[95px] px-3 py-[6px] rounded-md bg-red-100 text-red-700 text-xs font-semibold">
+                        Rechazado
+                      </span>
+                    {% else %}
+                      <span class="inline-flex items-center justify-center w-[95px] px-3 py-[6px] rounded-md bg-yellow-100 text-yellow-700 text-xs font-semibold">
+                        Pendiente
+                      </span>
+                    {% endif %}
+                  {% endwith %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="5" class="py-6 px-4 text-center text-gray-500">
+                  Aún no tienes horas extras registradas.
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Nota -->
+      <p class="mt-4 text-sm text-gray-500 text-center">
+        Vista de solo lectura. Si notas algún error, comunícate con administración.
+      </p>
+    </div>
   </div>
 </body>
 </html>

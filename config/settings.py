@@ -90,7 +90,7 @@ DATABASES = {
         'NAME': 'SESSIS',
         'USER': '',
         'PASSWORD': '',
-        'HOST': '',
+        'HOST': 'AKILES08CR\SQLEXPRESS',
         'PORT': '',
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
@@ -99,7 +99,7 @@ DATABASES = {
     }
 }
 
-
+# Para Stwart : AKILES08CR\SQLEXPRESS
 
 
 # Password validation
