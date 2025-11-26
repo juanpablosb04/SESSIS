@@ -74,10 +74,12 @@ CREATE TABLE Usuarios (
     id_rol INT NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
     password VARCHAR(150) NOT NULL,
+    password_temp BIT NOT NULL DEFAULT 1,
     estado VARCHAR(50),
     FOREIGN KEY (id_empleado) REFERENCES Empleado(id_empleado),
     FOREIGN KEY (id_rol) REFERENCES Roles(id_rol)
 );
+
 
 -- ==============================
 -- TABLA REPORTE INCIDENTES
