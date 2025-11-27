@@ -1,214 +1,292 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Usuarios</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    .fondo {
-      background-image: url('/static/Img/fondo.jpg');
-      background-size: cover;
-      background-position: center;
-      min-height: 100vh;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios SES</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    .alert-error {
-      background-color: rgba(255, 0, 0, 0.15);
-      color: #ff4d4d;
-      border: 1px solid rgba(255, 0, 0, 0.3);
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 10px;
-      text-align: center;
-      font-size: 14px;
-      font-weight: 500;
-      backdrop-filter: blur(10px);
-    }
+    <style>
+        /* Estilos copiados de empleados.html */
+        body {
+            background: #f2f3f5;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            padding-top: 5rem;
+            color: #1f2937;
+        }
 
-    .alert-success {
-      background-color: rgba(0, 128, 0, 0.15);
-      color: #4dff4d;
-      border: 1px solid rgba(0, 128, 0, 0.3);
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 10px;
-      text-align: center;
-      font-size: 14px;
-      font-weight: 500;
-      backdrop-filter: blur(10px);
-    }
-  </style>
+        .card {
+            background: #ffffff;
+            border-radius: 1rem;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .alert-error {
+            background-color: rgba(255, 0, 0, 0.15);
+            color: #ff4d4d;
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        .alert-success {
+            background-color: rgba(0, 128, 0, 0.15);
+            color: #4dff4d;
+            border: 1px solid rgba(0, 128, 0, 0.3);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn {
+            padding: .6rem 1rem;
+            border-radius: .5rem;
+            font-weight: 600;
+            transition: .2s;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #099268;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #c92a2a;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-warning {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #1e40af;
+        }
+
+        /* Estilo de los inputs basado en empleados.html */
+        .input-style {
+            padding: .75rem;
+            border: 1px solid #d1d5db;
+            border-radius: .5rem;
+            width: 100%;
+            /* Ajustado para el color de texto por defecto del body (#1f2937) */
+            color: #1f2937;
+        }
+    </style>
+
+    {% include "includes/navbar.html" %}
 </head>
+
 <body>
-  {% include "includes/navbar.html" %}
- 
-  <div class="fondo p-8 flex flex-col items-center">
-    <!-- Formulario de registro -->
-    <div class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7 mb-10">
-      <h2 class="text-2xl font-bold text-gray-200 mb-4">Registro de Usuarios</h2>
-      {% if messages %}
-        {% for message in messages %}
-        {% if 'crear' in message.tags %}
-        {% if 'success' in message.tags %}
-        <div class="alert-success">{{ message }}</div>
-        {% else %}
-        <div class="alert-error">{{ message }}</div>
-        {% endif %}
-        {% endif %}
-        {% endfor %}
-        {% endif %}
- 
-      <form method="POST" action="" class="flex flex-col space-y-4" autocomplete="off">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="crear">
- 
-        <!-- Select de empleados -->
-        <select name="id_empleado" autocomplete="off" class="w-full p-2 rounded bg-gray-700 text-white" required>
-          <option value="">Seleccione Empleado</option>
-          {% for empleado in empleados %}
-            <option value="{{ empleado.id_empleado }}">{{ empleado.nombre_completo }}</option>
-          {% endfor %}
-        </select>
- 
-        <input name="email" type="email" placeholder="Email" class="w-full p-2 rounded bg-gray-700 text-white" autocomplete="new-email" required>
-        <input name="password" type="password" placeholder="Contraseña" class="w-full p-2 rounded bg-gray-700 text-white" autocomplete="new-password" required>
- 
-        <select name="id_rol" autocomplete="off" class="w-full p-2 rounded bg-gray-700 text-white" required>
-          <option value="">Seleccione Rol</option>
-          {% for rol in roles %}
-            <option value="{{ rol.0 }}">{{ rol.1 }}</option>
-          {% endfor %}
-        </select>
- 
-        <input type="hidden" name="estado" value="Activo">
-        <button type="submit" class="bg-gradient-to-r from-green-500 to-green-700 text-white font-bold py-2 px-4 rounded">
-          Registrar Usuario
-        </button>
-      </form>
-    </div>
- 
-    <!-- Tabla de usuarios -->
-    <div class="w-full max-w-[1000px] bg-gray-800 rounded-lg shadow-md p-7">
-      <h2 class="text-2xl font-bold text-gray-200 mb-4">Lista de Usuarios</h2>
-      {% if messages %}
-        {% for message in messages %}
-        {% if 'editar' in message.tags or 'eliminar' in message.tags %}
-        {% if 'success' in message.tags %}
-        <div class="alert-success">{{ message }}</div>
-        {% else %}
-        <div class="alert-error">{{ message }}</div>
-        {% endif %}
-        {% endif %}
-        {% endfor %}
-        {% endif %}
-      <table class="w-full text-left border border-gray-600">
-        <thead class="bg-gray-700 text-gray-200">
-          <tr>
-            <!-- ID Usuario eliminado -->
-            <th class="p-2">Empleado</th>
-            <th class="p-2">Rol</th>
-            <th class="p-2">Email</th>
-            <th class="p-2">Estado</th>
-            <th class="p-2 text-center">Acciones</th>
-          </tr>
-        </thead>
-        <tbody class="text-gray-300">
-          {% for usuario in usuarios %}
-          <tr class="border-b border-gray-700">
-            <!-- ID Usuario eliminado -->
-            <td class="p-2">{{ usuario.id_empleado.nombre_completo }}</td>
-            <td class="p-2">
-              {% for rol in roles %}
-                {% if rol.0 == usuario.id_rol %}
-                  {{ rol.1 }}
-                {% endif %}
-              {% endfor %}
-            </td>
-            <td class="p-2">{{ usuario.email }}</td>
-            <td class="p-2">{{ usuario.estado }}</td>
-            <td class="p-2 flex justify-center gap-2">
-              <!-- Editar -->
-              <button onclick="abrirModalEditar('{{ usuario.id_usuario }}', '{{ usuario.id_empleado.id_empleado }}', '{{ usuario.id_rol }}', '{{ usuario.email }}', '{{ usuario.estado }}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">
-                Editar
-              </button>
- 
-              <!-- Botón Eliminar eliminado -->
- 
-              <!-- Auditar -->
-              <a href="{% url 'auditoria_usuario' usuario.id_usuario %}" class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded">
-                Auditar
-              </a>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="5" class="p-4 text-center text-gray-400">No hay usuarios registrados.</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
- 
-  <!-- Modal Editar -->
-  <div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
-    <div class="bg-gray-800 rounded-lg shadow-md p-6 w-full max-w-md">
-      <h2 class="text-xl font-bold mb-4 text-gray-200">Editar Usuario</h2>
-      <form method="POST" action="" class="space-y-4" autocomplete="off">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="editar">
-        <input type="hidden" id="edit_id" name="usuario_id">
- 
-        <select id="edit_empleado" name="id_empleado" autocomplete="off" class="w-full p-2 rounded bg-gray-700 text-white" required>
-          <option value="">Seleccione Empleado</option>
-          {% for empleado in empleados %}
-            <option value="{{ empleado.id_empleado }}">{{ empleado.nombre_completo }}</option>
-          {% endfor %}
-        </select>
- 
-        <input id="edit_email" name="email" type="email" class="w-full p-2 rounded bg-gray-700 text-white" autocomplete="new-email" required>
-        <input id="edit_password" name="password" type="password" class="w-full p-2 rounded bg-gray-700 text-white" autocomplete="new-password" placeholder="Nueva Contraseña">
- 
-        <select id="edit_rol" name="id_rol" autocomplete="off" class="w-full p-2 rounded bg-gray-700 text-white" required>
-          {% for rol in roles %}
-            <option value="{{ rol.0 }}">{{ rol.1 }}</option>
-          {% endfor %}
-        </select>
- 
-        <select id="edit_estado" name="estado" class="w-full p-2 rounded bg-gray-700 text-white" required>
-          <option value="Activo">Activo</option>
-          <option value="Inactivo">Inactivo</option>
-        </select>
- 
-        <div class="flex justify-end gap-2 mt-4">
-          <button type="button" onclick="cerrarModalEditar()" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded">
-            Cancelar
-          </button>
-          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">
-            Guardar Cambios
-          </button>
+    <div class="max-w-6xl mx-auto px-4">
+
+        <div class="card p-8 mb-6 max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold mb-6 text-center">Registro de Usuarios</h2>
+
+            {% if messages %}
+            {% for message in messages %}
+            {% if 'crear' in message.tags %}
+            {% if 'success' in message.tags %}
+            <div class="alert-success">{{ message }}</div>
+            {% else %}
+            <div class="alert-error">{{ message }}</div>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+
+            <form method="POST" action="" class="space-y-4" autocomplete="off">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="crear">
+
+                <select name="id_empleado" autocomplete="off" class="input-style" required>
+                    <option value="">Seleccione Empleado</option>
+                    {% for empleado in empleados %}
+                    <option value="{{ empleado.id_empleado }}">{{ empleado.nombre_completo }}</option>
+                    {% endfor %}
+                </select>
+
+                <input name="email" type="email" placeholder="Email" class="input-style" autocomplete="new-email" required>
+                <input name="password" type="password" placeholder="Contraseña" class="input-style" autocomplete="new-password" required>
+
+                <select name="id_rol" autocomplete="off" class="input-style" required>
+                    <option value="">Seleccione Rol</option>
+                    {% for rol in roles %}
+                    <option value="{{ rol.0 }}">{{ rol.1 }}</option>
+                    {% endfor %}
+                </select>
+
+                <input type="hidden" name="estado" value="Activo">
+                <button type="submit" class="btn btn-primary w-full bg-green-500 hover:bg-[#099268]">
+                    Registrar Usuario
+                </button>
+            </form>
         </div>
-      </form>
+
+        <div class="card p-8 mb-8 max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold mb-6 text-center">Lista de Usuarios</h2>
+
+            {% if messages %}
+            {% for message in messages %}
+            {% if 'editar' in message.tags or 'eliminar' in message.tags %}
+            {% if 'success' in message.tags %}
+            <div class="alert-success">{{ message }}</div>
+            {% else %}
+            <div class="alert-error">{{ message }}</div>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+
+            <div class="overflow-x-auto">
+                <table class="w-full border border-gray-300 rounded-lg text-sm">
+                    <thead class="bg-gray-500 text-white border-b border-gray-300">
+                        <tr class="uppercase">
+                            <th class="p-3">Empleado</th>
+                            <th class="p-3">Rol</th>
+                            <th class="p-3">Email</th>
+                            <th class="p-3">Estado</th>
+                            <th class="p-3 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-700">
+                        {% for usuario in usuarios %}
+                        <tr class="border-b border-gray-200">
+                            <td class="p-3">{{ usuario.id_empleado.nombre_completo }}</td>
+                            <td class="p-3">
+                                {% for rol in roles %}
+                                {% if rol.0 == usuario.id_rol %}
+                                {{ rol.1 }}
+                                {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td class="p-3">{{ usuario.email }}</td>
+                            <td class="p-3 text-center">
+                                {% if usuario.estado == 'Activo' %}
+                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded text-xs font-semibold">Activo</span>
+                                {% else %}
+                                <span class="bg-red-100 text-red-700 px-3 py-1 rounded text-xs font-semibold">Inactivo</span>
+                                {% endif %}
+                            </td>
+                            <td class="p-3">
+                                <div class="flex justify-center gap-2"> 
+                                    <button onclick="abrirModalEditar('{{ usuario.id_usuario }}', '{{ usuario.id_empleado.id_empleado }}', '{{ usuario.id_rol }}', '{{ usuario.email }}', '{{ usuario.estado }}')"
+                                        class="btn bg-yellow-500 text-white text-xs">
+                                        Editar
+                                    </button>
+
+                                    <a href="{% url 'auditoria_usuario' usuario.id_usuario %}"
+                                        class="btn btn-warning bg-blue-500 text-xs">
+                                        Auditoría
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="p-4 text-center text-gray-500">No hay usuarios registrados.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-  </div>
- 
-  <script>
-    function abrirModalEditar(id, empleado, rol, email, estado) {
-      document.getElementById('edit_id').value = id;
-      document.getElementById('edit_empleado').value = empleado;
-      document.getElementById('edit_rol').value = rol;
-      document.getElementById('edit_email').value = email;
-      document.getElementById('edit_estado').value = estado;
-      document.getElementById('modalEditar').classList.remove('hidden');
-      document.getElementById('modalEditar').classList.add('flex');
-    }
- 
-    function cerrarModalEditar() {
-      document.getElementById('modalEditar').classList.add('hidden');
-      document.getElementById('modalEditar').classList.remove('flex');
-    }
-  </script>
+
+    <div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center p-4">
+        <div class="card p-6 w-full max-w-lg">
+            <h3 class="text-2xl font-bold mb-4 text-center">Editar Usuario</h3>
+
+            <form method="POST" action="" class="space-y-4" autocomplete="off">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="editar">
+                <input type="hidden" id="edit_id" name="usuario_id">
+
+                <select id="edit_empleado" name="id_empleado" autocomplete="off" class="input-style" required>
+                    <option value="">Seleccione Empleado</option>
+                    {% for empleado in empleados %}
+                    <option value="{{ empleado.id_empleado }}">{{ empleado.nombre_completo }}</option>
+                    {% endfor %}
+                </select>
+
+                <input id="edit_email" name="email" type="email" class="input-style" autocomplete="new-email" required>
+                <input id="edit_password" name="password" type="password" class="input-style" autocomplete="new-password" placeholder="Nueva Contraseña (Opcional)">
+
+                <select id="edit_rol" name="id_rol" autocomplete="off" class="input-style" required>
+                    {% for rol in roles %}
+                    <option value="{{ rol.0 }}">{{ rol.1 }}</option>
+                    {% endfor %}
+                </select>
+
+                <select id="edit_estado" name="estado" class="input-style" required>
+                    <option value="Activo">Activo</option>
+                    <option value="Inactivo">Inactivo</option>
+                </select>
+
+                <div class="flex justify-end gap-3 pt-3">
+                    <button type="button" onclick="cerrarModalEditar()" class="btn btn-secondary">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function abrirModalEditar(id, empleado, rol, email, estado) {
+            document.getElementById('edit_id').value = id;
+            document.getElementById('edit_empleado').value = empleado;
+            document.getElementById('edit_rol').value = rol;
+            document.getElementById('edit_email').value = email;
+            document.getElementById('edit_estado').value = estado;
+            // Limpiar el campo de contraseña al abrir
+            document.getElementById('edit_password').value = '';
+
+            document.getElementById('modalEditar').classList.remove('hidden');
+            document.getElementById('modalEditar').classList.add('flex');
+        }
+
+        function cerrarModalEditar() {
+            document.getElementById('modalEditar').classList.add('hidden');
+            document.getElementById('modalEditar').classList.remove('flex');
+        }
+    </script>
 </body>
+
 </html>
