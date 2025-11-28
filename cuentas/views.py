@@ -39,23 +39,26 @@ def user_login(request):
         password = request.POST.get("password")
 
         try:
-            usuario = Usuarios.objects.get(email=email, estado="activo")
+            usuario = Usuarios.objects.get(email=email)
 
-            # Validar contraseña hasheada
+            # 1️⃣ Verificar si la cuenta está inactiva
+            if usuario.estado.lower() != "activo":
+                messages.error(request, "La cuenta está inactiva. Contacte al administrador.")
+                return redirect("login")
+
+            # 2️⃣ Validar contraseña
             if not check_password(password, usuario.password):
                 messages.error(request, "Correo o contraseña incorrectos.")
                 return redirect("login")
 
-            # Guardar sesión
+            # 3️⃣ Guardar sesión
             request.session["usuario_id"] = usuario.id_usuario
             request.session["usuario_email"] = usuario.email
             request.session["usuario_rol"] = usuario.id_rol.nombre_rol
 
-            # ------------ SOLUCIÓN ----------------
-            # Verificar si el usuario tiene clave temporal
+            # 4️⃣ Verificar si debe cambiar contraseña
             if usuario.password_temp == True:
                 return redirect("cambiar_contrasena")
-            # --------------------------------------
 
             return redirect("inicio")
 
@@ -63,6 +66,7 @@ def user_login(request):
             messages.error(request, "Correo o contraseña incorrectos.")
 
     return render(request, "cuentas/index.html")
+
 
 
 # ======================================================

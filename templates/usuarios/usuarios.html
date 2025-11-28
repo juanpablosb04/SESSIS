@@ -139,8 +139,10 @@
                     {% endfor %}
                 </select>
 
-                <input name="email" type="email" placeholder="Email" class="input-style" autocomplete="new-email" required>
-                <input name="password" type="password" placeholder="Contraseña" class="input-style" autocomplete="new-password" required>
+                <input name="email" type="email" placeholder="Email" class="input-style" autocomplete="new-email"
+                    required>
+                <input name="password" type="password" placeholder="Contraseña" class="input-style"
+                    autocomplete="new-password" required>
 
                 <select name="id_rol" autocomplete="off" class="input-style" required>
                     <option value="">Seleccione Rol</option>
@@ -196,14 +198,17 @@
                             <td class="p-3">{{ usuario.email }}</td>
                             <td class="p-3 text-center">
                                 {% if usuario.estado == 'Activo' %}
-                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded text-xs font-semibold">Activo</span>
+                                <span
+                                    class="bg-green-100 text-green-700 px-3 py-1 rounded text-xs font-semibold">Activo</span>
                                 {% else %}
-                                <span class="bg-red-100 text-red-700 px-3 py-1 rounded text-xs font-semibold">Inactivo</span>
+                                <span
+                                    class="bg-red-100 text-red-700 px-3 py-1 rounded text-xs font-semibold">Inactivo</span>
                                 {% endif %}
                             </td>
                             <td class="p-3">
-                                <div class="flex justify-center gap-2"> 
-                                    <button onclick="abrirModalEditar('{{ usuario.id_usuario }}', '{{ usuario.id_empleado.id_empleado }}', '{{ usuario.id_rol }}', '{{ usuario.email }}', '{{ usuario.estado }}')"
+                                <div class="flex justify-center gap-2">
+                                    <button
+                                        onclick="abrirModalEditar('{{ usuario.id_usuario }}', '{{ usuario.id_empleado.id_empleado }}', '{{ usuario.id_rol }}', '{{ usuario.email }}', '{{ usuario.estado }}')"
                                         class="btn bg-yellow-500 text-white text-xs">
                                         Editar
                                     </button>
@@ -235,6 +240,7 @@
                 <input type="hidden" name="action" value="editar">
                 <input type="hidden" id="edit_id" name="usuario_id">
 
+                <!-- EMPLEADO -->
                 <select id="edit_empleado" name="id_empleado" autocomplete="off" class="input-style" required>
                     <option value="">Seleccione Empleado</option>
                     {% for empleado in empleados %}
@@ -242,20 +248,32 @@
                     {% endfor %}
                 </select>
 
+                <!-- EMAIL -->
                 <input id="edit_email" name="email" type="email" class="input-style" autocomplete="new-email" required>
-                <input id="edit_password" name="password" type="password" class="input-style" autocomplete="new-password" placeholder="Nueva Contraseña (Opcional)">
 
+                <!-- CONTRASEÑA -->
+                <div>
+                    <label class="text-sm font-medium">Contraseña</label>
+                    <div class="relative">
+                        <input id="edit_password" name="password" type="password" class="input-style pr-10"
+                            placeholder="Dejar vacío si no desea cambiarla" value="********">
+                    </div>
+                </div>
+
+                <!-- ROL -->
                 <select id="edit_rol" name="id_rol" autocomplete="off" class="input-style" required>
                     {% for rol in roles %}
                     <option value="{{ rol.0 }}">{{ rol.1 }}</option>
                     {% endfor %}
                 </select>
 
+                <!-- ESTADO -->
                 <select id="edit_estado" name="estado" class="input-style" required>
                     <option value="Activo">Activo</option>
                     <option value="Inactivo">Inactivo</option>
                 </select>
 
+                <!-- BOTONES -->
                 <div class="flex justify-end gap-3 pt-3">
                     <button type="button" onclick="cerrarModalEditar()" class="btn btn-secondary">
                         Cancelar
@@ -275,8 +293,6 @@
             document.getElementById('edit_rol').value = rol;
             document.getElementById('edit_email').value = email;
             document.getElementById('edit_estado').value = estado;
-            // Limpiar el campo de contraseña al abrir
-            document.getElementById('edit_password').value = '';
 
             document.getElementById('modalEditar').classList.remove('hidden');
             document.getElementById('modalEditar').classList.add('flex');
@@ -285,6 +301,12 @@
         function cerrarModalEditar() {
             document.getElementById('modalEditar').classList.add('hidden');
             document.getElementById('modalEditar').classList.remove('flex');
+        }
+
+        // Mostrar/ocultar contraseña
+        function togglePassEdit() {
+            const input = document.getElementById('edit_password');
+            input.type = input.type === "password" ? "text" : "password";
         }
     </script>
 </body>
