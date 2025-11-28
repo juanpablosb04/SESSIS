@@ -57,11 +57,11 @@ def lista_usuarios(request):
             usuario.id_rol = int(request.POST["id_rol"])
             usuario.email = request.POST["email"]
 
-            nueva_password = request.POST["password"].strip()
+            nueva_password = request.POST.get("password")
 
-            if nueva_password:
-                usuario.password = make_password(nueva_password)  # ← ENCRIPTAR
-                usuario.password_temp = True  # Vuelve a requerir cambio si se editó la clave
+
+            if nueva_password and nueva_password != "********":
+                usuario.password = make_password(nueva_password)
 
             usuario.estado = request.POST.get("estado", "")
             usuario.save()

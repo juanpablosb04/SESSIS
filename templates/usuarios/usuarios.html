@@ -253,10 +253,16 @@
 
                 <!-- CONTRASEÑA -->
                 <div>
-                    <label class="text-sm font-medium">Contraseña</label>
+                    <label>Contraseña</label>
                     <div class="relative">
                         <input id="edit_password" name="password" type="password" class="input-style pr-10"
-                            placeholder="Dejar vacío si no desea cambiarla" value="********">
+                            value="********"
+                        autocomplete="new-password">
+
+                        <button type="button" onclick="togglePassEdit()"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
+                            👁
+                        </button>
                     </div>
                 </div>
 
@@ -293,7 +299,7 @@
             document.getElementById('edit_rol').value = rol;
             document.getElementById('edit_email').value = email;
             document.getElementById('edit_estado').value = estado;
-
+            document.getElementById('edit_password').value = '********';
             document.getElementById('modalEditar').classList.remove('hidden');
             document.getElementById('modalEditar').classList.add('flex');
         }
@@ -303,11 +309,10 @@
             document.getElementById('modalEditar').classList.remove('flex');
         }
 
-        // Mostrar/ocultar contraseña
         function togglePassEdit() {
-            const input = document.getElementById('edit_password');
-            input.type = input.type === "password" ? "text" : "password";
-        }
+        const input = document.getElementById("edit_password");
+        input.type = input.type === "password" ? "text" : "password";
+}
     </script>
 </body>
 
