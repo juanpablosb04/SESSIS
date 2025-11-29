@@ -11,7 +11,7 @@
 
     <style>
         body {
-            /* Nuevo Fondo: Estilo de empleados.html */
+
             background: #f2f3f5;
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
@@ -19,7 +19,6 @@
             color: #1f2937;
         }
 
-        /* Estilo de la card de empleados.html */
         .card {
             background: #ffffff;
             border-radius: 1rem;
@@ -27,10 +26,9 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
         }
 
-        /* Estilos de Alertas de empleados.html */
         .alert-error {
             background-color: rgba(255, 0, 0, 0.15);
-            color: #ff4d4d;
+            color: #1e2835;
             border: 1px solid rgba(255, 0, 0, 0.3);
             border-radius: 10px;
             padding: 12px;
@@ -43,7 +41,7 @@
 
         .alert-success {
             background-color: rgba(0, 128, 0, 0.15);
-            color: #4dff4d;
+            color: #1e2835;
             border: 1px solid rgba(0, 128, 0, 0.3);
             border-radius: 10px;
             padding: 12px;
@@ -54,7 +52,6 @@
             backdrop-filter: blur(10px);
         }
 
-        /* Estilos de Botones de empleados.html */
         .btn {
             padding: .6rem 1rem;
             border-radius: .5rem;
@@ -111,8 +108,8 @@
 
             {% if messages %}
             {% for message in messages %}
-            {% if 'crear' in message.tags %}
-            <div class="alert-success">{{ message }}</div>
+            {% if "crear" in message.tags %}
+            <div class="{{ message.tags }}">{{ message }}</div>
             {% endif %}
             {% endfor %}
             {% endif %}
@@ -141,20 +138,20 @@
 
                     <div>
                         <label for="hora_inicio" class="text-gray-700 text-sm font-medium">Hora de Inicio</label>
-                        <input type="time" name="hora_inicio" id="hora_inicio"
+                        <input type="time" name="hora_inicio" id="hora_inicio" required
                             class="mt-1 p-3 border border-gray-300 rounded-lg w-full">
                     </div>
 
                     <div>
                         <label for="hora_finalizacion" class="text-gray-700 text-sm font-medium">Hora de
                             Finalización</label>
-                        <input type="time" name="hora_finalizacion" id="hora_finalizacion"
+                        <input type="time" name="hora_finalizacion" id="hora_finalizacion" required
                             class="mt-1 p-3 border border-gray-300 rounded-lg w-full">
                     </div>
 
                     <div class="md:col-span-2">
                         <label for="motivo" class="text-gray-700 text-sm font-medium">Motivo</label>
-                        <textarea name="motivo" id="motivo" placeholder="Motivo de la cita"
+                        <textarea name="motivo" id="motivo" placeholder="Motivo de la cita" required
                             class="mt-1 p-3 border border-gray-300 rounded-lg w-full"></textarea>
                     </div>
 

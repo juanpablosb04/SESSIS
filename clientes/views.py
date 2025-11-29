@@ -57,13 +57,12 @@ def clientes_view(request):
 
             # Validaciones básicas
             if not nombre or not email or not cedula:
-                messages.error(request, "⚠️ Nombre, email y cédula son obligatorios", extra_tags='crear')
+                messages.error(request, "⚠️ Nombre, email y cédula son obligatorios", extra_tags='crear alert-error')
             elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-                messages.error(request, "⚠️ El correo no tiene un formato válido", extra_tags='crear')
-            elif Clientes.objects.filter(email=email).exists():
-                messages.error(request, "⚠️ El correo ya está registrado", extra_tags='crear')
+                messages.error(request, "⚠️ El correo no tiene un formato válido", extra_tags='crear alert-error')
+                messages.error(request, "⚠️ El correo ya está registrado", extra_tags='crear alert-error')
             elif Clientes.objects.filter(cedula=cedula).exists():
-                messages.error(request, "⚠️ La cédula ya está registrada", extra_tags='crear')
+                messages.error(request, "⚠️ La cédula ya está registrada", extra_tags='crear alert-error')
             else:
                 # Resolver ubicación si viene
                 ubic = None
@@ -73,8 +72,7 @@ def clientes_view(request):
                     except Ubicaciones.DoesNotExist:
                         messages.warning(
                             request,
-                            "La ubicación seleccionada no existe. Se guardará sin ubicación.", extra_tags='crear'
-                        )
+                            "La ubicación seleccionada no existe. Se guardará sin ubicación.", extra_tags='crear alert-success')
 
                 cliente = Clientes(
                     nombre_completo=nombre,
@@ -86,7 +84,7 @@ def clientes_view(request):
                 # Correo del ejecutor para auditoría en signals
                 cliente._usuario_email = request.session.get("usuario_email")
                 cliente.save()
-                messages.success(request, "✅ Cliente creado correctamente", extra_tags='crear')
+                messages.success(request, "✅ Cliente creado correctamente", extra_tags='crear alert-success')
 
         # ---------------- EDITAR ----------------
         elif action == "editar":
@@ -102,13 +100,13 @@ def clientes_view(request):
                 .exclude(id_cliente=cliente.id_cliente)
                 .exists()
             ):
-                messages.error(request, "⚠️ Ese correo ya está en uso", extra_tags='editar')
+                messages.error(request, "⚠️ Ese correo ya está en uso", extra_tags='editar alert-error')
             elif (
                 Clientes.objects.filter(cedula=nueva_cedula)
                 .exclude(id_cliente=cliente.id_cliente)
                 .exists()
             ):
-                messages.error(request, "⚠️ Esa cédula ya está en uso", extra_tags='editar')
+                messages.error(request, "⚠️ Esa cédula ya está en uso", extra_tags='editar alert-error')
             else:
                 # Resolver ubicación si viene
                 ubic = None
@@ -118,8 +116,7 @@ def clientes_view(request):
                     except Ubicaciones.DoesNotExist:
                         messages.warning(
                             request,
-                            "La ubicación seleccionada no existe. Se guardará sin ubicación.", extra_tags='editar'
-                        )
+                            "La ubicación seleccionada no existe. Se guardará sin ubicación.", extra_tags='editar alert-error')
                         ubic = None
 
                 cliente.nombre_completo = request.POST.get("nombre")
@@ -131,7 +128,7 @@ def clientes_view(request):
                 # Correo del ejecutor para auditoría en signals
                 cliente._usuario_email = request.session.get("usuario_email")
                 cliente.save()
-                messages.success(request, "✏️ Cliente editado correctamente", extra_tags='editar')
+                messages.success(request, "✏️ Cliente editado correctamente", extra_tags='editar alert-success')
 
         # ---------------- CAMBIAR ESTADO (Activo/Inactivo) ----------------
         elif action == "cambiar_estado":
@@ -149,8 +146,7 @@ def clientes_view(request):
 
             messages.success(
                 request,
-                f"🔁 Estado actualizado a {'Activo' if nuevo_estado else 'Inactivo'} correctamente", extra_tags='editar'
-            )
+                f"🔁 Estado actualizado a {'Activo' if nuevo_estado else 'Inactivo'} correctamente", extra_tags='editar alert-success')
 
         # Redirige siempre para evitar re-envío del form
         return redirect("clientes")

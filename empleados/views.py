@@ -46,6 +46,7 @@ def _parse_bool(value, fallback=False):
 # =========================
 @role_required(["Administrador"])
 def empleados_view(request):
+    
     empleados = Empleado.objects.all().order_by("nombre_completo")
 
     paginator = Paginator(empleados, 5)
@@ -63,17 +64,18 @@ def empleados_view(request):
             cedula = request.POST.get("cedula", "").strip()
             telefono = request.POST.get("telefono", "").strip()
             direccion = request.POST.get("direccion", "").strip()
-            fecha = request.POST.get("fecha_contratacion", "").strip()  # 'YYYY-MM-DD'
+            fecha = request.POST.get("fecha_contratacion", "").strip()
 
             if not nombre or not email or not cedula or not fecha:
 
-                messages.error(request, "⚠️ Nombre, correo, cédula y fecha son obligatorios.")
+                messages.error(request, "⚠️ Nombre, correo, cédula y fecha son obligatorios.", extra_tags='crear alert-error')
+
             elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-                messages.error(request, "⚠️ El correo no tiene un formato válido.", extra_tags='crear')
+                messages.error(request, "⚠️ El correo no tiene un formato válido.", extra_tags='crear alert-error')
             elif Empleado.objects.filter(email=email).exists():
-                messages.error(request, "⚠️ El correo ya está registrado.", extra_tags='crear')
+                messages.error(request, "⚠️ El correo ya está registrado.", extra_tags='crear alert-error')
             elif Empleado.objects.filter(cedula=cedula).exists():
-                messages.error(request, "⚠️ La cédula ya está registrada.", extra_tags='crear')
+                messages.error(request, "⚠️ La cédula ya está registrada.", extra_tags='crear alert-error')
 
 
             else:
@@ -87,7 +89,7 @@ def empleados_view(request):
                 )
                 empleado._usuario_email = request.session.get("usuario_email")  # 👈 para signals
                 empleado.save()
-                messages.success(request, "✅ Empleado creado correctamente.", extra_tags='crear')
+                messages.success(request, "✅ Empleado creado correctamente.", extra_tags='crear alert-success')
 
 
         # -------- EDITAR --------
@@ -104,13 +106,13 @@ def empleados_view(request):
 
 
             if not nuevo_nombre or not nuevo_email or not nueva_cedula or not nueva_fecha:
-                messages.error(request, "⚠️ Nombre, correo, cédula y fecha son obligatorios.", extra_tags='editar')
+                messages.error(request, "⚠️ Nombre, correo, cédula y fecha son obligatorios.", extra_tags='editar alert-error')
             elif not re.match(r"[^@]+@[^@]+\.[^@]+", nuevo_email):
-                messages.error(request, "⚠️ El correo no tiene un formato válido.", extra_tags='editar')
+                messages.error(request, "⚠️ El correo no tiene un formato válido.", extra_tags='editar alert-error')
             elif Empleado.objects.filter(email=nuevo_email).exclude(id_empleado=empleado.id_empleado).exists():
-                messages.error(request, "⚠️ Ese correo ya está en uso.", extra_tags='editar')
+                messages.error(request, "⚠️ Ese correo ya está en uso.", extra_tags='editar alert-error')
             elif Empleado.objects.filter(cedula=nueva_cedula).exclude(id_empleado=empleado.id_empleado).exists():
-                messages.error(request, "⚠️ Esa cédula ya está en uso.", extra_tags='editar')
+                messages.error(request, "⚠️ Esa cédula ya está en uso.", extra_tags='editar alert-error')
             else:
                 empleado.nombre_completo = nuevo_nombre
                 empleado.email = nuevo_email
@@ -121,7 +123,7 @@ def empleados_view(request):
                 empleado._usuario_email = request.session.get("usuario_email")
                 empleado.save()
 
-                messages.success(request, "✏️ Empleado editado correctamente.", extra_tags='editar')
+                messages.success(request, "✏️ Empleado editado correctamente.", extra_tags='editar alert-success')
 
             # ---------------- CAMBIAR ESTADO (Activo/Inactivo) ----------------
         elif action == "cambiar_estado":
@@ -139,14 +141,13 @@ def empleados_view(request):
             messages.success(
                 request,
                 f"🔁 Estado del empleado actualizado a {'Activo' if nuevo_estado else 'Inactivo'} correctamente",
-                extra_tags='editar'
-            )
+                extra_tags='editar alert-success')
 
             # Redirige siempre para evitar re-envío del form
             return redirect("empleados")
 
 
-    return render(request, "empleados/empleados.html", {"empleados": empleados})
+    return render(request, "empleados/empleados.html", {"empleados": empleados, "page_obj": empleados})
 
 
 # =========================
@@ -168,7 +169,7 @@ def horas_extras_admin(request):
             estado = (request.POST.get("estado") or "").strip()
 
             if not emp_id or not fecha or not horas_raw or not estado:
-                messages.error(request, "⚠️ Empleado, fecha, horas y estado son obligatorios.", extra_tags='crear')
+                messages.error(request, "⚠️ Empleado, fecha, horas y estado son obligatorios.", extra_tags='crear alert-error')
                 return redirect("horasExtras")
 
             empleado = get_object_or_404(Empleado, id_empleado=emp_id)
@@ -177,14 +178,14 @@ def horas_extras_admin(request):
             try:
                 horas_dec = Decimal(horas_raw.replace(",", "."))
             except (InvalidOperation, TypeError):
-                messages.error(request, "⚠️ La cantidad de horas no es un número válido.", extra_tags='crear')
+                messages.error(request, "⚠️ La cantidad de horas no es un número válido.", extra_tags='crear alert-error')
                 return redirect("horasExtras")
 
             if horas_dec <= 0:
-                messages.error(request, "⚠️ La cantidad de horas debe ser mayor que 0.", extra_tags='crear')
+                messages.error(request, "⚠️ La cantidad de horas debe ser mayor que 0.", extra_tags='crear alert-error')
                 return redirect("horasExtras")
             if horas_dec > Decimal("24"):
-                messages.error(request, "⚠️ Máximo permitido: 24 horas por registro.", extra_tags='crear')
+                messages.error(request, "⚠️ Máximo permitido: 24 horas por registro.", extra_tags='crear alert-error')
                 return redirect("horasExtras")
 
             ESTADOS = {
@@ -208,7 +209,7 @@ def horas_extras_admin(request):
             registro._usuario_email = request.session.get("usuario_email")
             registro.save()
 
-            messages.success(request, "✅ Horas extras registradas correctamente.", extra_tags='crear')
+            messages.success(request, "✅ Horas extras registradas correctamente.", extra_tags='crear alert-success')
             return redirect("horasExtras")
 
         # ---------- EDITAR (opcional, si ya lo usas desde el modal) ----------
@@ -226,7 +227,7 @@ def horas_extras_admin(request):
             try:
                 horas_dec = Decimal(horas_raw.replace(",", "."))
             except (InvalidOperation, TypeError):
-                messages.error(request, "⚠️ La cantidad de horas no es un número válido.", extra_tags='editar')
+                messages.error(request, "⚠️ La cantidad de horas no es un número válido.", extra_tags='editar alert-error')
                 return redirect("horasExtras")
 
             ESTADOS = {
@@ -237,7 +238,6 @@ def horas_extras_admin(request):
                 "pendiente": "Pendiente",
             }
             estado_norm = ESTADOS.get(estado.lower(), estado)
-
             registro.empleado = empleado
             registro.fecha = fecha
             registro.cantidad_horas = horas_dec
@@ -246,7 +246,7 @@ def horas_extras_admin(request):
             registro._usuario_email = request.session.get("usuario_email")
             registro.save()
 
-            messages.success(request, "✏️ Registro actualizado.", extra_tags='editar')
+            messages.success(request, "✏️ Registro actualizado.", extra_tags='editar alert-success')
             return redirect("horasExtras")
 
         # ---------- CUALQUIER OTRA ACCIÓN ----------
@@ -339,10 +339,14 @@ def auditoria_horas_extras_por_empleado(request, empleado_id):
         .order_by("-fecha")[:300]
     )
 
+    paginator = Paginator(logs, 5)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
     return render(
         request,
         "empleados/auditoria_horas_extras.html",
-        {"empleado": empleado, "logs": logs},
+        {"empleado": empleado, "logs": logs, "page_obj": page_obj},
     )
 
 # =========================

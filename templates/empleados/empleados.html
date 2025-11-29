@@ -27,7 +27,7 @@
 
     .alert-error {
       background-color: rgba(255, 0, 0, 0.15);
-      color: #ff4d4d;
+      color: #1e2835;
       border: 1px solid rgba(255, 0, 0, 0.3);
       border-radius: 10px;
       padding: 12px;
@@ -40,7 +40,7 @@
 
     .alert-success {
       background-color: rgba(0, 128, 0, 0.15);
-      color: #4dff4d;
+      color: #1e2835;
       border: 1px solid rgba(0, 128, 0, 0.3);
       border-radius: 10px;
       padding: 12px;
@@ -85,8 +85,14 @@
       background: #b91c1c;
     }
 
-      .btn-warning { background: #2563eb; color: white; }
-      .btn-warning:hover { background: #1e40af; }
+    .btn-warning {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #1e40af;
+    }
   </style>
 
   {% include "includes/navbar.html" %}
@@ -101,8 +107,8 @@
 
       {% if messages %}
       {% for message in messages %}
-      {% if 'crear' in message.tags %}
-      <div class="alert-success">{{ message }}</div>
+      {% if "crear" in message.tags %}
+      <div class="{{ message.tags }}">{{ message }}</div>
       {% endif %}
       {% endfor %}
       {% endif %}
@@ -140,8 +146,8 @@
 
       {% if messages %}
       {% for message in messages %}
-      {% if 'editar' in message.tags or 'eliminar' in message.tags or 'cambiar_estado' in message.tags %}
-      <div class="alert-error">{{ message }}</div>
+      {% if "editar" in message.tags %}
+      <div class="{{ message.tags }}">{{ message }}</div>
       {% endif %}
       {% endfor %}
       {% endif %}
@@ -210,6 +216,39 @@
           </tbody>
         </table>
       </div>
+    </div>
+
+    <!-- PAGINACIÓN -->
+    <div class="flex justify-center mt-6 mb-6">
+      <nav class="flex items-center space-x-1">
+
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}"
+          class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">
+          « Anterior
+        </a>
+        {% else %}
+        <span class="px-3 py-1 bg-gray-300 text-gray-500 rounded cursor-not-allowed">« Anterior</span>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}
+        <span class="px-3 py-1 bg-gray-200 text-gray-900 border border-gray-400 rounded">{{ num }}</span>
+        {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %} <a href="?page={{ num }}"
+          class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">{{ num }}</a>
+          {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}"
+            class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">
+            Siguiente »
+          </a>
+          {% else %}
+          <span class="px-3 py-1 bg-gray-300 text-gray-500 rounded cursor-not-allowed">Siguiente »</span>
+          {% endif %}
+
+      </nav>
     </div>
 
 

@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,53 +10,53 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-      body {
-          background: #f2f3f5;
-          font-family: 'Inter', sans-serif;
-          min-height: 100vh;
-          padding-top: 5rem;
-          color: #1f2937;
-      }
+    body {
+      background: #f2f3f5;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding-top: 5rem;
+      color: #1f2937;
+    }
 
-      .card {
-          background: #ffffff;
-          border-radius: 1rem;
-          border: 1px solid #e5e7eb;
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-      }
+    .card {
+      background: #ffffff;
+      border-radius: 1rem;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
 
-      .alert-error {
-          background-color: rgba(255, 0, 0, 0.15);
-          color: #ff4d4d;
-          border: 1px solid rgba(255, 0, 0, 0.3);
-          border-radius: 10px;
-          padding: 12px;
-          margin-bottom: 10px;
-          text-align: center;
-          font-size: 14px;
-          font-weight: 500;
-          backdrop-filter: blur(10px);
-      }
+    .alert-error {
+      background-color: rgba(255, 0, 0, 0.15);
+      color: #1e2835;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
 
-      .alert-success {
-          background-color: rgba(0, 128, 0, 0.15);
-          color: #4dff4d;
-          border: 1px solid rgba(0, 128, 0, 0.3);
-          border-radius: 10px;
-          padding: 12px;
-          margin-bottom: 10px;
-          text-align: center;
-          font-size: 14px;
-          font-weight: 500;
-          backdrop-filter: blur(10px);
-      }
+    .alert-success {
+      background-color: rgba(0, 128, 0, 0.15);
+      color: #1e2835;
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
 
-      .btn {
-          padding: .6rem 1rem;
-          border-radius: .5rem;
-          font-weight: 600;
-          transition: .2s;
-      }
+    .btn {
+      padding: .6rem 1rem;
+      border-radius: .5rem;
+      font-weight: 600;
+      transition: .2s;
+    }
 
     .btn-primary {
       background: #2563eb;
@@ -66,143 +67,134 @@
       background: #099268;
     }
 
-      .btn-warning { background: #2563eb; color: white; }
-      .btn-warning:hover { background: #1e40af; }
+    .btn-warning {
+      background: #2563eb;
+      color: white;
+    }
 
+    .btn-warning:hover {
+      background: #1e40af;
+    }
   </style>
 
   {% include "includes/navbar.html" %}
 </head>
+
 <body>
 
-<div class="max-w-6xl mx-auto px-4">
+  <div class="max-w-6xl mx-auto px-4">
 
-  <!-- FORMULARIO -->
-  <div class="card p-8 mb-2">
-    <h2 class="text-3xl font-bold mb-6 text-center">Registrar Horas Extras</h2>
+    <!-- FORMULARIO -->
+    <div class="card p-8 mb-2">
+      <h2 class="text-3xl font-bold mb-6 text-center">Registrar Horas Extras</h2>
 
-    {% if messages %}
+      {% if messages %}
       {% for message in messages %}
-        {% if 'crear' in message.tags %}
-          {% if 'success' in message.tags %}
-            <div class="alert-success">{{ message }}</div>
-          {% else %}
-            <div class="alert-error">{{ message }}</div>
-          {% endif %}
-        {% endif %}
+      {% if "crear" in message.tags %}
+      <div class="{{ message.tags }}">{{ message }}</div>
+      {% endif %}
       {% endfor %}
-    {% endif %}
+      {% endif %}
 
-    <form method="POST" class="space-y-4" action="{% url 'horasExtras' %}">
-      {% csrf_token %}
-      <input type="hidden" name="action" value="crear">
+      <form method="POST" class="space-y-4" action="{% url 'horasExtras' %}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="crear">
 
-      <div>
-        <label class="text-sm text-gray-700">Empleado</label>
-        <select name="empleado_id" class="w-full mt-1 p-3 border border-gray-300 rounded-lg bg-white" required>
-          <option value="">-- Seleccione un empleado --</option>
-          {% for e in empleados %}
+        <div>
+          <label class="text-sm text-gray-700">Empleado</label>
+          <select name="empleado_id" class="w-full mt-1 p-3 border border-gray-300 rounded-lg bg-white" required>
+            <option value="">-- Seleccione un empleado --</option>
+            {% for e in empleados %}
             <option value="{{ e.id_empleado }}">{{ e.nombre_completo }} — {{ e.cedula }}</option>
-          {% endfor %}
-        </select>
-      </div>
+            {% endfor %}
+          </select>
+        </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="text-sm text-gray-700">Fecha</label>
-          <input type="date" name="fecha" class="mt-1 p-3 border border-gray-300 rounded-lg w-full" required>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-sm text-gray-700">Fecha</label>
+            <input type="date" name="fecha" class="mt-1 p-3 border border-gray-300 rounded-lg w-full" required>
+          </div>
+
+          <div>
+            <label class="text-sm text-gray-700">Cantidad de horas</label>
+            <input type="number" name="cantidad_horas" min="0.5" step="0.5" max="24"
+              class="mt-1 p-3 border border-gray-300 rounded-lg w-full" placeholder="Ej: 1, 2, 3.5" required>
+          </div>
         </div>
 
         <div>
-          <label class="text-sm text-gray-700">Cantidad de horas</label>
-          <input type="number" name="cantidad_horas" min="0.5" step="0.5" max="24"
-                class="mt-1 p-3 border border-gray-300 rounded-lg w-full"
-                placeholder="Ej: 1, 2, 3.5" required>
+          <label class="text-sm text-gray-700">Justificación</label>
+          <textarea name="justificacion" rows="3" class="w-full mt-1 p-3 border border-gray-300 rounded-lg"
+            placeholder="Detalle breve de la razón..."></textarea>
         </div>
-      </div>
 
-      <div>
-        <label class="text-sm text-gray-700">Justificación</label>
-        <textarea name="justificacion" rows="3"
-                  class="w-full mt-1 p-3 border border-gray-300 rounded-lg"
-                  placeholder="Detalle breve de la razón..."></textarea>
-      </div>
+        <div>
+          <label class="text-sm text-gray-700">Estado</label>
+          <select name="estado" class="w-full mt-1 p-3 border border-gray-300 rounded-lg">
+            <option value="PENDIENTE">Pendiente</option>
+            <option value="APROBADO">Aprobado</option>
+          </select>
+        </div>
 
-      <div>
-        <label class="text-sm text-gray-700">Estado</label>
-        <select name="estado" class="w-full mt-1 p-3 border border-gray-300 rounded-lg">
-          <option value="PENDIENTE">Pendiente</option>
-          <option value="APROBADO">Aprobado</option>
-        </select>
-      </div>
+        <button class="btn btn-primary bg-green-500 w-full">Registrar</button>
+      </form>
+    </div>
 
-      <button class="btn btn-primary bg-green-500 w-full">Registrar</button>
-    </form>
-  </div>
+    <!-- HISTORIAL -->
+    <div class="card p-8">
+      <h2 class="text-3xl font-bold mb-6 text-center">Historial de Horas Extras</h2>
 
-  <!-- HISTORIAL -->
-  <div class="card p-8">
-    <h2 class="text-3xl font-bold mb-6 text-center">Historial de Horas Extras</h2>
-
-    {% if messages %}
+      {% if messages %}
       {% for message in messages %}
-        {% if 'editar' in message.tags or 'eliminar' in message.tags or 'cambiar_estado' in message.tags %}
-          {% if 'success' in message.tags %}
-            <div class="alert-success">{{ message }}</div>
-          {% else %}
-            <div class="alert-error">{{ message }}</div>
-          {% endif %}
-        {% endif %}
+      {% if "editar" in message.tags %}
+      <div class="{{ message.tags }}">{{ message }}</div>
+      {% endif %}
       {% endfor %}
-    {% endif %}
+      {% endif %}
 
-    <div class="overflow-x-auto">
-      <table class="w-full border border-gray-300 rounded-lg text-sm">
-        <thead class="bg-gray-500 text-white border-b border-gray-300">
-          <tr class="uppercase">
-            <th class="p-3">Empleado</th>
-            <th class="p-3">Fecha</th>
-            <th class="p-3 text-center">Horas</th>
-            <th class="p-3">Justificación</th>
-            <th class="p-3 text-center">Estado</th>
-            <th class="p-3 text-center">Acciones</th>
-          </tr>
-        </thead>
+      <div class="overflow-x-auto">
+        <table class="w-full border border-gray-300 rounded-lg text-sm">
+          <thead class="bg-gray-500 text-white border-b border-gray-300">
+            <tr class="uppercase">
+              <th class="p-3">Empleado</th>
+              <th class="p-3">Fecha</th>
+              <th class="p-3 text-center">Horas</th>
+              <th class="p-3">Justificación</th>
+              <th class="p-3 text-center">Estado</th>
+              <th class="p-3 text-center">Acciones</th>
+            </tr>
+          </thead>
 
-        <tbody>
-        {% for r in registros %}
-          <tr class="border-b border-gray-200">
-            <td class="p-3">{{ r.empleado.nombre_completo }}</td>
-            <td class="p-3">{{ r.fecha|date:"d/m/Y" }}</td>
-            <td class="p-3 text-center">{{ r.cantidad_horas|floatformat:"-2" }}</td>
-            <td class="p-3">{{ r.justificacion|default:"—" }}</td>
+          <tbody>
+            {% for r in registros %}
+            <tr class="border-b border-gray-200">
+              <td class="p-3">{{ r.empleado.nombre_completo }}</td>
+              <td class="p-3">{{ r.fecha|date:"d/m/Y" }}</td>
+              <td class="p-3 text-center">{{ r.cantidad_horas|floatformat:"-2" }}</td>
+              <td class="p-3">{{ r.justificacion|default:"—" }}</td>
 
-            <td class="p-3 text-center">
-              {% with est=r.estado|lower %}
+              <td class="p-3 text-center">
+                {% with est=r.estado|lower %}
                 {% if est == "aprobado" %}
-                  <span class="bg-green-100 text-green-700 px-3 py-1 rounded text-xs font-semibold">Aprobado</span>
+                <span class="bg-green-100 text-green-700 px-3 py-1 rounded text-xs font-semibold">Aprobado</span>
                 {% elif est == "pendiente" or est == "en revisión" or est == "en revision" %}
-                  <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded text-xs font-semibold">En revisión</span>
+                <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded text-xs font-semibold">En revisión</span>
                 {% elif est == "rechazado" %}
-                  <span class="bg-red-100 text-red-700 px-3 py-1 rounded text-xs font-semibold">Rechazado</span>
+                <span class="bg-red-100 text-red-700 px-3 py-1 rounded text-xs font-semibold">Rechazado</span>
                 {% else %}
-                  <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs font-semibold">{{ r.estado }}</span>
+                <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs font-semibold">{{ r.estado }}</span>
                 {% endif %}
-              {% endwith %}
-            </td>
+                {% endwith %}
+              </td>
 
-            <td class="p-3">
-              <div class="flex justify-center gap-2 flex-wrap">
-                <!-- Botón Editar -->
-                <button
-                      class="btn bg-yellow-500 text-white"
-                      data-id="{{ r.id_hora_extra }}"
-                      data-empleado="{{ r.empleado.id_empleado }}"
-                      data-fecha="{{ r.fecha|date:'Y-m-d' }}"
-                      data-horas="{{ r.cantidad_horas }}"
-                      data-just="{{ r.justificacion|default_if_none:''|escapejs }}"
-                      data-estado="{{ r.estado }}"
-                      onclick="abrirModalEditar(
+              <td class="p-3">
+                <div class="flex justify-center gap-2 flex-wrap">
+                  <!-- Botón Editar -->
+                  <button class="btn bg-yellow-500 text-white" data-id="{{ r.id_hora_extra }}"
+                    data-empleado="{{ r.empleado.id_empleado }}" data-fecha="{{ r.fecha|date:'Y-m-d' }}"
+                    data-horas="{{ r.cantidad_horas }}" data-just="{{ r.justificacion|default_if_none:''|escapejs }}"
+                    data-estado="{{ r.estado }}" onclick="abrirModalEditar(
                         this.dataset.id,
                         this.dataset.empleado,
                         this.dataset.fecha,
@@ -210,118 +202,116 @@
                         this.dataset.just,
                         this.dataset.estado
                       )">
-                      Editar
-                    </button>
+                    Editar
+                  </button>
 
-                <!-- Auditoría -->
-                <a href="{% url 'auditoria_horas_extras_por_empleado' r.empleado.id_empleado %}"
-                   class="btn btn-warning bg-blue-500 text-xs">
-                  Auditoría
-                </a>
+                  <!-- Auditoría -->
+                  <a href="{% url 'auditoria_horas_extras_por_empleado' r.empleado.id_empleado %}"
+                    class="btn btn-warning bg-blue-500 text-xs">
+                    Auditoría
+                  </a>
 
-              </div>
-            </td>
-          </tr>
-        {% empty %}
-          <tr>
-            <td colspan="6" class="p-4 text-center text-gray-500">No hay registros de horas extras</td>
-          </tr>
-        {% endfor %}
-        </tbody>
-      </table>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="p-4 text-center text-gray-500">No hay registros de horas extras</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
 
-      <!-- PAGINACIÓN -->
-      <div class="flex justify-center mt-6">
-        <nav class="flex items-center space-x-1">
+        <!-- PAGINACIÓN -->
+        <div class="flex justify-center mt-6">
+          <nav class="flex items-center space-x-1">
 
-          {% if registros.has_previous %}
+            {% if registros.has_previous %}
             <a href="?page={{ registros.previous_page_number }}"
-               class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">« Anterior</a>
-          {% else %}
+              class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">« Anterior</a>
+            {% else %}
             <span class="px-3 py-1 bg-gray-300 text-gray-500 rounded cursor-not-allowed">« Anterior</span>
-          {% endif %}
-
-          {% for num in registros.paginator.page_range %}
-            {% if num == registros.number %}
-              <span class="px-3 py-1 border border-gray-400 bg-gray-200 text-gray-900 rounded">{{ num }}</span>
-            {% elif num >= registros.number|add:'-2' and num <= registros.number|add:'2' %}
-              <a href="?page={{ num }}" class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">{{ num }}</a>
             {% endif %}
-          {% endfor %}
 
-          {% if registros.has_next %}
-            <a href="?page={{ registros.next_page_number }}"
-               class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">Siguiente »</a>
-          {% else %}
-            <span class="px-3 py-1 bg-gray-300 text-gray-500 rounded cursor-not-allowed">Siguiente »</span>
-          {% endif %}
-        </nav>
+            {% for num in registros.paginator.page_range %}
+            {% if num == registros.number %}
+            <span class="px-3 py-1 border border-gray-400 bg-gray-200 text-gray-900 rounded">{{ num }}</span>
+            {% elif num >= registros.number|add:'-2' and num <= registros.number|add:'2' %} <a href="?page={{ num }}"
+              class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">{{ num }}</a>
+              {% endif %}
+              {% endfor %}
+
+              {% if registros.has_next %}
+              <a href="?page={{ registros.next_page_number }}"
+                class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">Siguiente »</a>
+              {% else %}
+              <span class="px-3 py-1 bg-gray-300 text-gray-500 rounded cursor-not-allowed">Siguiente »</span>
+              {% endif %}
+          </nav>
+        </div>
+
       </div>
+    </div>
 
+  </div>
+
+  <!-- MODAL EDITAR -->
+  <div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center p-4">
+    <div class="card p-6 w-full max-w-lg">
+      <h3 class="text-2xl font-bold mb-4 text-center">Editar Registro</h3>
+
+      <form method="POST" action="{% url 'horasExtras' %}" class="space-y-3">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="editar">
+        <input type="hidden" id="edit_id" name="hora_extra_id">
+
+        <div>
+          <label class="text-sm text-gray-700">Empleado</label>
+          <select id="edit_empleado" name="empleado_id"
+            class="w-full mt-1 p-3 border border-gray-300 rounded-lg bg-white">
+            {% for e in empleados %}
+            <option value="{{ e.id_empleado }}">{{ e.nombre_completo }} — {{ e.cedula }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-sm text-gray-700">Fecha</label>
+            <input id="edit_fecha" name="fecha" type="date" class="w-full p-3 mt-1 border border-gray-300 rounded-lg">
+          </div>
+
+          <div>
+            <label class="text-sm text-gray-700">Horas</label>
+            <input id="edit_horas" name="cantidad_horas" type="number" min="0.5" step="0.5" max="24"
+              class="w-full p-3 mt-1 border border-gray-300 rounded-lg">
+          </div>
+        </div>
+
+        <div>
+          <label class="text-sm text-gray-700">Justificación</label>
+          <textarea id="edit_just" name="justificacion" rows="3"
+            class="w-full mt-1 p-3 border border-gray-300 rounded-lg"></textarea>
+        </div>
+
+        <div>
+          <label class="text-sm text-gray-700">Estado</label>
+          <select id="edit_estado" name="estado" class="w-full mt-1 p-3 border border-gray-300 rounded-lg">
+            <option value="Pendiente">Pendiente</option>
+            <option value="Aprobado">Aprobado</option>
+          </select>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-3">
+          <button type="button" onclick="cerrarModalEditar()" class="btn btn-secondary">Cancelar</button>
+          <button class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
     </div>
   </div>
 
-</div>
-
-<!-- MODAL EDITAR -->
-<div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center p-4">
-  <div class="card p-6 w-full max-w-lg">
-    <h3 class="text-2xl font-bold mb-4 text-center">Editar Registro</h3>
-
-    <form method="POST" action="{% url 'horasExtras' %}" class="space-y-3">
-      {% csrf_token %}
-      <input type="hidden" name="action" value="editar">
-      <input type="hidden" id="edit_id" name="hora_extra_id">
-
-      <div>
-        <label class="text-sm text-gray-700">Empleado</label>
-        <select id="edit_empleado" name="empleado_id"
-                class="w-full mt-1 p-3 border border-gray-300 rounded-lg bg-white">
-          {% for e in empleados %}
-            <option value="{{ e.id_empleado }}">{{ e.nombre_completo }} — {{ e.cedula }}</option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="text-sm text-gray-700">Fecha</label>
-          <input id="edit_fecha" name="fecha" type="date"
-                 class="w-full p-3 mt-1 border border-gray-300 rounded-lg">
-        </div>
-
-        <div>
-          <label class="text-sm text-gray-700">Horas</label>
-          <input id="edit_horas" name="cantidad_horas" type="number" min="0.5" step="0.5" max="24"
-                 class="w-full p-3 mt-1 border border-gray-300 rounded-lg">
-        </div>
-      </div>
-
-      <div>
-        <label class="text-sm text-gray-700">Justificación</label>
-        <textarea id="edit_just" name="justificacion" rows="3"
-                  class="w-full mt-1 p-3 border border-gray-300 rounded-lg"></textarea>
-      </div>
-
-      <div>
-        <label class="text-sm text-gray-700">Estado</label>
-        <select id="edit_estado" name="estado"
-                class="w-full mt-1 p-3 border border-gray-300 rounded-lg">
-          <option value="PENDIENTE">Pendiente</option>
-          <option value="APROBADO">Aprobado</option>
-        </select>
-      </div>
-
-      <div class="flex justify-end gap-3 pt-3">
-        <button type="button" onclick="cerrarModalEditar()" class="btn btn-secondary">Cancelar</button>
-        <button class="btn btn-primary">Guardar</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<script>
-  function abrirModalEditar(id, empleado, fecha, horas, just, estado) {
+  <script>
+    function abrirModalEditar(id, empleado, fecha, horas, just, estado) {
       const modal = document.getElementById("modalEditar");
       modal.classList.remove("hidden");
       modal.classList.add("flex");
@@ -332,14 +322,15 @@
       edit_horas.value = horas;
       edit_just.value = just;
       edit_estado.value = estado;
-  }
+    }
 
-  function cerrarModalEditar() {
+    function cerrarModalEditar() {
       const modal = document.getElementById("modalEditar");
       modal.classList.add("hidden");
       modal.classList.remove("flex");
-  }
-</script>
+    }
+  </script>
 
 </body>
+
 </html>

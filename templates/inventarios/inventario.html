@@ -28,7 +28,7 @@
 
     .alert-error {
       background-color: rgba(255, 0, 0, 0.15);
-      color: #ff4d4d;
+      color: #1e2835;
       border: 1px solid rgba(255, 0, 0, 0.3);
       border-radius: 10px;
       padding: 12px;
@@ -41,7 +41,7 @@
 
     .alert-success {
       background-color: rgba(0, 128, 0, 0.15);
-      color: #4dff4d;
+      color: #1e2835;
       border: 1px solid rgba(0, 128, 0, 0.3);
       border-radius: 10px;
       padding: 12px;
@@ -101,15 +101,11 @@
       <h2 class="text-3xl font-bold mb-6 text-center">Registro de equipo de inventario</h2>
 
       {% if messages %}
-        {% for message in messages %}
-          {% if 'crear' in message.tags %}
-            {% if 'success' in message.tags %}
-              <div class="alert-success">{{ message }}</div>
-            {% else %}
-              <div class="alert-error">{{ message }}</div>
-            {% endif %}
-          {% endif %}
-        {% endfor %}
+      {% for message in messages %}
+      {% if "crear" in message.tags %}
+      <div class="{{ message.tags }}">{{ message }}</div>
+      {% endif %}
+      {% endfor %}
       {% endif %}
 
       <form method="POST" class="space-y-4">
@@ -146,15 +142,11 @@
       <h2 class="text-3xl font-bold mb-6 text-center">Lista de Inventario</h2>
 
       {% if messages %}
-        {% for message in messages %}
-          {% if 'editar' in message.tags or 'eliminar' in message.tags %}
-            {% if 'success' in message.tags %}
-              <div class="alert-success">{{ message }}</div>
-            {% else %}
-              <div class="alert-error">{{ message }}</div>
-            {% endif %}
-          {% endif %}
-        {% endfor %}
+      {% for message in messages %}
+      {% if "editar" in message.tags %}
+      <div class="{{ message.tags }}">{{ message }}</div>
+      {% endif %}
+      {% endfor %}
       {% endif %}
 
       <div class="overflow-x-auto">
@@ -180,7 +172,7 @@
                 <td class="p-3">{{ inv.id_ubicacion.nombre }}</td>
 
                 <td class="p-3">
-                  <div class="flex justify-center gap-2 flex-wrap">
+                  <div class="flex justify-center gap-2">
 
                     <button
                     onclick="abrirModal('{{ inv.id_inventario }}','{{ inv.nombre }}','{{ inv.descripcion }}','{{ inv.estado }}','{{ inv.id_cliente.id_cliente }}')"
@@ -232,7 +224,7 @@
             <input id="edit_estado" name="estado" placeholder="Estado" type="text"
                    class="p-3 border border-gray-300 rounded-lg" />
             <select id="edit_ubicacion" name="id_ubicacion" class="p-3 border border-gray-300 rounded-lg">
-              <option disabled selected>Selecciona ubicación</option>
+              <option value="">Selecciona ubicación</option>
               {% for ubic in ubicaciones %}
                 <option value="{{ ubic.id_ubicacion }}">{{ ubic.nombre }}</option>
               {% endfor %}

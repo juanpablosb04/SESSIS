@@ -27,7 +27,7 @@
 
     .alert-error {
       background-color: rgba(255, 0, 0, 0.15);
-      color: #ff4d4d;
+      color: #1e2835;
       border: 1px solid rgba(255, 0, 0, 0.3);
       border-radius: 10px;
       padding: 12px;
@@ -40,7 +40,7 @@
 
     .alert-success {
       background-color: rgba(0, 128, 0, 0.15);
-      color: #4dff4d;
+      color: #1e2835;
       border: 1px solid rgba(0, 128, 0, 0.3);
       border-radius: 10px;
       padding: 12px;
@@ -100,15 +100,11 @@
       <h2 class="text-3xl font-bold mb-6 text-center">Registro de Clientes</h2>
 
       {% if messages %}
-        {% for message in messages %}
-          {% if 'crear' in message.tags %}
-            {% if 'success' in message.tags %}
-              <div class="alert-success">{{ message }}</div>
-            {% else %}
-              <div class="alert-error">{{ message }}</div>
-            {% endif %}
-          {% endif %}
-        {% endfor %}
+      {% for message in messages %}
+      {% if "crear" in message.tags %}
+      <div class="{{ message.tags }}">{{ message }}</div>
+      {% endif %}
+      {% endfor %}
       {% endif %}
 
       <form method="POST" action="{% url 'clientes' %}" class="space-y-4">
@@ -150,15 +146,11 @@
       <h2 class="text-3xl font-bold mb-6 text-center">Lista de Clientes</h2>
 
       {% if messages %}
-        {% for message in messages %}
-          {% if 'editar' in message.tags or 'eliminar' in message.tags %}
-            {% if 'success' in message.tags %}
-              <div class="alert-success">{{ message }}</div>
-            {% else %}
-              <div class="alert-error">{{ message }}</div>
-            {% endif %}
-          {% endif %}
-        {% endfor %}
+      {% for message in messages %}
+      {% if "editar" in message.tags %}
+      <div class="{{ message.tags }}">{{ message }}</div>
+      {% endif %}
+      {% endfor %}
       {% endif %}
 
       <div class="overflow-x-auto">
@@ -199,7 +191,7 @@
                 </td>
 
                 <td class="p-3">
-                  <div class="flex justify-center gap-2 flex-wrap">
+                  <div class="flex justify-center gap-2">
 
                     <!-- Editar -->
                     <button
