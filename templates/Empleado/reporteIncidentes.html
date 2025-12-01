@@ -26,9 +26,9 @@
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
     }
 
-    .alert-error{
+    .alert-error {
       background-color: rgba(255, 0, 0, 0.15);
-      color: #ff4d4d;
+      color: #1e2835;
       border: 1px solid rgba(255, 0, 0, 0.3);
       border-radius: 10px;
       padding: 12px;
@@ -39,9 +39,9 @@
       backdrop-filter: blur(10px);
     }
 
-    .alert-success{
+    .alert-success {
       background-color: rgba(0, 128, 0, 0.15);
-      color: #4dff4d;
+      color: #1e2835;
       border: 1px solid rgba(0, 128, 0, 0.3);
       border-radius: 10px;
       padding: 12px;
@@ -80,15 +80,11 @@
       <h2 class="text-3xl font-bold mb-6 text-center">Registrar incidente</h2>
 
       {% if messages %}
-        {% for message in messages %}
-          {% if 'crear' in message.tags %}
-            {% if 'success' in message.tags %}
-              <div class="alert-success">{{ message }}</div>
-            {% else %}
-              <div class="alert-error">{{ message }}</div>
-            {% endif %}
-          {% endif %}
-        {% endfor %}
+      {% for message in messages %}
+        {% if "crear" in message.tags %}
+          <div class="{{ message.tags }}">{{ message }}</div>
+        {% endif %}
+      {% endfor %}
       {% endif %}
 
       <form method="POST" enctype="multipart/form-data" class="space-y-4">
@@ -97,18 +93,16 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Fecha del evento -->
           <div>
-            <label for="fecha_evento" class="block text-sm mb-1 text-gray-700">Fecha del evento</label>
+            <label class="block text-sm mb-1 text-gray-700">Fecha del evento</label>
             <input id="fecha_evento" name="fecha_evento" type="date"
-                   class="border border-gray-300 rounded-md p-2 w-full"
-                   required />
+                   class="border border-gray-300 rounded-md p-2 w-full" required />
           </div>
 
           <!-- Categoría -->
           <div>
-            <label for="categoria" class="block text-sm mb-1 text-gray-700">Categoría del incidente</label>
+            <label class="block text-sm mb-1 text-gray-700">Categoría del incidente</label>
             <select id="categoria" name="categoria"
-                    class="border border-gray-300 rounded-md p-2 w-full"
-                    required>
+                    class="border border-gray-300 rounded-md p-2 w-full" required>
               <option value="">Seleccionar categoría</option>
               <option value="accidente-trabajo">🔧 Accidente de trabajo</option>
               <option value="fallo-equipamiento">⚙️ Fallo de equipamiento</option>
@@ -121,16 +115,15 @@
 
         <!-- Descripción -->
         <div>
-          <label for="descripcion" class="block text-sm mb-1 text-gray-700">Descripción detallada</label>
+          <label class="block text-sm mb-1 text-gray-700">Descripción detallada</label>
           <textarea id="descripcion" name="descripcion" rows="5"
                     class="border border-gray-300 rounded-md p-3 w-full"
-                    placeholder="Circunstancias, personas involucradas, ubicación exacta, consecuencias y acciones tomadas…"
                     required></textarea>
         </div>
 
         <!-- Foto única -->
         <div class="mb-2">
-          <label for="foto" class="block text-sm mb-1 text-gray-700">Foto del incidente (una sola imagen)</label>
+          <label class="block text-sm mb-1 text-gray-700">Foto del incidente (una sola imagen)</label>
           <input id="foto" name="foto" type="file" accept="image/*"
                  class="block w-full text-sm file:mr-4 file:py-2 file:px-4
                         file:rounded-md file:border-0 file:text-sm
@@ -143,7 +136,6 @@
         <button type="submit" class="btn btn-primary bg-green-500 hover:bg-green-600">
           Registrar incidente
         </button>
-
       </form>
     </div>
 
@@ -155,31 +147,32 @@
         <table class="w-full border border-gray-300 rounded-lg text-sm">
           <thead class="bg-gray-500 text-white border-b border-gray-300">
             <tr class="uppercase">
-              <th class="p-2 whitespace-nowrap text-left">Fecha</th>
-              <th class="p-2 whitespace-nowrap text-left">Categoría</th>
+              <th class="p-2 text-left">Fecha</th>
+              <th class="p-2 text-left">Categoría</th>
               <th class="p-2 text-left">Descripción</th>
-              <th class="p-2 whitespace-nowrap text-left">Foto</th>
+              <th class="p-2 text-left">Foto</th>
             </tr>
           </thead>
           <tbody>
-            {% for rep in reportes %}
+            {% for rep in page_obj %}
             <tr class="border-b border-gray-200">
               <td class="p-2 whitespace-nowrap">
-                {% if rep.fecha_evento %}{{ rep.fecha_evento|date:"d-m-Y" }}{% else %}-{% endif %}
+                {{ rep.fecha_evento|date:"d-m-Y" }}
               </td>
+
               <td class="p-2 whitespace-nowrap">{{ rep.categoria|default:"-" }}</td>
+
               <td class="p-2">
                 {{ rep.descripcion|default:"-"|truncatechars:120 }}
               </td>
+
               <td class="p-2">
-                {% if rep.foto and rep.id_reporte %}
+                {% if rep.foto %}
                   <a href="{% url 'verFotoIncidente' rep.id_reporte %}"
                      target="_blank"
-                     class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800"
-                     title="Ver imagen" rel="noopener noreferrer">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                         fill="currentColor" class="h-6 w-6">
-                      <path d="M4 5a2 2 0 0 0-2 2v10c0 1.1.9 2 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H4zm0 2h16v7.586l-3.293-3.293a1 1 0 0 0-1.414 0L12 15.586l-2.293-2.293a1 1 0 0 0-1.414 0L4 17V7zm3 2a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
+                     class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="h-6 w-6">
+                      <path d="M4 5a2 2 0 0 0-2 2v10c0 ..."/>
                     </svg>
                     <span class="underline">Ver</span>
                   </a>
@@ -188,6 +181,7 @@
                 {% endif %}
               </td>
             </tr>
+
             {% empty %}
             <tr>
               <td colspan="4" class="p-4 text-center text-gray-500">
@@ -198,24 +192,52 @@
           </tbody>
         </table>
       </div>
+
+      <!-- PAGINACIÓN -->
+      {% if page_obj.has_other_pages %}
+      <div class="flex justify-center mt-6">
+        <div class="inline-flex space-x-1">
+
+          {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">«</a>
+          {% else %}
+            <span class="px-3 py-2 bg-gray-100 text-gray-400 rounded">«</span>
+          {% endif %}
+
+          {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}
+              <span class="px-3 py-2 bg-blue-600 text-white rounded">{{ num }}</span>
+            {% else %}
+              <a href="?page={{ num }}" class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">{{ num }}</a>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">»</a>
+          {% else %}
+            <span class="px-3 py-2 bg-gray-100 text-gray-400 rounded">»</span>
+          {% endif %}
+
+        </div>
+      </div>
+      {% endif %}
     </div>
 
   </div>
 
   <script>
-    // Previsualización de la imagen seleccionada (una sola foto)
+    /* PREVIEW */
     const input = document.getElementById('foto');
     const preview = document.getElementById('preview');
     input?.addEventListener('change', (e) => {
-      const file = e.target.files && e.target.files[0];
-      if (!file) { preview.classList.add('hidden'); preview.src = ''; return; }
+      const file = e.target.files?.[0];
+      if (!file) { preview.classList.add('hidden'); return; }
       if (!file.type.startsWith('image/')) { alert('Selecciona una imagen.'); input.value=''; return; }
-      const url = URL.createObjectURL(file);
-      preview.src = url;
+      preview.src = URL.createObjectURL(file);
       preview.classList.remove('hidden');
     });
 
-    // Fecha hoy por defecto
+    /* FECHA HOY */
     const f = document.getElementById('fecha_evento');
     if (f && !f.value) f.value = new Date().toISOString().split('T')[0];
   </script>

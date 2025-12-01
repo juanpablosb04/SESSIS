@@ -197,6 +197,54 @@
             {% endfor %}
           </tbody>
         </table>
+
+
+        <!-- PAGINACIÓN -->
+        <div class="flex justify-center mt-6">
+          <nav class="flex items-center space-x-1 text-sm">
+
+            <!-- PREVIOUS -->
+            {% if inventarios.has_previous %}
+              <a href="?page={{ inventarios.previous_page_number }}"
+                 class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 border border-gray-300">
+                « Anterior
+              </a>
+            {% else %}
+              <span class="px-3 py-1 bg-gray-100 text-gray-400 rounded border border-gray-200 cursor-not-allowed">
+                « Anterior
+              </span>
+            {% endif %}
+
+            <!-- NÚMEROS -->
+            {% for num in inventarios.paginator.page_range %}
+              {% if num == inventarios.number %}
+                <span class="px-3 py-1 border border-gray-400 bg-white text-gray-900 rounded">
+                  {{ num }}
+                </span>
+              {% elif num >= inventarios.number|add:'-2' and num <= inventarios.number|add:'2' %}
+                <a href="?page={{ num }}"
+                   class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 border border-gray-300">
+                  {{ num }}
+                </a>
+              {% endif %}
+            {% endfor %}
+
+            <!-- NEXT -->
+            {% if inventarios.has_next %}
+              <a href="?page={{ inventarios.next_page_number }}"
+                 class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 border border-gray-300">
+                Siguiente »
+              </a>
+            {% else %}
+              <span class="px-3 py-1 bg-gray-100 text-gray-400 rounded border border-gray-200 cursor-not-allowed">
+                Siguiente »
+              </span>
+            {% endif %}
+
+          </nav>
+        </div>
+
+
       </div>
     </div>
 

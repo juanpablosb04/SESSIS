@@ -366,16 +366,22 @@ def consultar_horas_extras_oficial(request):
         registros = []
         total_horas_aprobadas = Decimal("0")
         ultima_actualizacion = timezone.now().date()
+        page_obj = []
     else:
-        # Traer TODOS los registros del oficial para la tabla
-        registros = (
+        # Traer TODOS los registros
+        registros_qs = (
             HorasExtras.objects
             .select_related("empleado")
             .filter(empleado=empleado)
             .order_by("-fecha", "-id_hora_extra")
         )
 
-        # Sumar SOLO las horas que estén Aprobadas
+        # ---- PAGINACIÓN ----
+        paginator = Paginator(registros_qs, 5)  # 10 registros por página
+        page_number = request.GET.get("page")
+        page_obj = paginator.get_page(page_number)
+
+        # Suma solo horas aprobadas
         total_horas_aprobadas = (
             HorasExtras.objects
             .filter(empleado=empleado, estado__iexact="Aprobado")
@@ -383,8 +389,8 @@ def consultar_horas_extras_oficial(request):
             .get("suma") or Decimal("0")
         )
 
-        # Fecha del registro más reciente para "Última actualización"
-        ultimo = registros.first()
+        # Última actualización
+        ultimo = registros_qs.first()
         ultima_actualizacion = ultimo.fecha if ultimo else timezone.now().date()
 
     return render(
@@ -392,8 +398,9 @@ def consultar_horas_extras_oficial(request):
         "empleados/consultarHorasExtras.html",
         {
             "empleado": empleado,
-            "registros": registros,
-            "total_horas": total_horas_aprobadas,      # <- ya filtrado por Aprobado
+            "page_obj": page_obj,               # <- se usa en el HTML
+            "registros": page_obj.object_list,  # <- solo los de la página actual
+            "total_horas": total_horas_aprobadas,
             "ultima_actualizacion": ultima_actualizacion,
         },
     )

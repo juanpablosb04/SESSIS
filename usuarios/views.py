@@ -18,21 +18,79 @@ ROLES = {
 # ========================
 @role_required(["Administrador"])
 def lista_usuarios(request):
+
+    usuarios = Usuario.objects.all().order_by("email")
+
+    paginator = Paginator(usuarios, 5)
+    page_number = request.GET.get("page")
+    usuarios = paginator.get_page(page_number)
+
     if request.method == "POST":
         action = request.POST.get("action")
-        usuario_actual = None  # Usuario admin logueado si lo deseas
+        usuario_actual = None 
+
+        # =============================
+        # VALIDACIONES GENERALES
+        # =============================
+        email = request.POST.get("email", "").strip()
+        id_empleado = request.POST.get("id_empleado")
+        id_rol = request.POST.get("id_rol")
+        estado = request.POST.get("estado", "")
+
+        # Email vacío
+        if not email:
+            messages.error(request, "❌ El email es obligatorio.", extra_tags='crear alert-error')
+            return redirect("lista_usuarios")
+
+        # Validación email básico
+        if "@" not in email or "." not in email:
+            messages.error(request, "❌ Debes ingresar un email válido.", extra_tags='crear alert-error')
+            return redirect("lista_usuarios")
+
+        # Empleado obligatorio
+        if not id_empleado:
+            messages.error(request, "❌ Debes seleccionar un empleado.", extra_tags='crear alert-error')
+            return redirect("lista_usuarios")
+
+        # Rol obligatorio
+        if not id_rol:
+            messages.error(request, "❌ Debes seleccionar un rol.", extra_tags='crear alert-error')
+            return redirect("lista_usuarios")
+
+        # Estado obligatorio
+        if not estado:
+            messages.error(request, "❌ Debes seleccionar un estado.", extra_tags='crear alert-error')
+            return redirect("lista_usuarios")
 
         # ============================================
         # CREAR USUARIO
         # ============================================
         if action == "crear":
+            password = request.POST.get("password")
+
+            # Contraseña obligatoria
+            if not password:
+                messages.error(request, "❌ La contraseña es obligatoria.", extra_tags='crear alert-error')
+                return redirect("lista_usuarios")
+
+            # Email único
+            if Usuario.objects.filter(email=email).exists():
+                messages.error(request, "❌ Ya existe un usuario con este email.", extra_tags='crear alert-error')
+                return redirect("lista_usuarios")
+
+            # OPCIONAL: un empleado no puede tener 2 usuarios
+            if Usuario.objects.filter(id_empleado=id_empleado).exists():
+                messages.error(request, "❌ Este empleado ya tiene un usuario asociado.", extra_tags='crear alert-error')
+                return redirect("lista_usuarios")
+
+            # Crear usuario
             usuario = Usuario.objects.create(
-                id_empleado_id=int(request.POST["id_empleado"]),
-                id_rol=int(request.POST["id_rol"]),
-                email=request.POST["email"],
-                password=make_password(request.POST["password"]),   # ← ENCRIPTAR
-                estado=request.POST.get("estado", "Activo"),
-                password_temp=True  # ← REQUIERE CAMBIO AL INICIAR
+                id_empleado_id=int(id_empleado),
+                id_rol=int(id_rol),
+                email=email,
+                password=make_password(password),   # ← ENCRIPTAR
+                estado=estado,
+                password_temp=True
             )
 
             AuditoriaUsuario.objects.create(
@@ -45,7 +103,8 @@ def lista_usuarios(request):
                 estado=usuario.estado
             )
 
-            messages.success(request, "✅ Usuario creado correctamente.", extra_tags='crear')
+            messages.success(request, "✅ Usuario creado correctamente.", extra_tags='crear alert-success')
+            return redirect("lista_usuarios")
 
         # ============================================
         # EDITAR USUARIO
@@ -53,17 +112,22 @@ def lista_usuarios(request):
         elif action == "editar":
             usuario = get_object_or_404(Usuario, id_usuario=request.POST["usuario_id"])
 
-            usuario.id_empleado_id = int(request.POST["id_empleado"])
-            usuario.id_rol = int(request.POST["id_rol"])
-            usuario.email = request.POST["email"]
-
             nueva_password = request.POST.get("password")
 
+            # Validación: email único en actualización
+            if Usuario.objects.filter(email=email).exclude(id_usuario=usuario.id_usuario).exists():
+                messages.error(request, "❌ Ya existe otro usuario con este email.", extra_tags='editar alert-error')
+                return redirect("lista_usuarios")
 
+            usuario.id_empleado_id = int(id_empleado)
+            usuario.id_rol = int(id_rol)
+            usuario.email = email
+
+            # Cambiar contraseña solo si el usuario ingresó una nueva
             if nueva_password and nueva_password != "********":
                 usuario.password = make_password(nueva_password)
 
-            usuario.estado = request.POST.get("estado", "")
+            usuario.estado = estado
             usuario.save()
 
             AuditoriaUsuario.objects.create(
@@ -76,11 +140,9 @@ def lista_usuarios(request):
                 estado=usuario.estado
             )
 
-            messages.success(request, "✏️ Usuario editado correctamente.", extra_tags='editar')
+            messages.success(request, "✏️ Usuario editado correctamente.", extra_tags='editar alert-success')
+            return redirect("lista_usuarios")
 
-        return redirect("lista_usuarios")
-
-    usuarios = Usuario.objects.all()
     empleados = Empleado.objects.all()
 
     return render(
@@ -90,6 +152,7 @@ def lista_usuarios(request):
     )
 
 
+
 # ========================
 # AUDITORÍA DE UN USUARIO
 # ========================
@@ -97,10 +160,14 @@ def lista_usuarios(request):
 def auditoria_usuario(request, id_usuario):
     usuario = get_object_or_404(Usuario, id_usuario=id_usuario)
     auditoria = AuditoriaUsuario.objects.filter(usuario_afectado=usuario).order_by('-fecha')
+    
+    paginator = Paginator(auditoria, 5)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
 
     return render(
         request,
         "usuarios/auditoria_usuario.html",
-        {"usuario": usuario, "auditoria": auditoria}
+        {"usuario": usuario, "auditoria": auditoria, "page_obj": page_obj,}
     )
 

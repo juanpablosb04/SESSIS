@@ -42,7 +42,7 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="bg-gray-50 rounded-xl px-5 py-4 border border-gray-200">
           <p class="text-sm text-gray-500">Registros</p>
-          <p class="text-2xl font-bold text-gray-900">{{ registros|length }}</p>
+          <p class="text-2xl font-bold text-gray-900">{{ page_obj.paginator.count }}</p>
         </div>
 
         <div class="bg-gray-50 rounded-xl px-5 py-4 border border-gray-200">
@@ -81,34 +81,20 @@
             </tr>
           </thead>
           <tbody>
-            {% for r in registros %}
+            {% for r in page_obj %}
               <tr class="border-b border-gray-200">
-                <td class="py-3 px-4">
-                  {{ r.empleado.cedula }}
-                </td>
-                <td class="py-3 px-4">
-                  {{ r.fecha|date:"d/m/Y" }}
-                </td>
-                <td class="py-3 px-4">
-                  {{ r.cantidad_horas|floatformat:"-2" }}
-                </td>
-                <td class="py-3 px-4">
-                  {{ r.justificacion|default:"—" }}
-                </td>
+                <td class="py-3 px-4">{{ r.empleado.cedula }}</td>
+                <td class="py-3 px-4">{{ r.fecha|date:"d/m/Y" }}</td>
+                <td class="py-3 px-4">{{ r.cantidad_horas|floatformat:"-2" }}</td>
+                <td class="py-3 px-4">{{ r.justificacion|default:"—" }}</td>
                 <td class="py-3 px-4">
                   {% with e=r.estado|lower %}
                     {% if e == "aprobado" %}
-                      <span class="inline-flex items-center justify-center w-[95px] px-3 py-[6px] rounded-md bg-green-100 text-green-700 text-xs font-semibold">
-                        Aprobado
-                      </span>
+                      <span class="inline-flex items-center justify-center w-[95px] px-3 py-[6px] rounded-md bg-green-100 text-green-700 text-xs font-semibold">Aprobado</span>
                     {% elif e == "rechazado" %}
-                      <span class="inline-flex items-center justify-center w-[95px] px-3 py-[6px] rounded-md bg-red-100 text-red-700 text-xs font-semibold">
-                        Rechazado
-                      </span>
+                      <span class="inline-flex items-center justify-center w-[95px] px-3 py-[6px] rounded-md bg-red-100 text-red-700 text-xs font-semibold">Rechazado</span>
                     {% else %}
-                      <span class="inline-flex items-center justify-center w-[95px] px-3 py-[6px] rounded-md bg-yellow-100 text-yellow-700 text-xs font-semibold">
-                        Pendiente
-                      </span>
+                      <span class="inline-flex items-center justify-center w-[95px] px-3 py-[6px] rounded-md bg-yellow-100 text-yellow-700 text-xs font-semibold">Pendiente</span>
                     {% endif %}
                   {% endwith %}
                 </td>
@@ -124,7 +110,38 @@
         </table>
       </div>
 
-      <!-- Nota -->
+      <!-- PAGINACIÓN -->
+      {% if page_obj.has_other_pages %}
+      <div class="flex justify-center mt-6">
+        <div class="inline-flex space-x-1">
+
+          <!-- Anterior -->
+          {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">«</a>
+          {% else %}
+            <span class="px-3 py-2 bg-gray-100 text-gray-400 rounded">«</span>
+          {% endif %}
+
+          <!-- Números -->
+          {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}
+              <span class="px-3 py-2 bg-blue-600 text-white rounded">{{ num }}</span>
+            {% else %}
+              <a href="?page={{ num }}" class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">{{ num }}</a>
+            {% endif %}
+          {% endfor %}
+
+          <!-- Siguiente -->
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">»</a>
+          {% else %}
+            <span class="px-3 py-2 bg-gray-100 text-gray-400 rounded">»</span>
+          {% endif %}
+
+        </div>
+      </div>
+      {% endif %}
+
       <p class="mt-4 text-sm text-gray-500 text-center">
         Vista de solo lectura. Si notas algún error, comunícate con administración.
       </p>

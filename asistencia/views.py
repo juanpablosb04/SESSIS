@@ -7,6 +7,10 @@ from ubicaciones.models import Ubicaciones
 from .models import Asistencia
 from config.decorators import role_required
 from datetime import datetime
+from django.core.paginator import Paginator
+from reportlab.lib import colors
+from reportlab.platypus import Table, TableStyle
+from reportlab.lib.pagesizes import landscape, A4
 
 
 def determinar_turno_actual():
@@ -45,10 +49,9 @@ def registrar_asistencia_view(request):
             messages.success(
                 request,
                 f"✅ Asistencia registrada correctamente a las {nueva_asistencia.turno_ingreso.strftime('%H:%M:%S')}.",
-                extra_tags="crear"
-            )
+                extra_tags='crear alert-success')
         except Exception as e:
-            messages.error(request, f"⚠️ Error al registrar asistencia: {str(e)}", extra_tags="crear")
+            messages.error(request, f"⚠️ Error al registrar asistencia: {str(e)}", extra_tags='crear alert-error')
 
         return redirect("registrarAsistencia")
 
@@ -78,12 +81,12 @@ def asistencias_activas_view(request):
             asistencia.turno_salida = datetime.now()
             asistencia.estado = 'Finalizado'
             asistencia.save()
-            messages.success(request, f"✅ Turno finalizado a las {asistencia.turno_salida.strftime('%H:%M:%S')}", extra_tags="crear")
+            messages.success(request, f"✅ Turno finalizado a las {asistencia.turno_salida.strftime('%H:%M:%S')}", extra_tags='editar alert-success')
         elif accion == "editar":
             observaciones = request.POST.get("observaciones", "").strip()
             asistencia.observaciones = observaciones or None
             asistencia.save()
-            messages.success(request, "✅ Observaciones actualizadas correctamente", extra_tags="crear")
+            messages.success(request, "✅ Observaciones actualizadas correctamente", extra_tags='editar alert-success')
 
         return redirect("consultarAsistencia")
 
@@ -165,23 +168,31 @@ def _build_filtered_qs_oficiales(request):
 
 @role_required(["Administrador"])
 def ver_asistencia_oficiales_view(request):
+
+    # Este método ya devuelve el queryset filtrado
     qs, filtros_ctx, es_oficial, empleado_actual = _build_filtered_qs_oficiales(request)
 
-    paginator = Paginator(qs, 25)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-
+    # Filtrar empleados según el tipo de usuario
     if es_oficial and empleado_actual:
         empleados = Empleado.objects.filter(pk=empleado_actual.pk)
     else:
         empleados = Empleado.objects.all().order_by("nombre_completo")
 
+    # -------------------------
+    # PAGINACIÓN
+    # -------------------------
+    paginator = Paginator(qs.order_by('-turno_ingreso'), 10)  # 10 registros por página
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    # -------------------------
+
     ctx = {
         "empleados": empleados,
-        "asistencias": page_obj.object_list,
+        "asistencias": page_obj,   # ← enviamos page_obj ENTERRRRRRO
         "page_obj": page_obj,
         **filtros_ctx,
     }
+
     return render(request, "empleados/verAsistenciaOficiales.html", ctx)
 
 @role_required(["Administrador"])
@@ -252,113 +263,78 @@ def ver_asistencia_oficiales_export(request):
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 @role_required(["Administrador"])
 def ver_asistencia_oficiales_export_pdf(request):
-    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-    from reportlab.lib.pagesizes import A4, landscape
-    from reportlab.lib import colors
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    asistencias = Asistencia.objects.all().order_by('-turno_ingreso')
 
-    qs, filtros_ctx, _, _ = _build_filtered_qs_oficiales(request)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="reporte_asistencias.pdf"'
 
-    buffer = BytesIO()
     doc = SimpleDocTemplate(
-        buffer,
+        response,
         pagesize=landscape(A4),
-        leftMargin=20, rightMargin=20, topMargin=20, bottomMargin=20
+        leftMargin=20,
+        rightMargin=20,
+        topMargin=40,
+        bottomMargin=30
     )
 
     styles = getSampleStyleSheet()
-    # Estilo para todas las celdas del cuerpo (texto claro)
-    body_style = ParagraphStyle(
-        name="BodyWhite",
-        parent=styles["Normal"],
-        textColor=colors.HexColor("#E5E7EB"),
+    style_body = ParagraphStyle(
+        name="body",
         fontSize=9,
-        leading=11
+        textColor=colors.black
     )
 
-    elems = []
+    story = []
+    story.append(Paragraph("<b>Reporte de Asistencias</b>", styles['Title']))
+    story.append(Spacer(1, 20))
 
-    # Título
-    elems.append(Paragraph("Reporte de Asistencias", styles["Title"]))
+    datos = [[
+        "Empleado",
+        "Hora Entrada",
+        "Hora Salida",
+        "Ubicación",
+        "Observaciones",
+        "Estado"
+    ]]
 
-    # Línea con filtros usados
-    filtros_txt = []
-    if filtros_ctx.get("fecha_inicio"):
-        filtros_txt.append(f"Inicio: {filtros_ctx['fecha_inicio']}")
-    if filtros_ctx.get("fecha_fin"):
-        filtros_txt.append(f"Fin: {filtros_ctx['fecha_fin']}")
-    if filtros_ctx.get("empleado_id"):
-        filtros_txt.append(f"Empleado ID: {filtros_ctx['empleado_id']}")
-    if filtros_txt:
-        elems.append(Paragraph(" / ".join(filtros_txt), styles["Normal"]))
-    elems.append(Spacer(1, 12))
+    for a in asistencias:
+        datos.append([
+            f"{a.id_empleado.cedula} - {a.id_empleado.nombre_completo}",
+            a.turno_ingreso.strftime("%H:%M") if a.turno_ingreso else "",
+            a.turno_salida.strftime("%H:%M") if a.turno_salida else "",
+            a.id_ubicacion.nombre if a.id_ubicacion else "",
+            Paragraph(a.observaciones or "No hay Observaciones que agregar", style_body),
+            a.estado,
+        ])
 
-    # Datos de la tabla
-    header = ["Fecha", "Empleado", "Hora Entrada", "Hora Salida", "Ubicación", "Observaciones", "Estado"]
-    data = [header]
+    column_widths = [
+        150, 70, 70, 140, 300, 70
+    ]
 
-    for a in qs:
-        ing = timezone.localtime(a.turno_ingreso)
-        sal = timezone.localtime(a.turno_salida) if a.turno_salida else None
+    tabla = Table(datos, colWidths=column_widths, repeatRows=1)
+    tabla.splitByRow = True
 
-        empleado_str = f"{getattr(a.id_empleado, 'cedula', a.id_empleado_id)} - {getattr(a.id_empleado, 'nombre_completo', a.id_empleado_id)}"
-        fecha_p = Paragraph(ing.strftime("%d/%m/%Y"), body_style)
-        emp_p   = Paragraph(empleado_str, body_style)
-        he_p    = Paragraph(ing.strftime("%H:%M"), body_style)
-        hs_p    = Paragraph(sal.strftime("%H:%M") if sal else "--:--", body_style)
-        ubi_p   = Paragraph(getattr(a.id_ubicacion, "nombre", a.id_ubicacion_id), body_style)
-        obs_p   = Paragraph(a.observaciones or "", body_style)
-        est_p   = Paragraph(a.estado, body_style)
+    tabla.setStyle(TableStyle([
+        ("BACKGROUND", (0,0), (-1,0), colors.HexColor("#1e293b")),
+        ("TEXTCOLOR", (0,0), (-1,0), colors.white),
+        ("FONTNAME", (0,0), (-1,0), "Helvetica-Bold"),
+        ("FONTSIZE", (0,0), (-1,0), 11),
 
-        data.append([fecha_p, emp_p, he_p, hs_p, ubi_p, obs_p, est_p])
+        ("TEXTCOLOR", (0,1), (-1,-1), colors.black),
+        ("FONTNAME", (0,1), (-1,-1), "Helvetica"),
+        ("FONTSIZE", (0,1), (-1,-1), 9),
 
-    # Anchos de columnas
-    col_widths = [80, 220, 80, 80, 150, 260, 90]
+        ("GRID", (0,0), (-1,-1), 0.25, colors.grey),
 
-    table = Table(data, colWidths=col_widths, repeatRows=1)
-    table.setStyle(TableStyle([
-        # Encabezado
-        ("BACKGROUND",      (0, 0), (-1, 0), colors.HexColor("#374151")),
-        ("TEXTCOLOR",       (0, 0), (-1, 0), colors.whitesmoke),
-        ("FONTNAME",        (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("FONTSIZE",        (0, 0), (-1, 0), 11),
-        ("ALIGN",           (0, 0), (-1, 0), "LEFT"),
-        ("VALIGN",          (0, 0), (-1, 0), "MIDDLE"),
-
-        # Cuerpo (los Paragraph ya llevan color claro)
-        ("VALIGN",          (0, 1), (-1, -1), "MIDDLE"),
-        ("TOPPADDING",      (0, 1), (-1, -1), 4),
-        ("BOTTOMPADDING",   (0, 1), (-1, -1), 4),
-        ("LEFTPADDING",     (0, 1), (-1, -1), 6),
-        ("RIGHTPADDING",    (0, 1), (-1, -1), 6),
-
-        # Alternar fondos
-        ("ROWBACKGROUNDS",  (0, 1), (-1, -1), [colors.HexColor("#0F172A"), colors.HexColor("#111827")]),
-
-        # Rejilla
-        ("GRID",            (0, 0), (-1, -1), 0.25, colors.HexColor("#4B5563")),
+        ("ALIGN", (1,1), (2,-1), "CENTER"),
+        ("ALIGN", (5,1), (5,-1), "CENTER"),
+        ("VALIGN", (0,0), (-1,-1), "TOP"),
     ]))
 
-    elems.append(table)
-    doc.build(elems)
-
-    pdf = buffer.getvalue()
-    buffer.close()
-
-    # Nombre de archivo con filtros
-    partes = ["asistencias"]
-    if filtros_ctx.get("fecha_inicio"):
-        partes.append(f"ini_{filtros_ctx['fecha_inicio']}")
-    if filtros_ctx.get("fecha_fin"):
-        partes.append(f"fin_{filtros_ctx['fecha_fin']}")
-    if filtros_ctx.get("empleado_id"):
-        partes.append(f"emp_{filtros_ctx['empleado_id']}")
-    filename = "_".join(partes) + ".pdf"
-
-    response = HttpResponse(pdf, content_type="application/pdf")
-    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    story.append(tabla)
+    doc.build(story)
     return response

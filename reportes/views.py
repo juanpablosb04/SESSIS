@@ -10,6 +10,9 @@ from config.decorators import role_required
 from empleados.models import Empleado
 from .models import ReporteIncidente
 
+from django.core.paginator import Paginator
+from datetime import datetime
+
 
 # -------------------- helpers --------------------
 def _empleado_actual(request):
@@ -53,15 +56,15 @@ def ver_foto_incidente_view(request, id_reporte: int):
 @role_required(["Oficial", "Administrador"])
 def reporte_incidentes_view(request):
     """
-    Formulario para registrar incidentes y listado para el empleado autenticado.
+    Registrar incidentes y mostrar listado con paginación.
     """
     empleado = _empleado_actual(request)
     if not empleado:
         messages.error(request, "No se encontró el empleado asociado a la sesión.")
         return redirect("inicio")
 
+    # -------------------- POST (crear reporte) --------------------
     if request.method == "POST":
-        # fecha_evento puede llegar como 'YYYY-MM-DD'
         fecha_evento = request.POST.get("fecha_evento")
         if fecha_evento:
             try:
@@ -73,7 +76,7 @@ def reporte_incidentes_view(request):
 
         categoria = request.POST.get("categoria") or ""
         descripcion = request.POST.get("descripcion") or ""
-        foto = request.FILES.get("foto")  # ImageField (db_column="archivo")
+        foto = request.FILES.get("foto")
 
         ReporteIncidente.objects.create(
             id_empleado=empleado,
@@ -83,44 +86,51 @@ def reporte_incidentes_view(request):
             foto=foto,
         )
 
-        messages.success(request, "Incidente registrado correctamente.", extra_tags="crear success")
+        messages.success(
+            request,
+            "Incidente registrado correctamente.",
+            extra_tags="crear alert-success"
+        )
         return redirect("reporteIncidentes")
 
-    reportes = (
+    # -------------------- LISTADO CON PAGINACIÓN --------------------
+    reportes_qs = (
         ReporteIncidente.objects
         .filter(id_empleado=empleado)
         .order_by("-fecha_evento", "-id_reporte")
     )
-    return render(request, "Empleado/reporteIncidentes.html", {"reportes": reportes})
 
+    paginator = Paginator(reportes_qs, 5)  # <- cantidad por página
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    return render(
+        request,
+        "Empleado/reporteIncidentes.html",
+        {
+            "page_obj": page_obj,
+            "reportes": page_obj.object_list,  # únicamente los visibles en la página
+        },
+    )
 
 # -------------------- panel administrador --------------------
 @role_required(["Administrador"])
 def reportes_incidentes_admin_view(request):
-    """
-    Listado de todos los reportes con filtros simples para ADMIN.
 
-    Filtros esperados (coinciden con el template HTML):
-      - empleado : id_empleado
-      - ini      : fecha inicio (YYYY-MM-DD)
-      - fin      : fecha fin    (YYYY-MM-DD)
-    """
     qs = (
         ReporteIncidente.objects
         .select_related("id_empleado")
         .order_by("-fecha_evento", "-id_reporte")
     )
 
-    # Parámetros GET que manda el formulario
+    # Parámetros GET
     emp_id = (request.GET.get("empleado") or "").strip()
     f_ini = (request.GET.get("ini") or "").strip()
     f_fin = (request.GET.get("fin") or "").strip()
 
-    # Filtro por empleado (id_empleado)
     if emp_id:
         qs = qs.filter(id_empleado_id=emp_id)
 
-    # Filtro por fecha inicio
     if f_ini:
         try:
             fi = datetime.strptime(f_ini, "%Y-%m-%d").date()
@@ -128,7 +138,6 @@ def reportes_incidentes_admin_view(request):
         except ValueError:
             pass
 
-    # Filtro por fecha fin
     if f_fin:
         try:
             ff = datetime.strptime(f_fin, "%Y-%m-%d").date()
@@ -136,11 +145,17 @@ def reportes_incidentes_admin_view(request):
         except ValueError:
             pass
 
+    # 🔥 PAGINACIÓN
+    paginator = Paginator(qs, 5)  # 20 por página
+    page_number = request.GET.get("page")
+    reportes_pag = paginator.get_page(page_number)
+
     context = {
-        "reportes": qs,
+        "reportes": reportes_pag,   # aquí ya enviamos página, no queryset normal
         "empleados": Empleado.objects.all().order_by("nombre_completo"),
-        # el template usa request.GET para rellenar valores, no necesita dict extra
+        "paginator": paginator,
     }
+
     return render(request, "Empleado/reporteIncidentesAdmin.html", context)
 
 

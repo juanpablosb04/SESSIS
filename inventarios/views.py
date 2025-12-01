@@ -1,15 +1,20 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from .models import Inventario
+from django.core.paginator import Paginator
 from ubicaciones.models import Ubicaciones
 from config.decorators import role_required
 
 
 @role_required(["Administrador"])
 def inventarios_view(request):
-    # Traemos todos los inventarios junto con su ubicación
-    inventarios = Inventario.objects.select_related("id_ubicacion").all()
+
+    inventarios = Inventario.objects.select_related("id_ubicacion").all().order_by("nombre")
     ubicaciones = Ubicaciones.objects.all()
+
+    paginator = Paginator(inventarios, 5)
+    page_number = request.GET.get("page")
+    inventarios = paginator.get_page(page_number)
 
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -55,12 +60,15 @@ def inventarios_view(request):
                 inventario.nombre = nuevo_nombre
                 inventario.descripcion = nueva_descripcion
                 inventario.estado = nuevo_estado
+
                 if nuevo_ubicacion_id:
                     inventario.id_ubicacion = get_object_or_404(Ubicaciones, id_ubicacion=nuevo_ubicacion_id)
+
                 inventario.save()
                 messages.success(request, "✏️ Inventario editado correctamente", extra_tags='editar alert-success')
 
     return render(request, 'inventarios/inventario.html', {
         'inventarios': inventarios,
-        'ubicaciones': ubicaciones  # enviar al template
+        'ubicaciones': ubicaciones
     })
+
