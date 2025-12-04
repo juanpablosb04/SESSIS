@@ -107,12 +107,10 @@
             <h2 class="text-3xl font-bold mb-6 text-center">Registrar Cita</h2>
 
             {% if messages %}
-            {% for message in messages %}
-            {% if "crear" in message.tags %}
-            <div class="{{ message.tags }}">{{ message }}</div>
-            {% endif %}
-            {% endfor %}
-            {% endif %}
+                        {% for message in messages %}
+                        <div class="{{ message.tags }}">{{ message }}</div>
+                        {% endfor %}
+                        {% endif %}
 
             <form method="POST" action="" class="space-y-4">
                 {% csrf_token %}

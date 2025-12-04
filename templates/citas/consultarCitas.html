@@ -110,12 +110,10 @@
       <h2 class="text-3xl font-bold mb-6 text-center">Lista de Citas</h2>
 
       {% if messages %}
-      {% for message in messages %}
-      {% if 'editar' in message.tags or 'eliminar' in message.tags %}
-      <div class="alert-error">{{ message }}</div>
-      {% endif %}
-      {% endfor %}
-      {% endif %}
+            {% for message in messages %}
+                  <div class="{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
 
       <div class="overflow-x-auto">
         <table class="w-full border border-gray-300 rounded-lg text-sm text-left">
@@ -169,7 +167,8 @@
 
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-2xl font-bold">Editar Cita</h3>
-          <button type="button" onclick="cerrarModal()" class="text-gray-700 hover:text-gray-900 text-2xl">&times;</button>
+          <button type="button" onclick="cerrarModal()"
+            class="text-gray-700 hover:text-gray-900 text-2xl">&times;</button>
         </div>
 
         <form id="formEditar" method="POST" action="{% url 'citas:consultarCitas' %}" class="space-y-3">
@@ -180,8 +179,8 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm text-gray-700">Cliente</label>
-              <select id="edit_cliente" name="id_cliente"
-                class="w-full mt-1 p-3 border border-gray-300 rounded-lg" required>
+              <select id="edit_cliente" name="id_cliente" class="w-full mt-1 p-3 border border-gray-300 rounded-lg"
+                required>
                 {% for cliente in clientes %}
                 <option value="{{ cliente.id_cliente }}">{{ cliente.nombre_completo }}</option>
                 {% endfor %}
