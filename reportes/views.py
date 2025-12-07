@@ -106,7 +106,7 @@ def reporte_incidentes_view(request):
 
     return render(
         request,
-        "Empleado/reporteIncidentes.html",
+        "reportes/reporteIncidentes.html",
         {
             "page_obj": page_obj,
             "reportes": page_obj.object_list,  # únicamente los visibles en la página
@@ -145,18 +145,25 @@ def reportes_incidentes_admin_view(request):
         except ValueError:
             pass
 
-    # 🔥 PAGINACIÓN
-    paginator = Paginator(qs, 5)  # 20 por página
+    # PAGINACIÓN
+    paginator = Paginator(qs, 5)
     page_number = request.GET.get("page")
     reportes_pag = paginator.get_page(page_number)
 
+    # --- Construir querystring SIN el page (para mantener filtros al paginar) ---
+    querydict = request.GET.copy()
+    if "page" in querydict:
+        querydict.pop("page")
+    querystring = querydict.urlencode()  # ejemplo: "empleado=3&ini=2025-01-01"
+
     context = {
-        "reportes": reportes_pag,   # aquí ya enviamos página, no queryset normal
+        "reportes": reportes_pag,
         "empleados": Empleado.objects.all().order_by("nombre_completo"),
         "paginator": paginator,
+        "querystring": querystring,
     }
 
-    return render(request, "Empleado/reporteIncidentesAdmin.html", context)
+    return render(request, "reportes/reporteIncidentesAdmin.html", context)
 
 
 @role_required(["Administrador"])

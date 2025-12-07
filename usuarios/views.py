@@ -112,6 +112,19 @@ def lista_usuarios(request):
         elif action == "editar":
             usuario = get_object_or_404(Usuario, id_usuario=request.POST["usuario_id"])
 
+            usuario_logueado_id = request.session.get("usuario_id")
+
+            # =======================
+            # 🚫 NO PERMITIR AUTO-INACTIVARSE
+            # =======================
+            if usuario_logueado_id and int(usuario_logueado_id) == usuario.id_usuario and estado == "Inactivo":
+                messages.error(
+                    request,
+                    "❌ No puedes inactivar tu propio usuario mientras estás logeado con el.",
+                    extra_tags='editar alert-error'
+                )
+                return redirect("lista_usuarios")
+
             nueva_password = request.POST.get("password")
 
             # Validación: email único en actualización
