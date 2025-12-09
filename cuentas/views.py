@@ -13,6 +13,7 @@ import random
 import re
 from django.db.models import Q
 from datetime import date
+from django.core.mail import send_mail
 
 
 # ======================================================
@@ -210,9 +211,6 @@ def generar_contrasena(longitud=8):
 # ENVIAR CORREO GMAIL
 # ======================================================
 def enviar_correo_gmail(destinatario, contrasena_nueva):
-    remitente = "sistemasessis@gmail.com"
-    password = "fpkl szho vbmk vssi"  # Contraseña de aplicación de Gmail
-
     asunto = "Recuperación de contraseña SESSIS"
     cuerpo = (
         f"Hola,\n\n"
@@ -221,18 +219,13 @@ def enviar_correo_gmail(destinatario, contrasena_nueva):
         f"Atentamente,\nEquipo de Soporte SESSIS"
     )
 
-    mensaje = MIMEText(cuerpo)
-    mensaje["Subject"] = asunto
-    mensaje["From"] = remitente
-    mensaje["To"] = destinatario
-
     try:
-        server = smtplib.SMTP("smtp.gmail.com", 587)
-        server.ehlo()
-        server.starttls()
-        server.ehlo()
-        server.login(remitente, password)
-        server.send_message(mensaje)
-        server.quit()
+        send_mail(
+            subject=asunto,
+            message=cuerpo,
+            from_email=None,  # usa DEFAULT_FROM_EMAIL de settings.py
+            recipient_list=[destinatario],
+            fail_silently=False,
+        )
     except Exception as e:
         print("Error al enviar el correo:", e)
