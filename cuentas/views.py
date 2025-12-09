@@ -125,7 +125,7 @@ def recuperar_password(request):
             enviar_correo_gmail(email, nueva_contrasena)
 
             messages.success(request, "Te hemos enviado una nueva contraseña.")
-            return redirect("login")
+            return redirect("recuperar")
 
         except Usuarios.DoesNotExist:
             messages.error(request, "El correo no existe en el sistema.")
