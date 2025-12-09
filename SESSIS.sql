@@ -306,3 +306,4 @@ VALUES (
 
 INSERT INTO Usuarios (id_empleado, id_rol, email, password, estado)
 VALUES (1, 1, 'msolis90362@ufide.ac.cr', 'MaribelSV1515*', 'Activo');
+
