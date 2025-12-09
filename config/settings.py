@@ -59,6 +59,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -94,15 +95,14 @@ WSGI_APPLICATION = 'config.wsgi.application'
 USE_RAILWAY = os.getenv("RAILWAY_ENVIRONMENT")
 
 if USE_RAILWAY:
-    # 🔹 Railway (MySQL)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.getenv("MYSQLDATABASE"),
-            'USER': os.getenv("MYSQLUSER"),
-            'PASSWORD': os.getenv("MYSQLPASSWORD"),
-            'HOST': os.getenv("MYSQLHOST"),
-            'PORT': os.getenv("MYSQLPORT"),
+            'NAME': os.getenv("MYSQLDATABASE") or "railway",
+            'USER': os.getenv("MYSQLUSER") or "root",
+            'PASSWORD': os.getenv("MYSQLPASSWORD") or "MaLwpmXBzVTlAXMSVSSneZtrMSldKKZM",
+            'HOST': os.getenv("MYSQLHOST") or "shuttle.proxy.rlwy.net",
+            'PORT': os.getenv("MYSQLPORT") or "40663",
         }
     }
 else:
