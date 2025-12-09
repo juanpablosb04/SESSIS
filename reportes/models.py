@@ -25,5 +25,5 @@ class ReporteIncidente(models.Model):
     descripcion  = models.TextField(blank=True, null=True)
 
     class Meta:
-        db_table = 'dbo.ReporteIncidente'
-        managed  = False
+        db_table = 'ReporteIncidentes'  # quitar 'dbo.'
+        managed = False
