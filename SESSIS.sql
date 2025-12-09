@@ -80,39 +80,38 @@ CREATE TABLE Usuarios (
     FOREIGN KEY (id_rol) REFERENCES Roles(id_rol)
 );
 
-
 -- ==============================
 -- TABLA REPORTE INCIDENTES
 -- ==============================
-CREATE TABLE dbo.ReporteIncidentes (
-    id_reporte     INT IDENTITY(1,1) NOT NULL
-                   CONSTRAINT PK_ReporteIncidentes PRIMARY KEY,
-    id_empleado    INT NOT NULL,            -- FK a dbo.Empleados(id_empleado)
-    categoria      VARCHAR(50) NOT NULL,    -- valores controlados (ver CHECK)
-    descripcion    NVARCHAR(1000) NOT NULL,
-    fecha_evento   DATE NOT NULL,
-    foto           NVARCHAR(400) NULL,      -- ruta relativa en /media (ImageField)
-    creado_por     NVARCHAR(150) NULL,
-    creado_en      DATETIME2(0) NOT NULL
-                   CONSTRAINT DF_ReporteIncidentes_creado_en DEFAULT SYSDATETIME()
+CREATE TABLE ReporteIncidentes (
+    id_reporte     INT IDENTITY(1,1) PRIMARY KEY,
+    id_empleado    INT NOT NULL,
+    categoria      VARCHAR(50) NOT NULL,
+    archivo        NVARCHAR(512) NULL,
+    fecha_evento   DATE NOT NULL 
+        CONSTRAINT DF_ReporteIncidentes_fecha_evento DEFAULT (CAST(GETDATE() AS DATE)),
+    descripcion    NVARCHAR(2000) NULL
 );
-ADD CONSTRAINT FK_ReporteIncidentes_Empleados
-      FOREIGN KEY (id_empleado) REFERENCES dbo.Empleados(id_empleado);
 
--- CHECK de categorías válidas (ajusta si necesitas más)
-  ADD CONSTRAINT CK_ReporteIncidentes_Categoria
-      CHECK (categoria IN (
-          'accidente-trabajo',
-          'fallo-equipamiento',
-          'incidente-seguridad',
-          'problema-ambiental',
-          'otros-eventos'
-      ));
+-- FOREIGN KEY
+ALTER TABLE ReporteIncidentes
+ADD CONSTRAINT FK_ReporteIncidentes_Empleado
+    FOREIGN KEY (id_empleado) REFERENCES Empleado(id_empleado);
 
--- Índices útiles
-CREATE INDEX IX_ReporteIncidentes_Empleado ON dbo.ReporteIncidentes (id_empleado);
-CREATE INDEX IX_ReporteIncidentes_Fecha   ON dbo.ReporteIncidentes (fecha_evento DESC);
-GO
+-- CHECK DE CATEGORÍAS
+ALTER TABLE ReporteIncidentes
+ADD CONSTRAINT CK_ReporteIncidentes_Categoria
+    CHECK (categoria IN (
+        'accidente-trabajo',
+        'fallo-equipamiento',
+        'incidente-seguridad',
+        'problema-ambiental',
+        'otros-eventos'
+    ));
+
+-- ÍNDICES
+CREATE INDEX IX_ReporteIncidentes_Empleado ON ReporteIncidentes (id_empleado);
+CREATE INDEX IX_ReporteIncidentes_Fecha ON ReporteIncidentes (fecha_evento DESC);
 
 -- ==============================
 -- TABLA ASISTENCIA
@@ -156,9 +155,10 @@ CREATE TABLE Citas (
     descripcion VARCHAR(250),
 
     FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente),
-    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario)
 );
 GO
+
 
 -- ==============================
 -- TABLAS DE AUDITORIA
@@ -277,24 +277,6 @@ CREATE TABLE dbo.HorasExtras_Auditoria_TB
 );
 GO
 
-
--- ==========================================
--- INSERTS PARA EMPLEADO
--- ==========================================
-INSERT INTO Empleado (nombre_completo, email, cedula, telefono, direccion, fecha_contratacion)
-VALUES ('Juan Pablo Solis Benamburg', 'juanpablops04@outlook.com', '118330293', '84433060', 'Fidelitas', CAST(GETDATE() AS DATE));
-
-INSERT INTO Empleado (nombre_completo, email, cedula, telefono, direccion, fecha_contratacion)
-VALUES ('Luis Anthony Rodriguez Jimenez', 'anthorj76@gmail.com', '119224578', '55556666', 'Fidelitas', CAST(GETDATE() AS DATE));
-
-INSERT INTO Empleado (nombre_completo, email, cedula, telefono, direccion, fecha_contratacion)
-VALUES ('Stwart Jafet Guerrero Fernandez', 'sgf.oficial08@gmail.com', '120224158', '66665555', 'Fidelitas', CAST(GETDATE() AS DATE));
-
--- Empleado inventado
-INSERT INTO Empleado (nombre_completo, email, cedula, telefono, direccion, fecha_contratacion)
-VALUES ('Carolina Mendez Chavarria', 'carolinamc@example.com', '121558899', '77774444', 'San José Centro', CAST(GETDATE() AS DATE));
-
-
 -- ==========================================
 -- INSERTS PARA ROLES
 -- ==========================================
@@ -304,24 +286,23 @@ VALUES ('Administrador', 'Acceso total al sistema, incluyendo gestión de usuari
 INSERT INTO Roles (nombre_rol, descripcion)
 VALUES ('Oficial', 'Acceso restringido, puede registrar asistencia, incidentes y reportes.');
 
+-- ==========================================
+-- INSERTS PARA EMPLEADO
+-- ==========================================
+INSERT INTO Empleado (nombre_completo, email, cedula, telefono, direccion, fecha_contratacion)
+VALUES (
+    'Maribel Solis Valverde',
+    'msolis90362@ufide.ac.cr',
+    '115678902',
+    '55554444',
+    'Fidelitas',
+    CAST(GETDATE() AS DATE)
+);
+
 
 -- ==========================================
--- INSERTS PARA USUARIOS
--- (Relaciona cada empleado con su rol)
+-- INSERTS PARA USUARIO
 -- ==========================================
--- NOTA: Aquí supongo que los IDs se generan con IDENTITY en Empleado y Roles.
---       Debes revisar los IDs reales después de insertar, o usar SELECT SCOPE_IDENTITY().
-
--- Los primeros 3 empleados con rol Administrador
-INSERT INTO Usuarios (id_empleado, id_rol, email, password, estado)
-VALUES (1, 1, 'juanpablops04@outlook.com', '123', 'Activo');
 
 INSERT INTO Usuarios (id_empleado, id_rol, email, password, estado)
-VALUES (2, 1, 'anthorj76@gmail.com', '123', 'Activo');
-
-INSERT INTO Usuarios (id_empleado, id_rol, email, password, estado)
-VALUES (3, 1, 'sgf.oficial08@gmail.com', '123', 'Activo');
-
--- El empleado inventado con rol Oficial
-INSERT INTO Usuarios (id_empleado, id_rol, email, password, estado)
-VALUES (4, 2, 'carolinamc@example.com', 'securePass2024!', 'Activo');
+VALUES (1, 1, 'msolis90362@ufide.ac.cr', 'MaribelSV1515*', 'Activo');

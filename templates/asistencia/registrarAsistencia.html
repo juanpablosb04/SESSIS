@@ -97,9 +97,14 @@
         <!-- Fecha -->
         <div>
           <label for="fecha" class="text-sm text-gray-700">Fecha</label>
-          <input id="fecha" name="fecha" type="date"
+          <input 
+            id="fecha" 
+            name="fecha" 
+            type="date"
             class="w-full mt-1 p-3 border border-gray-300 rounded-lg"
-            value="{{ today }}" readonly />
+            value="{{ today|date:'Y-m-d' }}" 
+            readonly 
+          />
         </div>
 
         <!-- Turno informativo -->
@@ -138,12 +143,6 @@
     </div>
     
   </div>
-
-  <script>
-    // Autoasignar fecha actual
-    const fechaInput = document.getElementById('fecha');
-    fechaInput.value = new Date().toISOString().split('T')[0];
-  </script>
 
 </body>
 

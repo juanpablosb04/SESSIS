@@ -67,6 +67,15 @@ def inventarios_view(request):
                 inventario.save()
                 messages.success(request, "✏️ Inventario editado correctamente", extra_tags='editar alert-success')
 
+             # -------- ELIMINAR --------
+        elif action == 'eliminar':
+            inventario_id = request.POST.get('inventario_id')
+            inventario = get_object_or_404(Inventario, id_inventario=inventario_id)
+            inventario.delete()
+            messages.success(request, "🗑️ Inventario eliminado correctamente")
+
+        return redirect('inventario')
+
     return render(request, 'inventarios/inventario.html', {
         'inventarios': inventarios,
         'ubicaciones': ubicaciones
