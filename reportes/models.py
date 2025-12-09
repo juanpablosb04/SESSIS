@@ -25,5 +25,5 @@ class ReporteIncidente(models.Model):
     descripcion  = models.TextField(blank=True, null=True)
 
     class Meta:
-        db_table = 'dbo.ReporteIncidentes'  # 👈 nombre exacto en SQL Server
-        managed  = False                    # Django NO crea/alterará la tabla
+        db_table = 'dbo.ReporteIncidente'
+        managed  = False
