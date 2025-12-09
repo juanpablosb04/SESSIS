@@ -7,164 +7,235 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Auditoría - {{ empleado.nombre_completo }}</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    .fondo {
-      background-image: url('/static/Img/fondo.jpg');
-      background-size: cover;
-      background-position: center;
+    body {
+      background: #f2f3f5;
+      font-family: 'Inter', sans-serif;
       min-height: 100vh;
+      padding-top: 5rem;
+      color: #1f2937;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 1rem;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .btn {
+      padding: .6rem 1rem;
+      border-radius: .5rem;
+      font-weight: 600;
+      transition: .2s;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1e40af;
+    }
+
+    .btn-secondary {
+      background: #6b7280;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #4b5563;
+    }
+
+    .tag {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 6px;
+      color: white;
+    }
+
+    .tag-green {
+      background: #16a34a;
+    }
+
+    .tag-yellow {
+      background: #f59e0b;
+    }
+
+    .tag-red {
+      background: #dc2626;
     }
   </style>
 
   {% include "includes/navbar.html" %}
-
 </head>
 
-<body class="bg-gray-900 text-gray-200 min-h-screen fondo">
+<body>
 
+  <div class="max-w-6xl mx-auto px-4">
 
+    <!-- TITULO -->
+    <div class="card p-8 mb-2">
+      <h1 class="text-3xl font-bold mb-2 text-center">Auditoría de Horas Extras</h1>
 
-  <div class="p-8 max-w-7xl mx-auto">
-    <div class="max-w-6xl mx-auto px-6 mb-6">
-      <div class="bg-gray-800/90 border border-gray-700 rounded-xl shadow-lg p-6">
-        <h1 class="text-3xl font-bold mb-4 text-white">Auditoría de Horas Extras</h1>
+      <p class="text-center text-gray-700 text-lg">
+        <span class="font-semibold">Empleado:</span>
+        {{ empleado.nombre_completo|default:"—" }} {{ empleado.cedula|default:"—" }}<br>
 
-        <p class="text-gray-200">
-          <span class="font-semibold text-white">Empleado:</span>
-          {{ empleado.nombre_completo|default:"—" }} ({{ empleado.cedula|default:"—" }})<br>
-          <span class="font-semibold text-white">Correo:</span>
-          {{ empleado.email|default:"—" }}
-        </p>
-      </div>
+        <span class="font-semibold">Correo:</span>
+        {{ empleado.email|default:"—" }}
+      </p>
     </div>
 
-    <!-- TARJETA OSCURA CON TABLA -->
-    <div class="overflow-x-auto bg-gray-800/90 backdrop-blur rounded-lg shadow-md p-6">
-      <h2 class="text-2xl font-semibold mb-4">
+    <!-- TABLA -->
+    <div class="card p-2">
+
+      <h2 class="text-2xl font-semibold mb-6 text-center">
         Historial de Cambios
-        <span class="text-sm text-gray-400 font-normal ml-2">
-          ({{ logs|length }} evento{{ logs|length|pluralize:"s" }})
-        </span>
       </h2>
 
-      <table class="w-full text-left border border-gray-700">
-        <thead class="bg-gray-700 text-gray-200">
-          <tr>
-            <th class="p-2 whitespace-nowrap">Fecha evento</th>
-            <th class="p-2 whitespace-nowrap">Acción</th>
-            <th class="p-2 whitespace-nowrap">Usuario que realizó</th>
-            <th class="p-2 whitespace-nowrap">Fecha registro</th>
-            <th class="p-2 whitespace-nowrap">Horas</th>
-            <th class="p-2 whitespace-nowrap">Estado</th>
-            <th class="p-2 whitespace-nowrap">Justificación</th>
-          </tr>
-        </thead>
+      <div class="overflow-x-auto">
+        <table class="w-full border border-gray-300 rounded-lg text-sm">
+          <thead class="bg-gray-500 text-white border-b border-gray-300">
+            <tr class="uppercase">
+              <th class="p-3">Fecha evento</th>
+              <th class="p-3">Acción</th>
+              <th class="p-3">Usuario que realizó</th>
+              <th class="p-3">Fecha registro</th>
+              <th class="p-3">Horas</th>
+              <th class="p-3">Estado</th>
+              <th class="p-3">Justificación</th>
+            </tr>
+          </thead>
 
-        <tbody class="text-gray-300">
-          {% for a in logs %}
-          <tr class="border-b border-gray-700 align-top">
-            <!-- Fecha del evento de auditoría -->
-            <td class="p-2 whitespace-nowrap">
-              {{ a.fecha|date:"d/m/Y H:i" }}
-            </td>
+          <tbody>
+            {% for a in logs %}
+            <tr class="border-b border-gray-200">
 
-            <!-- Acción (CREAR / MODIFICAR / ELIMINAR) -->
-            <td class="p-2 whitespace-nowrap">
-              {% with ac=a.accion|upper %}
-              {% if ac == "CREAR" %}
-              <span class="bg-green-600 px-2 py-1 rounded text-white text-xs font-semibold">
-                CREAR
-              </span>
-              {% elif ac == "MODIFICAR" or ac == "EDITAR" %}
-              <span class="bg-yellow-500 px-2 py-1 rounded text-white text-xs font-semibold">
-                MODIFICAR
-              </span>
-              {% elif ac == "ELIMINAR" %}
-              <span class="bg-red-600 px-2 py-1 rounded text-white text-xs font-semibold">
-                ELIMINAR
-              </span>
-              {% else %}
-              <span class="bg-gray-600 px-2 py-1 rounded text-white text-xs font-semibold">
-                {{ a.accion }}
-              </span>
-              {% endif %}
-              {% endwith %}
-            </td>
+              <td class="p-3 whitespace-nowrap">{{ a.fecha|date:"d/m/Y H:i" }}</td>
 
-            <!-- Usuario que hizo el cambio -->
-            <td class="p-2 whitespace-nowrap">
-              {% if a.usuario_email %}
-              {{ a.usuario_email }}
-              {% else %}
-              <span class="italic text-gray-400">Sistema</span>
-              {% endif %}
-            </td>
+              <td class="p-3 whitespace-nowrap">
+                {% with ac=a.accion|upper %}
+                {% if ac == "CREAR" %}
+                <span class="tag tag-green">CREAR</span>
 
-            <!-- Fecha declarada en el registro original -->
-            <td class="p-2 whitespace-nowrap">
-              {{ a.fecha_registro|date:"d/m/Y"|default:"—" }}
-            </td>
+                {% elif ac == "MODIFICAR" or ac == "EDITAR" %}
+                <span class="tag tag-yellow">MODIFICAR</span>
 
-            <!-- Cantidad de horas -->
-            <td class="p-2 whitespace-nowrap">
-              {% if a.cantidad_horas is not None %}
-              {{ a.cantidad_horas|floatformat:"-2" }}
-              {% else %}
-              —
-              {% endif %}
-            </td>
+                {% elif ac == "ELIMINAR" %}
+                <span class="tag tag-red">ELIMINAR</span>
 
-            <!-- Estado snapshot (Aprobado / En revisión / Rechazado ...) -->
-            <td class="p-2 whitespace-nowrap">
-              {% if a.estado %}
-              {% with est=a.estado|lower %}
-              {% if est == "aprobado" %}
-              <span class="bg-green-600 px-2 py-1 rounded text-white text-xs font-semibold">
-                Aprobado
-              </span>
-              {% elif est == "rechazado" %}
-              <span class="bg-red-600 px-2 py-1 rounded text-white text-xs font-semibold">
-                Rechazado
-              </span>
-              {% elif est == "en revisión" or est == "en revision" or est == "pendiente" %}
-              <span class="bg-yellow-500 px-2 py-1 rounded text-black text-xs font-semibold">
-                En revisión
-              </span>
-              {% else %}
-              <span class="bg-gray-600 px-2 py-1 rounded text-white text-xs font-semibold">
-                {{ a.estado }}
-              </span>
-              {% endif %}
-              {% endwith %}
-              {% else %}
-              <span class="text-gray-400 text-sm">—</span>
-              {% endif %}
-            </td>
+                {% else %}
+                <span class="tag bg-gray-600">{{ a.accion }}</span>
+                {% endif %}
+                {% endwith %}
+              </td>
 
-            <!-- Justificación -->
-            <td class="p-2 text-gray-300 max-w-[400px]">
-              {{ a.justificacion|default:"—" }}
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="7" class="p-4 text-center text-gray-400">
-              No hay registros de auditoría para este empleado.
-            </td>
-          </tr>
+              <td class="p-3 whitespace-nowrap">
+                {% if a.usuario_email %}
+                {{ a.usuario_email }}
+                {% else %}
+                <span class="italic text-gray-500">Sistema</span>
+                {% endif %}
+              </td>
+
+              <td class="p-3 whitespace-nowrap">
+                {{ a.fecha_registro|date:"d/m/Y"|default:"—" }}
+              </td>
+
+              <td class="p-3 whitespace-nowrap">
+                {% if a.cantidad_horas is not None %}
+                {{ a.cantidad_horas|floatformat:"-2" }}
+                {% else %}
+                —
+                {% endif %}
+              </td>
+
+              <td class="p-3 whitespace-nowrap">
+                {% if a.estado %}
+                {% with est=a.estado|lower %}
+                {% if est == "aprobado" %}
+                <span class="tag tag-green">Aprobado</span>
+
+                {% elif est == "rechazado" %}
+                <span class="tag tag-red">Rechazado</span>
+
+                {% elif est == "en revisión" or est == "en revision" or est == "pendiente" %}
+                <span class="tag tag-yellow text-white">En revisión</span>
+
+                {% else %}
+                <span class="tag bg-gray-600">{{ a.estado }}</span>
+                {% endif %}
+                {% endwith %}
+                {% else %}
+                —
+                {% endif %}
+              </td>
+
+              <td class="p-3 max-w-[400px]">
+                {{ a.justificacion|default:"—" }}
+              </td>
+
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="p-4 text-center text-gray-500">
+                No hay registros de auditoría para este empleado.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+
+    <!-- PAGINACIÓN -->
+    <div class="flex justify-center mt-6">
+      <nav class="flex items-center space-x-1">
+
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}"
+          class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">
+          « Anterior
+        </a>
+        {% else %}
+        <span class="px-3 py-1 bg-gray-300 text-gray-500 rounded cursor-not-allowed">« Anterior</span>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}
+        <span class="px-3 py-1 bg-gray-200 text-gray-900 border border-gray-400 rounded">{{ num }}</span>
+        {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %} <a href="?page={{ num }}"
+          class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">{{ num }}</a>
+          {% endif %}
           {% endfor %}
-        </tbody>
-      </table>
+
+          {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}"
+            class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">
+            Siguiente »
+          </a>
+          {% else %}
+          <span class="px-3 py-1 bg-gray-300 text-gray-500 rounded cursor-not-allowed">Siguiente »</span>
+          {% endif %}
+
+      </nav>
     </div>
 
-    <!-- Boton Volver -->
-    <div class="mt-6 flex flex-col sm:flex-row gap-4">
-      <a href="{% url 'horasExtras' %}"
-        class="inline-flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
-        <span>⬅</span> Volver a Horas Extras
-      </a>
+    <!-- BOTÓN VOLVER -->
+    <div class="mt-6 flex justify-center">
+      <a href="{% url 'horasExtras' %}" class="btn btn-primary">Volver</a>
     </div>
+
   </div>
+
 </body>
 
 </html>

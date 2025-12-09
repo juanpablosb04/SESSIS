@@ -9,6 +9,7 @@ class Usuario(models.Model):
     email = models.EmailField(max_length=100)
     password = models.CharField(max_length=100)
     estado = models.CharField(max_length=50)
+    password_temp = models.BooleanField(default=True)
 
     class Meta:
         db_table = 'Usuarios'

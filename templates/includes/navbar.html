@@ -73,7 +73,7 @@
                     </ul>
                 </li>
 
-                <li><a href="" class="text-gray-300 hover:text-accent-color font-medium transition duration-150 ease-in-out px-3 py-2 rounded-md text-sm">Reportes</a></li>
+                <li><a href="{% url 'reportesIncidentesAdmin' %}" class="text-gray-300 hover:text-accent-color font-medium transition duration-150 ease-in-out px-3 py-2 rounded-md text-sm">Reportes</a></li>
                 <li><a href="{% url 'lista_usuarios' %}" class="text-gray-300 hover:text-accent-color font-medium transition duration-150 ease-in-out px-3 py-2 rounded-md text-sm">Usuarios</a></li>
                 
                 {% endif %}
@@ -89,7 +89,7 @@
                         <li><a href="{% url 'consultarAsistencia' %}" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white text-sm transition duration-150">Ver las asistencias</a></li> 
                     </ul>
                 </li>
-                <li><a href="" class="text-gray-300 hover:text-accent-color font-medium transition duration-150 ease-in-out px-3 py-2 rounded-md text-sm">Reporte Incidentes</a></li>
+                <li><a href="{% url 'reporteIncidentes' %}" class="text-gray-300 hover:text-accent-color font-medium transition duration-150 ease-in-out px-3 py-2 rounded-md text-sm">Reporte Incidentes</a></li>
                 <li><a href="{% url 'consultarHorasExtras' %}" class="text-gray-300 hover:text-accent-color font-medium transition duration-150 ease-in-out px-3 py-2 rounded-md text-sm">Ver mis Horas extras</a></li>
                 {% endif %}
 
@@ -99,7 +99,7 @@
 
         <a class="px-4 py-2 bg-accent-color text-white font-semibold text-sm rounded-full shadow-lg hover:bg-blue-500 transition duration-300 ease-in-out transform hover:scale-105" 
            href="{% url 'logout' %}">
-            LogOut
+            Cerrar Sesión
         </a>
     </div>
 </nav>

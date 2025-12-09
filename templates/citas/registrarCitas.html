@@ -1,93 +1,173 @@
-{% load static %} 
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Registrar Cita</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registrar Cita</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    body {
-            background-image: url("{% static 'Img/fondoCitas.jpg' %}");
-                       
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            min-height: 100vh;
-            
-            padding-top: 4rem; 
+    <style>
+        body {
+
+            background: #f2f3f5;
             font-family: 'Inter', sans-serif;
-            background-color: #1a1a1a;
+            min-height: 100vh;
+            padding-top: 5rem;
+            color: #1f2937;
         }
-  </style>
 
-  {% include "includes/navbar.html" %}
+        .card {
+            background: #ffffff;
+            border-radius: 1rem;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .alert-error {
+            background-color: rgba(255, 0, 0, 0.15);
+            color: #1e2835;
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        .alert-success {
+            background-color: rgba(0, 128, 0, 0.15);
+            color: #1e2835;
+            border: 1px solid rgba(0, 128, 0, 0.3);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn {
+            padding: .6rem 1rem;
+            border-radius: .5rem;
+            font-weight: 600;
+            transition: .2s;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #099268;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #c92a2a;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-warning {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #1e40af;
+        }
+    </style>
+
+    {% include "includes/navbar.html" %}
 
 </head>
-<body class="bg-white text-gray-900">
 
+<body>
+    <div class="max-w-6xl mx-auto px-4">
 
+        <div id="formulario-cita" class="card p-8 mb-2 w-full max-w-[850px] mx-auto">
+            <h2 class="text-3xl font-bold mb-6 text-center">Registrar Cita</h2>
 
-<div class="flex flex-col items-center justify-start py-8">
+            {% if messages %}
+                        {% for message in messages %}
+                        <div class="{{ message.tags }}">{{ message }}</div>
+                        {% endfor %}
+                        {% endif %}
 
-  <!-- FORMULARIO REGISTRO CITA -->
-  <div id="formulario-cita" class="w-full max-w-[850px] bg-gray-800 rounded-lg shadow-md p-7 mb-10">
-    <h2 class="text-2xl font-bold text-gray-200 mb-4">Registrar Cita</h2>
-    <form method="POST" action="" class="space-y-4">
-      {% csrf_token %}
-      <input type="hidden" name="action" value="crear">
+            <form method="POST" action="" class="space-y-4">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="crear">
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- CLIENTE -->
-        <div>
-          <label for="id_cliente" class="text-gray-200 font-semibold">Cliente</label>
-          <select name="id_cliente" id="id_cliente" required class="p-2 rounded bg-gray-700 text-white w-full">
-            <option value="">Seleccione Cliente</option>
-            {% for cliente in clientes %}
-              <option value="{{ cliente.id_cliente }}">{{ cliente.nombre_completo }}</option>
-            {% endfor %}
-          </select>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="id_cliente" class="text-gray-700 text-sm font-medium">Cliente</label>
+                        <select name="id_cliente" id="id_cliente" required
+                            class="mt-1 p-3 border border-gray-300 rounded-lg w-full">
+                            <option value="">Seleccione Cliente</option>
+                            {% for cliente in clientes %}
+                            <option value="{{ cliente.id_cliente }}">{{ cliente.nombre_completo }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="fecha_cita" class="text-gray-700 text-sm font-medium">Fecha de la Cita</label>
+                        <input type="date" name="fecha_cita" id="fecha_cita" required
+                            class="mt-1 p-3 border border-gray-300 rounded-lg w-full">
+                    </div>
+
+                    <div>
+                        <label for="hora_inicio" class="text-gray-700 text-sm font-medium">Hora de Inicio</label>
+                        <input type="time" name="hora_inicio" id="hora_inicio" required
+                            class="mt-1 p-3 border border-gray-300 rounded-lg w-full">
+                    </div>
+
+                    <div>
+                        <label for="hora_finalizacion" class="text-gray-700 text-sm font-medium">Hora de
+                            Finalización</label>
+                        <input type="time" name="hora_finalizacion" id="hora_finalizacion" required
+                            class="mt-1 p-3 border border-gray-300 rounded-lg w-full">
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label for="motivo" class="text-gray-700 text-sm font-medium">Motivo</label>
+                        <textarea name="motivo" id="motivo" placeholder="Motivo de la cita" required
+                            class="mt-1 p-3 border border-gray-300 rounded-lg w-full"></textarea>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label for="descripcion" class="text-gray-700 text-sm font-medium">Descripción</label>
+                        <textarea name="descripcion" id="descripcion" placeholder="Descripción de la cita"
+                            class="mt-1 p-3 border border-gray-300 rounded-lg w-full"></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary bg-green-500 w-full mt-4">
+                    Registrar Cita
+                </button>
+            </form>
         </div>
 
-        <!-- FECHA -->
-        <div>
-          <label for="fecha_cita" class="text-gray-200 font-semibold">Fecha de la Cita</label>
-          <input type="date" name="fecha_cita" id="fecha_cita" required class="p-2 rounded bg-gray-700 text-white w-full">
-        </div>
-
-        <!-- HORA INICIO -->
-        <div>
-          <label for="hora_inicio" class="text-gray-200 font-semibold">Hora de Inicio</label>
-          <input type="time" name="hora_inicio" id="hora_inicio" class="p-2 rounded bg-gray-700 text-white w-full">
-        </div>
-
-        <!-- HORA FINALIZACIÓN -->
-        <div>
-          <label for="hora_finalizacion" class="text-gray-200 font-semibold">Hora de Finalización</label>
-          <input type="time" name="hora_finalizacion" id="hora_finalizacion" class="p-2 rounded bg-gray-700 text-white w-full">
-        </div>
-
-        <!-- MOTIVO -->
-        <div class="md:col-span-2">
-          <label for="motivo" class="text-gray-200 font-semibold">Motivo</label>
-          <textarea name="motivo" id="motivo" placeholder="Motivo de la cita" class="p-2 rounded bg-gray-700 text-white w-full"></textarea>
-        </div>
-
-        <!-- DESCRIPCIÓN -->
-        <div class="md:col-span-2">
-          <label for="descripcion" class="text-gray-200 font-semibold">Descripción</label>
-          <textarea name="descripcion" id="descripcion" placeholder="Descripción de la cita" class="p-2 rounded bg-gray-700 text-white w-full"></textarea>
-        </div>
-      </div>
-
-      <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4">
-        Registrar Cita
-      </button>
-    </form>
-  </div>
-
-</div>
+    </div>
 
 </body>
+
 </html>

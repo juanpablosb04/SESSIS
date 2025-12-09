@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'ubicaciones',
     'citas',
     'asistencia',
+    'reportes',
 ]
 
 MIDDLEWARE = [
@@ -98,7 +99,7 @@ DATABASES = {
     }
 }
 
-
+# Para Stwart : AKILES08CR\SQLEXPRESS
 
 
 # Password validation
@@ -165,6 +166,10 @@ LOGIN_REDIRECT_URL = 'inicio'
 
 # Redirigir al login después de cerrar sesión
 LOGOUT_REDIRECT_URL = 'login'
+
+#Imagenes
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 
 

@@ -7,17 +7,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Registro de Asistencia</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fuente Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
     body {
-      background-image: url('/static/Img/fondoSecundario.jpg');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+      background: #f2f3f5; /* Fondo del DISEÑO */
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding-top: 5rem;
+      color: #1f2937;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 1rem;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
     }
 
     .alert-error {
       background-color: rgba(255, 0, 0, 0.15);
-      color: #ff4d4d;
+      color: #1e2835;
       border: 1px solid rgba(255, 0, 0, 0.3);
       border-radius: 10px;
       padding: 12px;
@@ -30,7 +45,7 @@
 
     .alert-success {
       background-color: rgba(0, 128, 0, 0.15);
-      color: #4dff4d;
+      color: #1e2835;
       border: 1px solid rgba(0, 128, 0, 0.3);
       border-radius: 10px;
       padding: 12px;
@@ -41,78 +56,71 @@
       backdrop-filter: blur(10px);
     }
 
-    .alert-error2 {
-      background-color: rgba(255, 0, 0, 0.15);
-      color: #fff;
-      border: 1px solid rgba(255, 0, 0, 0.3);
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 10px;
-      text-align: center;
-      font-size: 14px;
-      font-weight: 500;
-      backdrop-filter: blur(10px);
+    .btn {
+      padding: .6rem 1rem;
+      border-radius: .5rem;
+      font-weight: 600;
+      transition: .2s;
     }
 
-    .alert-success2 {
-      background-color: rgba(0, 128, 0, 0.15);
-      color: #fff;
-      border: 1px solid rgba(0, 128, 0, 0.3);
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 10px;
-      text-align: center;
-      font-size: 14px;
-      font-weight: 500;
-      backdrop-filter: blur(10px);
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1e40af;
     }
   </style>
-</head>
-
-<body class="bg-gray-900 min-h-screen flex flex-col">
 
   {% include "includes/navbar.html" %}
+</head>
 
-  <div id="navbar"></div>
+<body>
+  <div class="max-w-6xl mx-auto px-4">
 
-  <main class="flex-grow flex items-center justify-center p-6">
-    <div class="w-full max-w-3xl bg-gray-800 bg-opacity-90 rounded-lg shadow-lg p-8">
-      <h2 class="text-3xl font-bold text-gray-100 mb-6 text-center">Registro de Asistencia</h2>
+    <!-- CARD PRINCIPAL -->
+    <div class="card p-8 max-w-3xl mx-auto">
+      <h2 class="text-3xl font-bold mb-6 text-center">Registro de Asistencia</h2>
+
       {% if messages %}
       {% for message in messages %}
-      {% if 'crear' in message.tags %}
-      {% if 'success' in message.tags %}
-      <div class="alert-success">{{ message }}</div>
-      {% else %}
-      <div class="alert-error">{{ message }}</div>
-      {% endif %}
+      {% if "crear" in message.tags %}
+      <div class="{{ message.tags }}">{{ message }}</div>
       {% endif %}
       {% endfor %}
       {% endif %}
-      <form id="formAsistencia" class="flex flex-col space-y-5 text-gray-200" method="POST">
+
+      <form id="formAsistencia" class="space-y-5" method="POST">
         {% csrf_token %}
 
+        <!-- Fecha -->
         <div>
-          <label for="fecha" class="block mb-1 font-semibold">Fecha</label>
-          <input id="fecha" name="fecha" type="date"
-            class="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value="{{ today }}" readonly />
+          <label for="fecha" class="text-sm text-gray-700">Fecha</label>
+          <input 
+            id="fecha" 
+            name="fecha" 
+            type="date"
+            class="w-full mt-1 p-3 border border-gray-300 rounded-lg"
+            value="{{ today|date:'Y-m-d' }}" 
+            readonly 
+          />
         </div>
 
         <!-- Turno informativo -->
         <div>
-          <label for="turno" class="block mb-1 font-semibold">Hora de entrada (asignado automáticamente)</label>
+          <label for="turno" class="text-sm text-gray-700">Hora de entrada (asignado automáticamente)</label>
           <select id="turno" name="turno"
-            class="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
+            class="w-full mt-1 p-3 border border-gray-300 rounded-lg" disabled>
             <option selected>Se registrará automáticamente</option>
           </select>
         </div>
 
         <!-- Ubicación -->
         <div>
-          <label for="id_ubicacion" class="block mb-1 font-semibold">Ubicación del puesto</label>
+          <label for="id_ubicacion" class="text-sm text-gray-700">Ubicación del puesto</label>
           <select id="id_ubicacion" name="id_ubicacion"
-            class="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            class="w-full mt-1 p-3 border border-gray-300 rounded-lg" required>
             <option value="">Seleccione una ubicación</option>
             {% for ubicacion in ubicaciones %}
             <option value="{{ ubicacion.id_ubicacion }}">{{ ubicacion.nombre }}</option>
@@ -122,49 +130,20 @@
 
         <!-- Observaciones -->
         <div>
-          <label for="observaciones" class="block mb-1 font-semibold">Observaciones</label>
-          <textarea id="observaciones" name="observaciones" rows="3" placeholder=""
-            class="w-full p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">No hay Observaciones que agregar</textarea>
+          <label for="observaciones" class="text-sm text-gray-700">Observaciones</label>
+          <textarea id="observaciones" name="observaciones" rows="3"
+            class="w-full mt-1 p-3 border border-gray-300 rounded-lg">No hay Observaciones que agregar</textarea>
         </div>
 
         <!-- Botón -->
-        <div class="flex justify-center mt-6">
-          <button type="submit"
-            class="w-1/2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded font-semibold transition duration-200">
-            Registrar Entrada
-          </button>
-        </div>
+        <button type="submit" class="btn btn-primary w-full">
+          Registrar Entrada
+        </button>
       </form>
     </div>
-  </main>
+    
+  </div>
 
-  <script>
-    // Autoasignar fecha actual
-    const fechaInput = document.getElementById('fecha');
-    const hoy = new Date().toISOString().split('T')[0];
-    fechaInput.value = hoy;
-
-    // Mostrar hora al registrar
-    document.getElementById("formAsistencia").addEventListener("submit", function (event) {
-      event.preventDefault(); // evita recargar
-
-      const ahora = new Date();
-      const hora = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-      alert(`✅ Asistencia registrada correctamente.\nHora de ingreso: ${hora}`);
-
-      // Aquí podrías enviar los datos al backend
-      // this.submit(); // Descomenta si ya conectas con Django
-    });
-
-    // Autoasignar fecha actual
-    const fechaInput = document.getElementById('fecha');
-    const fechaHoy = new Date().toISOString().split('T')[0];
-    fechaInput.value = fechaHoy;
-
-  </script>
-
-  <script src="/static/JS/navbarEmpleados.js"></script>
 </body>
 
 </html>

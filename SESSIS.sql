@@ -74,6 +74,7 @@ CREATE TABLE Usuarios (
     id_rol INT NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
     password VARCHAR(150) NOT NULL,
+    password_temp BIT NOT NULL DEFAULT 1,
     estado VARCHAR(50),
     FOREIGN KEY (id_empleado) REFERENCES Empleado(id_empleado),
     FOREIGN KEY (id_rol) REFERENCES Roles(id_rol)
@@ -83,12 +84,34 @@ CREATE TABLE Usuarios (
 -- TABLA REPORTE INCIDENTES
 -- ==============================
 CREATE TABLE ReporteIncidentes (
-    id_reporte INT PRIMARY KEY IDENTITY(1,1),
-    id_empleado INT NOT NULL,
-    categoria VARCHAR(100),
-    archivo VARCHAR(250),
-    FOREIGN KEY (id_empleado) REFERENCES Empleado(id_empleado)
+    id_reporte     INT IDENTITY(1,1) PRIMARY KEY,
+    id_empleado    INT NOT NULL,
+    categoria      VARCHAR(50) NOT NULL,
+    archivo        NVARCHAR(512) NULL,
+    fecha_evento   DATE NOT NULL 
+        CONSTRAINT DF_ReporteIncidentes_fecha_evento DEFAULT (CAST(GETDATE() AS DATE)),
+    descripcion    NVARCHAR(2000) NULL
 );
+
+-- FOREIGN KEY
+ALTER TABLE ReporteIncidentes
+ADD CONSTRAINT FK_ReporteIncidentes_Empleado
+    FOREIGN KEY (id_empleado) REFERENCES Empleado(id_empleado);
+
+-- CHECK DE CATEGORÍAS
+ALTER TABLE ReporteIncidentes
+ADD CONSTRAINT CK_ReporteIncidentes_Categoria
+    CHECK (categoria IN (
+        'accidente-trabajo',
+        'fallo-equipamiento',
+        'incidente-seguridad',
+        'problema-ambiental',
+        'otros-eventos'
+    ));
+
+-- ÍNDICES
+CREATE INDEX IX_ReporteIncidentes_Empleado ON ReporteIncidentes (id_empleado);
+CREATE INDEX IX_ReporteIncidentes_Fecha ON ReporteIncidentes (fecha_evento DESC);
 
 -- ==============================
 -- TABLA ASISTENCIA
@@ -132,9 +155,10 @@ CREATE TABLE Citas (
     descripcion VARCHAR(250),
 
     FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente),
-    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario)
 );
 GO
+
 
 -- ==============================
 -- TABLAS DE AUDITORIA
@@ -253,24 +277,6 @@ CREATE TABLE dbo.HorasExtras_Auditoria_TB
 );
 GO
 
-
--- ==========================================
--- INSERTS PARA EMPLEADO
--- ==========================================
-INSERT INTO Empleado (nombre_completo, email, cedula, telefono, direccion, fecha_contratacion)
-VALUES ('Juan Pablo Solis Benamburg', 'juanpablops04@outlook.com', '118330293', '84433060', 'Fidelitas', CAST(GETDATE() AS DATE));
-
-INSERT INTO Empleado (nombre_completo, email, cedula, telefono, direccion, fecha_contratacion)
-VALUES ('Luis Anthony Rodriguez Jimenez', 'anthorj76@gmail.com', '119224578', '55556666', 'Fidelitas', CAST(GETDATE() AS DATE));
-
-INSERT INTO Empleado (nombre_completo, email, cedula, telefono, direccion, fecha_contratacion)
-VALUES ('Stwart Jafet Guerrero Fernandez', 'sgf.oficial08@gmail.com', '120224158', '66665555', 'Fidelitas', CAST(GETDATE() AS DATE));
-
--- Empleado inventado
-INSERT INTO Empleado (nombre_completo, email, cedula, telefono, direccion, fecha_contratacion)
-VALUES ('Carolina Mendez Chavarria', 'carolinamc@example.com', '121558899', '77774444', 'San José Centro', CAST(GETDATE() AS DATE));
-
-
 -- ==========================================
 -- INSERTS PARA ROLES
 -- ==========================================
@@ -280,24 +286,23 @@ VALUES ('Administrador', 'Acceso total al sistema, incluyendo gestión de usuari
 INSERT INTO Roles (nombre_rol, descripcion)
 VALUES ('Oficial', 'Acceso restringido, puede registrar asistencia, incidentes y reportes.');
 
+-- ==========================================
+-- INSERTS PARA EMPLEADO
+-- ==========================================
+INSERT INTO Empleado (nombre_completo, email, cedula, telefono, direccion, fecha_contratacion)
+VALUES (
+    'Maribel Solis Valverde',
+    'msolis90362@ufide.ac.cr',
+    '115678902',
+    '55554444',
+    'Fidelitas',
+    CAST(GETDATE() AS DATE)
+);
+
 
 -- ==========================================
--- INSERTS PARA USUARIOS
--- (Relaciona cada empleado con su rol)
+-- INSERTS PARA USUARIO
 -- ==========================================
--- NOTA: Aquí supongo que los IDs se generan con IDENTITY en Empleado y Roles.
---       Debes revisar los IDs reales después de insertar, o usar SELECT SCOPE_IDENTITY().
-
--- Los primeros 3 empleados con rol Administrador
-INSERT INTO Usuarios (id_empleado, id_rol, email, password, estado)
-VALUES (1, 1, 'juanpablops04@outlook.com', '123', 'Activo');
 
 INSERT INTO Usuarios (id_empleado, id_rol, email, password, estado)
-VALUES (2, 1, 'anthorj76@gmail.com', '123', 'Activo');
-
-INSERT INTO Usuarios (id_empleado, id_rol, email, password, estado)
-VALUES (3, 1, 'sgf.oficial08@gmail.com', '123', 'Activo');
-
--- El empleado inventado con rol Oficial
-INSERT INTO Usuarios (id_empleado, id_rol, email, password, estado)
-VALUES (4, 2, 'carolinamc@example.com', 'securePass2024!', 'Activo');
+VALUES (1, 1, 'msolis90362@ufide.ac.cr', 'MaribelSV1515*', 'Activo');

@@ -1,6 +1,8 @@
 # cuentas/views.py
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth import update_session_auth_hash
 from django.utils import timezone
 from .models import Usuarios
 from citas.models import Cita
@@ -8,9 +10,25 @@ from email.mime.text import MIMEText
 import smtplib
 import string
 import random
+import re
 from django.db.models import Q
 from datetime import date
 
+
+# ======================================================
+# Requisitos minimos para la contrasena
+# ======================================================
+
+def validar_contrasena_segura(password):
+    if len(password) < 8:
+        return False
+    if not re.search(r"[A-Z]", password):
+        return False
+    if not re.search(r"[a-z]", password):
+        return False
+    if not re.search(r"[0-9]", password):
+        return False
+    return True
 
 # ======================================================
 # LOGIN
@@ -21,12 +39,26 @@ def user_login(request):
         password = request.POST.get("password")
 
         try:
-            usuario = Usuarios.objects.get(email=email, password=password, estado="activo")
+            usuario = Usuarios.objects.get(email=email)
 
-            # Guardar sesión
+            # 1️⃣ Verificar si la cuenta está inactiva
+            if usuario.estado.lower() != "activo":
+                messages.error(request, "La cuenta está inactiva. Contacte al administrador.")
+                return redirect("login")
+
+            # 2️⃣ Validar contraseña
+            if not check_password(password, usuario.password):
+                messages.error(request, "Correo o contraseña incorrectos.")
+                return redirect("login")
+
+            # 3️⃣ Guardar sesión
             request.session["usuario_id"] = usuario.id_usuario
             request.session["usuario_email"] = usuario.email
             request.session["usuario_rol"] = usuario.id_rol.nombre_rol
+
+            # 4️⃣ Verificar si debe cambiar contraseña
+            if usuario.password_temp == True:
+                return redirect("cambiar_contrasena")
 
             return redirect("inicio")
 
@@ -36,6 +68,10 @@ def user_login(request):
     return render(request, "cuentas/index.html")
 
 
+
+# ======================================================
+# INICIO
+# ======================================================
 def inicio(request):
 
     usuario_id = request.session.get("usuario_id")
@@ -82,7 +118,7 @@ def recuperar_password(request):
             usuario = Usuarios.objects.get(email=email, estado="activo")
 
             nueva_contrasena = generar_contrasena()
-            usuario.password = nueva_contrasena
+            usuario.password = make_password(nueva_contrasena)
             usuario.save()
 
             enviar_correo_gmail(email, nueva_contrasena)
@@ -96,15 +132,83 @@ def recuperar_password(request):
 
     return render(request, "cuentas/recuperarContrasena.html")
 
+# ======================================================
+# CAMBIAR CONTRASEÑA
+# ======================================================
+def cambiarContrasena(request):
+
+    usuario_id = request.session.get("usuario_id")
+    if not usuario_id:
+        return redirect("login")
+
+    usuario = Usuarios.objects.get(id_usuario=usuario_id)
+
+    if request.method == "POST":
+
+        old_pass = request.POST.get("old_password")
+        nueva_pass = request.POST.get("password")
+        confirmar_pass = request.POST.get("password2")
+
+        # 1. Validar campos vacíos
+        if not old_pass or not nueva_pass or not confirmar_pass:
+            messages.error(request, "Debes completar todos los campos.")
+            return redirect("cambiar_contrasena")
+
+        # 2. Verificar que la contraseña temporal sea correcta
+        if not check_password(old_pass, usuario.password):
+            messages.error(request, "La contraseña temporal es incorrecta.")
+            return redirect("cambiar_contrasena")
+
+        # 3. Validar coincidencia
+        if nueva_pass != confirmar_pass:
+            messages.error(request, "Las contraseñas no coinciden.")
+            return redirect("cambiar_contrasena")
+
+        # 4. Reglas de seguridad
+        if len(nueva_pass) < 8:
+            messages.error(request, "La contraseña debe tener al menos 8 caracteres.")
+            return redirect("cambiar_contrasena")
+
+        if not any(c.isdigit() for c in nueva_pass):
+            messages.error(request, "La contraseña debe incluir al menos un número.")
+            return redirect("cambiar_contrasena")
+
+        if not any(c.isupper() for c in nueva_pass):
+            messages.error(request, "La contraseña debe incluir al menos una mayúscula.")
+            return redirect("cambiar_contrasena")
+
+        if not any(c.islower() for c in nueva_pass):
+            messages.error(request, "La contraseña debe incluir al menos una minúscula.")
+            return redirect("cambiar_contrasena")
+
+        # 5. Guardar nueva contraseña encriptada
+        usuario.password = make_password(nueva_pass)
+        usuario.password_temp = False
+        usuario.save()
+
+        messages.success(request, "Tu contraseña ha sido actualizada exitosamente.")
+        return redirect("login")
+
+    return render(request, "cuentas/cambiarContrasena.html")
+
+
+
 
 # ======================================================
 # FUNCIONES AUXILIARES
+# ======================================================
+
+
+# ======================================================
+# GENERAR CONTRASEÑA
 # ======================================================
 def generar_contrasena(longitud=8):
     caracteres = string.ascii_letters + string.digits
     return "".join(random.choice(caracteres) for _ in range(longitud))
 
-
+# ======================================================
+# ENVIAR CORREO GMAIL
+# ======================================================
 def enviar_correo_gmail(destinatario, contrasena_nueva):
     remitente = "sistemasessis@gmail.com"
     password = "fpkl szho vbmk vssi"  # Contraseña de aplicación de Gmail
