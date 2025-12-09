@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-t+4!5y9qh8ci=nietzy9y8w(5zxa_bayaofve@adq6d=4_m*o0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -84,20 +84,37 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'mssql',
-        'NAME': 'SESSIS',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
-        'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
-            'trusted_connection': 'yes',
-        },
+# Detecta si estamos en Railway
+USE_RAILWAY = os.getenv("RAILWAY_ENVIRONMENT")
+
+if USE_RAILWAY:
+    # 🔹 Railway (MySQL)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.getenv("MYSQLDATABASE"),
+            'USER': os.getenv("MYSQLUSER"),
+            'PASSWORD': os.getenv("MYSQLPASSWORD"),
+            'HOST': os.getenv("MYSQLHOST"),
+            'PORT': os.getenv("MYSQLPORT"),
+        }
     }
-}
+else:
+    # 🔹 Local (SQL Server)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'mssql',
+            'NAME': 'SESSIS',
+            'USER': '',
+            'PASSWORD': '',
+            'HOST': '',
+            'PORT': '',
+            'OPTIONS': {
+                'driver': 'ODBC Driver 17 for SQL Server',
+                'trusted_connection': 'yes',
+            },
+        }
+    }
 
 # Para Stwart : AKILES08CR\SQLEXPRESS
 
@@ -170,6 +187,9 @@ LOGOUT_REDIRECT_URL = 'login'
 #Imagenes
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
 
