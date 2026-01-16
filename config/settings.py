@@ -31,7 +31,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://sessis-production.up.railway.app",
+    "https://web-production-738e4.up.railway.app",
 ]
 
 
@@ -101,9 +101,9 @@ if USE_RAILWAY:
             'ENGINE': 'django.db.backends.mysql',
             'NAME': os.getenv("MYSQLDATABASE", "railway"),
             'USER': os.getenv("MYSQLUSER", "root"),
-            'PASSWORD': os.getenv("MYSQLPASSWORD", "MaLwpmXBzVTlAXMSVSSneZtrMSldKKZM"),
-            'HOST': os.getenv("RAILWAY_TCP_PROXY_DOMAIN", "shuttle.proxy.rlwy.net"),
-            'PORT': os.getenv("RAILWAY_TCP_PROXY_PORT", "40663"),
+            'PASSWORD': os.getenv("MYSQLPASSWORD", "dOkJsdkFBGaAbAZJmUlFhGRgxRViZoPd"),
+            'HOST': os.getenv("RAILWAY_TCP_PROXY_DOMAIN", "nozomi.proxy.rlwy.net"),
+            'PORT': os.getenv("RAILWAY_TCP_PROXY_PORT", "18088"),
             'OPTIONS': {
                 'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",  # ayuda a evitar errores de integridad
             },
