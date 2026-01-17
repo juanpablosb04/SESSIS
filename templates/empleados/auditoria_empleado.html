@@ -1,0 +1,229 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auditoría - {{ empleado.nombre_completo }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      background: #f2f3f5;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding-top: 5rem;
+      color: #1f2937;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 1rem;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .btn {
+      padding: .6rem 1rem;
+      border-radius: .5rem;
+      font-weight: 600;
+      transition: .2s;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1e40af;
+    }
+
+    .btn-secondary {
+      background: #6b7280;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #4b5563;
+    }
+
+    .tag {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 6px;
+      color: white;
+    }
+
+    .tag-green {
+      background: #16a34a;
+    }
+
+    .tag-yellow {
+      background: #f59e0b;
+    }
+
+    .tag-red {
+      background: #dc2626;
+    }
+  </style>
+
+  {% include "includes/navbar.html" %}
+</head>
+
+
+<body>
+
+  <div class="max-w-6xl mx-auto px-4">
+
+    <!-- TITULO -->
+    <div class="card p-8 mb-2">
+      <h1 class="text-3xl font-bold mb-4 text-center">Auditoría del Empleado</h1>
+
+      <p class="text-center text-gray-700 text-lg">
+        <span class="font-semibold">Empleado:</span>
+        {{ empleado.nombre_completo }} - {{ empleado.cedula }}
+      </p>
+    </div>
+
+
+    <!-- TABLA DE AUDITORÍA -->
+    <div class="card p-2">
+
+      <h2 class="text-2xl font-semibold mb-6 text-center">Historial de Cambios</h2>
+
+      <div class="overflow-x-auto">
+        <table class="w-full border border-gray-300 rounded-lg text-sm">
+          <thead class="bg-gray-500 text-white border-b border-gray-300">
+            <tr class="uppercase">
+              <th class="p-3 whitespace-nowrap">Fecha</th>
+              <th class="p-3 whitespace-nowrap">Acción</th>
+              <th class="p-3 whitespace-nowrap">Usuario</th>
+              <th class="p-3 whitespace-nowrap">Nombre</th>
+              <th class="p-3 whitespace-nowrap">Email</th>
+              <th class="p-3 whitespace-nowrap">Cédula</th>
+              <th class="p-3 whitespace-nowrap">Teléfono</th>
+              <th class="p-3 whitespace-nowrap">Dirección</th>
+              <th class="p-3 whitespace-nowrap">Fecha Contratación</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for reg in page_obj %}
+            <tr class="border-b border-gray-200">
+
+              <td class="p-3 whitespace-nowrap">{{ reg.fecha|date:"d/m/Y H:i" }}</td>
+
+              <td class="p-3 whitespace-nowrap">
+                {% with ac=reg.accion|upper %}
+                {% if ac == "CREAR" %}
+                <span class="tag tag-green">CREAR</span>
+
+                {% elif ac == "MODIFICAR" %}
+                <span class="tag tag-yellow">MODIFICAR</span>
+
+                {% elif ac == "ELIMINAR" %}
+                <span class="tag tag-red">ELIMINAR</span>
+
+                {% else %}
+                <span class="tag bg-gray-600">{{ reg.accion }}</span>
+                {% endif %}
+                {% endwith %}
+              </td>
+
+              <td class="p-3 whitespace-nowrap">
+                {% if reg.usuario %}
+                {{ reg.usuario.email }}
+                {% elif reg.usuario_email %}
+                {{ reg.usuario_email }}
+                {% else %}
+                <span class="italic text-gray-500">Sistema</span>
+                {% endif %}
+              </td>
+
+              <td class="p-3 whitespace-nowrap">{{ reg.nombre_completo }}</td>
+              <td class="p-3 whitespace-nowrap">{{ reg.email }}</td>
+              <td class="p-3 whitespace-nowrap">{{ reg.cedula }}</td>
+
+              <td class="p-3 whitespace-nowrap">
+                {{ reg.telefono|default:"—" }}
+              </td>
+
+              <td class="p-3 max-w-[400px]">
+                {{ reg.direccion|default:"—" }}
+              </td>
+
+              <td class="p-3 whitespace-nowrap">
+                {% if reg.fecha_contratacion %}
+                {{ reg.fecha_contratacion|date:"Y-m-d" }}
+                {% else %}
+                —
+                {% endif %}
+              </td>
+
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="9" class="p-4 text-center text-gray-500">
+                No hay registros de auditoría para este empleado.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+
+
+    <!-- PAGINACIÓN -->
+    <div class="flex justify-center mt-6">
+      <nav class="flex items-center space-x-1">
+
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}"
+          class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">
+          « Anterior
+        </a>
+        {% else %}
+        <span class="px-3 py-1 bg-gray-300 text-gray-500 rounded cursor-not-allowed">« Anterior</span>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}
+        <span class="px-3 py-1 bg-gray-200 text-gray-900 border border-gray-400 rounded">{{ num }}</span>
+        {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %} <a href="?page={{ num }}"
+          class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">{{ num }}</a>
+          {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}"
+            class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">
+            Siguiente »
+          </a>
+          {% else %}
+          <span class="px-3 py-1 bg-gray-300 text-gray-500 rounded cursor-not-allowed">Siguiente »</span>
+          {% endif %}
+
+      </nav>
+    </div>
+
+  </div>
+
+
+  <!-- VOLVER -->
+  <div class="mt-6 flex justify-center">
+    <a href="{% url 'empleados' %}" class="btn btn-primary">Volver</a>
+  </div>
+
+  </div>
+
+</body>
+
+</html>

@@ -1,3 +1,5 @@
+import os
+
 """
 Django settings for config project.
 
@@ -26,7 +28,11 @@ SECRET_KEY = 'django-insecure-t+4!5y9qh8ci=nietzy9y8w(5zxa_bayaofve@adq6d=4_m*o0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://web-production-738e4.up.railway.app",
+]
 
 
 # Application definition
@@ -43,14 +49,20 @@ INSTALLED_APPS = [
     'roles',
     'clientes.apps.ClientesConfig',
     'usuarios',
+    'inventarios',
+    'ubicaciones',
+    'citas',
+    'asistencia',
+    'reportes',
 ]
 
 MIDDLEWARE = [
-   'django.middleware.security.SecurityMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',  # 👈 importante
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -79,22 +91,42 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'mssql',
-        'NAME': 'SESSIS',
-        'USER': '',      # vacío porque usas Trusted_Connection
-        'PASSWORD': '',
-        'HOST': 'AKILES08CR\\SQLEXPRESS',
-        'PORT': '',
-        'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
-            'trusted_connection': 'yes',
-        },
+# Detecta si estamos en Railway
+USE_RAILWAY = os.getenv("RAILWAY_ENVIRONMENT")
+
+if USE_RAILWAY:
+    # ✅ Usando la DB pública para pruebas desde el contenedor de Railway
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.getenv("MYSQLDATABASE", "railway"),
+            'USER': os.getenv("MYSQLUSER", "root"),
+            'PASSWORD': os.getenv("MYSQLPASSWORD", "dOkJsdkFBGaAbAZJmUlFhGRgxRViZoPd"),
+            'HOST': os.getenv("RAILWAY_TCP_PROXY_DOMAIN", "nozomi.proxy.rlwy.net"),
+            'PORT': os.getenv("RAILWAY_TCP_PROXY_PORT", "18088"),
+            'OPTIONS': {
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",  # ayuda a evitar errores de integridad
+            },
+        }
     }
-}
+else:
+    # 🔹 Local (SQL Server)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'mssql',
+            'NAME': 'SESSIS',
+            'USER': '',
+            'PASSWORD': '',
+            'HOST': '',
+            'PORT': '',
+            'OPTIONS': {
+                'driver': 'ODBC Driver 17 for SQL Server',
+                'trusted_connection': 'yes',
+            },
+        }
+    }
 
-
+# Para Stwart : AKILES08CR\SQLEXPRESS
 
 
 # Password validation
@@ -121,7 +153,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Costa_Rica'
 
 USE_I18N = True
 
@@ -132,11 +164,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
+STATIC_ROOT = BASE_DIR / "staticfiles"
 # Para que Django sepa dónde buscar tus archivos estáticos globales
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -162,6 +196,25 @@ LOGIN_REDIRECT_URL = 'inicio'
 # Redirigir al login después de cerrar sesión
 LOGOUT_REDIRECT_URL = 'login'
 
+#Imagenes
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+
+# ======================
+# Configuración de correo
+# ======================
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = 'sistemasessis@gmail.com'
+EMAIL_HOST_PASSWORD = 'fpkl szho vbmk vssi'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
 

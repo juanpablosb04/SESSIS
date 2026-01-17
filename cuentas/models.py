@@ -9,6 +9,7 @@ class Usuarios(models.Model):
     email = models.CharField(unique=True, max_length=150, db_collation='Modern_Spanish_CI_AS')
     password = models.CharField(max_length=150, db_collation='Modern_Spanish_CI_AS')
     estado = models.CharField(max_length=50, db_collation='Modern_Spanish_CI_AS', blank=True, null=True)
+    password_temp = models.BooleanField(default=True)
 
     class Meta:
         managed = False

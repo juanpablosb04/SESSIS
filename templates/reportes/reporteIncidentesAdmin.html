@@ -1,0 +1,244 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reportes de Incidentes – Admin</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/static/JS/navbar.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body{
+      background: #f2f3f5;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding-top: 5rem;
+      color: #1f2937;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 1rem;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .alert-error{
+      background-color: rgba(255, 0, 0, 0.15);
+      color: #ff4d4d;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-success{
+      background-color: rgba(0, 128, 0, 0.15);
+      color: #4dff4d;
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .btn {
+      padding: .6rem 1rem;
+      border-radius: .5rem;
+      font-weight: 600;
+      transition: .2s;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #099268;
+    }
+
+    .btn-secondary {
+      background: #6b7280;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #c92a2a;
+    }
+  </style>
+</head>
+
+<body>
+  {% include "includes/navbar.html" %}
+
+  <div class="max-w-6xl mx-auto py-8 px-4">
+
+    <!-- TÍTULO Y BOTÓN PDF -->
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+      <h1 class="text-3xl font-bold">Reportes de incidentes de empleados</h1>
+
+      <a
+        href="{% url 'reportesIncidentesAdminPDF' %}?empleado={{ request.GET.empleado }}&ini={{ request.GET.ini }}&fin={{ request.GET.fin }}"
+        class="inline-flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white font-semibold px-4 py-2 rounded-md"
+        title="Descargar PDF"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 2H8a2 2 0 0 0-2 2v3H5a2 2 0 0 0-2 2v9a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V4a2 2 0 0 0-2-2Zm-7 2h7v11h-7V4ZM7 9h4v2H7v6h7v2H7a2 2 0 0 1-2-2V11a2 2 0 0 1 2-2Z"/>
+        </svg>
+        Exportar PDF
+      </a>
+    </div>
+
+    <!-- FILTROS -->
+    <form method="get" class="card p-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <label class="text-sm block mb-1 text-gray-700">Empleado</label>
+          <select name="empleado"
+                  class="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700">
+            <option value="">Todos</option>
+            {% if empleados %}
+              {% for e in empleados %}
+                <option value="{{ e.id_empleado }}" {% if request.GET.empleado == e.id_empleado|stringformat:"s" %}selected{% endif %}>
+                  {{ e.cedula }} - {{ e.nombre_completo }}
+                </option>
+              {% endfor %}
+            {% endif %}
+          </select>
+        </div>
+
+        <div>
+          <label class="text-sm block mb-1 text-gray-700">Fecha inicio</label>
+          <input type="date" name="ini" value="{{ request.GET.ini }}"
+                 class="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700">
+        </div>
+
+        <div>
+          <label class="text-sm block mb-1 text-gray-700">Fecha fin</label>
+          <input type="date" name="fin" value="{{ request.GET.fin }}"
+                 class="w-full border border-gray-300 rounded-md p-2 bg-white text-gray-700">
+        </div>
+
+        <div class="flex items-end gap-2">
+          <button class="btn btn-primary" type="submit">
+            Filtrar
+          </button>
+          <a href="{% url 'reportesIncidentesAdmin' %}"
+             class="btn btn-secondary">
+            Resetear
+          </a>
+        </div>
+      </div>
+    </form>
+
+    {% if messages %}
+      {% for message in messages %}
+        {% if 'success' in message.tags %}
+          <div class="alert-success">{{ message }}</div>
+        {% else %}
+          <div class="alert-error">{{ message }}</div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+    <!-- TABLA -->
+    <div class="card p-8">
+      <h2 class="text-2xl font-semibold mb-4 text-center">Listado de reportes</h2>
+
+      <div class="overflow-x-auto">
+        <table class="w-full border border-gray-300 rounded-lg text-sm">
+          <thead class="bg-gray-500 text-white border-b border-gray-300">
+            <tr class="uppercase">
+              <th class="p-2 whitespace-nowrap text-left">Fecha</th>
+              <th class="p-2 whitespace-nowrap text-left">Empleado</th>
+              <th class="p-2 whitespace-nowrap text-left">Categoría</th>
+              <th class="p-2 text-left">Descripción</th>
+              <th class="p-2 whitespace-nowrap text-left">Foto</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for rep in reportes %}
+              <tr class="border-b border-gray-200">
+                <td class="p-2 whitespace-nowrap">
+                  {% if rep.fecha_evento %}{{ rep.fecha_evento|date:"d-m-Y" }}{% else %}-{% endif %}
+                </td>
+                <td class="p-2 whitespace-nowrap">
+                  {{ rep.id_empleado.cedula }} - {{ rep.id_empleado.nombre_completo }}
+                </td>
+                <td class="p-2 whitespace-nowrap">{{ rep.categoria|default:"-" }}</td>
+                <td class="p-2">{{ rep.descripcion|default:"-" }}</td>
+                <td class="p-2">
+                  {% if rep.foto %}
+                    <a href="{{ rep.foto.url }}" target="_blank" rel="noopener noreferrer"
+                       class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800">
+                      <img src="{{ rep.foto.url }}" alt="foto" class="h-12 w-12 object-cover rounded border border-gray-300">
+                      <span class="underline">Abrir</span>
+                    </a>
+                  {% else %}
+                    <span class="text-gray-500">Sin foto</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="5" class="p-4 text-center text-gray-500">
+                  No hay reportes para mostrar.
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- PAGINACIÓN -->
+    <div class="flex justify-center mt-6 mb-6">
+      <nav class="flex items-center space-x-1">
+
+        {% if reportes.has_previous %}
+          <a href="?page={{ reportes.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}"
+            class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">
+            « Anterior
+          </a>
+        {% else %}
+          <span class="px-3 py-1 bg-gray-300 text-gray-500 rounded cursor-not-allowed">« Anterior</span>
+        {% endif %}
+
+        {% for num in reportes.paginator.page_range %}
+          {% if num == reportes.number %}
+            <span class="px-3 py-1 bg-gray-200 text-gray-900 border border-gray-400 rounded">{{ num }}</span>
+          {% elif num >= reportes.number|add:'-2' and num <= reportes.number|add:'2' %}
+            <a href="?page={{ num }}{% if querystring %}&{{ querystring }}{% endif %}"
+              class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">
+              {{ num }}
+            </a>
+          {% endif %}
+        {% endfor %}
+
+        {% if reportes.has_next %}
+          <a href="?page={{ reportes.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}"
+            class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">
+            Siguiente »
+          </a>
+        {% else %}
+          <span class="px-3 py-1 bg-gray-300 text-gray-500 rounded cursor-not-allowed">Siguiente »</span>
+        {% endif %}
+
+      </nav>
+    </div>
+
+  </div>
+</body>
+</html>

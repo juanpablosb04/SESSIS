@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Actualizar Contraseña</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+  </style>
+</head>
+
+<body class="h-screen w-screen flex">
+
+  <!-- LEFT PANEL -->
+    <div class="hidden md:flex w-2/3 bg-cover bg-center bg-no-repeat text-white p-12 flex-col justify-between"
+        style="background-image: url('/static/Img/fondoCC.png');">
+
+        <div>
+            <h1 class="text-4xl font-bold mb-4 drop-shadow-lg text-[#63192a]">SES</h1>
+            <p class="text-3xl font-bold mb-4 drop-shadow-lg text-black">“Seguridad moderna y eficaz</p>
+        </div>
+
+        <div class="text-sm opacity-80 drop-shadow-lg text-black">
+            © 2025 SES. Todos los derechos reservados.
+        </div>
+    </div>
+
+  <!-- PANEL DERECHO -->
+  <div class="w-full md:w-1/3 bg-white flex items-center justify-center p-10">
+    <div class="w-full max-w-sm">
+
+      <!-- FORMULARIO -->
+      <form method="POST" action="/actualizar-contrasena/">
+        {% csrf_token %}
+
+        <h3 class="text-2xl font-semibold text-center mb-6">
+          Actualizar Contraseña 🔐
+        </h3>
+
+        {% if messages %}
+          {% for message in messages %}
+            <div class="p-3 mb-3 text-sm text-red-800 bg-red-100 rounded-lg">
+                {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <!-- Contraseña Temporal -->
+        <label class="text-sm font-medium text-gray-700">Contraseña Temporal</label>
+        <input
+          type="password"
+          name="old_password"
+          placeholder="••••••••"
+          required
+          class="w-full mt-1 mb-4 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+        >
+
+        <!-- Nueva Contraseña -->
+        <label class="text-sm font-medium text-gray-700">Nueva Contraseña</label>
+        <input
+          type="password"
+          name="password"
+          id="password"
+          placeholder="••••••••"
+          required
+          class="w-full mt-1 mb-4 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+        >
+
+        <!-- Confirmar Nueva Contraseña -->
+        <label class="text-sm font-medium text-gray-700">Confirmar Nueva Contraseña</label>
+        <input
+          type="password"
+          name="password2"
+          id="password2"
+          placeholder="••••••••"
+          required
+          class="w-full mt-1 mb-6 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+        >
+
+        <!-- Botón -->
+        <button
+          type="submit"
+          class="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700"
+        >
+          Guardar Nueva Contraseña
+        </button>
+
+        <!-- Volver al login -->
+        <p class="text-center mt-5 text-sm">
+          <a href="{% url 'login' %}" class="text-blue-600 hover:underline">
+            ¿Volver al Login?
+          </a>
+        </p>
+      </form>
+
+    </div>
+  </div>
+
+</body>
+</html>
