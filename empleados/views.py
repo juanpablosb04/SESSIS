@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from .models import Empleado, EmpleadosAuditoria, Asistencia
 from config.decorators import role_required
+from datetime import datetime , date
 from django.utils import timezone
 from django.db.models import Q
 from .models import (
@@ -46,110 +47,139 @@ def _parse_bool(value, fallback=False):
 # =========================
 @role_required(["Administrador"])
 def empleados_view(request):
-    
-    empleados = Empleado.objects.all().order_by("nombre_completo")
+    empleados_qs = Empleado.objects.all().order_by("nombre_completo")
 
-    paginator = Paginator(empleados, 5)
+    paginator = Paginator(empleados_qs, 5)
     page_number = request.GET.get("page")
     empleados = paginator.get_page(page_number)
-
 
     if request.method == "POST":
         action = request.POST.get("action")
 
         # -------- CREAR --------
         if action == "crear":
-            nombre = request.POST.get("nombre_completo", "").strip()
-            email = request.POST.get("email", "").strip()
-            cedula = request.POST.get("cedula", "").strip()
-            telefono = request.POST.get("telefono", "").strip()
+            nombre    = request.POST.get("nombre_completo", "").strip()
+            email     = request.POST.get("email", "").strip()
+            cedula    = request.POST.get("cedula", "").strip()
+            telefono  = request.POST.get("telefono", "").strip()
             direccion = request.POST.get("direccion", "").strip()
-            fecha = request.POST.get("fecha_contratacion", "").strip()
+            fecha_s   = request.POST.get("fecha_contratacion", "").strip()
 
-            if not nombre or not email or not cedula or not fecha:
-
-                messages.error(request, "⚠️ Nombre, correo, cédula y fecha son obligatorios.", extra_tags='crear alert-error')
+            if not nombre or not email or not cedula or not fecha_s:
+                messages.error(request, "⚠️ Nombre, correo, cédula y fecha son obligatorios.", extra_tags="crear alert-error")
 
             elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-                messages.error(request, "⚠️ El correo no tiene un formato válido.", extra_tags='crear alert-error')
-            elif Empleado.objects.filter(email=email).exists():
-                messages.error(request, "⚠️ El correo ya está registrado.", extra_tags='crear alert-error')
-            elif Empleado.objects.filter(cedula=cedula).exists():
-                messages.error(request, "⚠️ La cédula ya está registrada.", extra_tags='crear alert-error')
+                messages.error(request, "⚠️ El correo no tiene un formato válido.", extra_tags="crear alert-error")
 
+            elif Empleado.objects.filter(email=email).exists():
+                messages.error(request, "⚠️ El correo ya está registrado.", extra_tags="crear alert-error")
+
+            elif Empleado.objects.filter(cedula=cedula).exists():
+                messages.error(request, "⚠️ La cédula ya está registrada.", extra_tags="crear alert-error")
 
             else:
-                empleado = Empleado(
-                    nombre_completo=nombre,
-                    email=email,
-                    cedula=cedula,
-                    telefono=telefono or None,
-                    direccion=direccion or None,
-                    fecha_contratacion=fecha,
-                )
-                empleado._usuario_email = request.session.get("usuario_email")  # 👈 para signals
-                empleado.save()
-                messages.success(request, "✅ Empleado creado correctamente.", extra_tags='crear alert-success')
+                # Parsear fecha y bloquear futuras (admite YYYY-MM-DD y dd/mm/YYYY)
+                fecha_dt = None
+                for fmt in ("%Y-%m-%d", "%d/%m/%Y"):
+                    try:
+                        fecha_dt = datetime.strptime(fecha_s, fmt).date()
+                        break
+                    except ValueError:
+                        continue
 
+                if not fecha_dt:
+                    messages.error(request, "⚠️ La fecha de contratación no es válida.", extra_tags="crear alert-error")
+                else:
+                    hoy = timezone.localdate()
+                    if fecha_dt > hoy:
+                        messages.error(request, "⚠️ La fecha de contratación no puede ser futura.", extra_tags="crear alert-error")
+                    else:
+                        Empleado.objects.create(
+                            nombre_completo=nombre,
+                            email=email,
+                            cedula=cedula,
+                            telefono=telefono or None,
+                            direccion=direccion or None,
+                            fecha_contratacion=fecha_dt,
+                            # si usas signals para auditoría, puedes setear en save():
+                            # _usuario_email=request.session.get("usuario_email")
+                        )
+                        messages.success(request, "✅ Empleado creado correctamente.", extra_tags="crear alert-success")
+                        return redirect("empleados")  # evita reenvío y muestra el message
 
         # -------- EDITAR --------
         elif action == "editar":
             empleado_id = request.POST.get("empleado_id")
             empleado = get_object_or_404(Empleado, id_empleado=empleado_id)
 
-            nuevo_nombre = request.POST.get("nombre_completo", "").strip()
-            nuevo_email = request.POST.get("email", "").strip()
-            nueva_cedula = request.POST.get("cedula", "").strip()
-            nuevo_telefono = request.POST.get("telefono", "").strip()
+            nuevo_nombre    = request.POST.get("nombre_completo", "").strip()
+            nuevo_email     = request.POST.get("email", "").strip()
+            nueva_cedula    = request.POST.get("cedula", "").strip()
+            nuevo_telefono  = request.POST.get("telefono", "").strip()
             nueva_direccion = request.POST.get("direccion", "").strip()
-            nueva_fecha = request.POST.get("fecha_contratacion", "").strip()
+            nueva_fecha_s   = request.POST.get("fecha_contratacion", "").strip()
 
+            if not nuevo_nombre or not nuevo_email or not nueva_cedula or not nueva_fecha_s:
+                messages.error(request, "⚠️ Nombre, correo, cédula y fecha son obligatorios.", extra_tags="editar alert-error")
 
-            if not nuevo_nombre or not nuevo_email or not nueva_cedula or not nueva_fecha:
-                messages.error(request, "⚠️ Nombre, correo, cédula y fecha son obligatorios.", extra_tags='editar alert-error')
             elif not re.match(r"[^@]+@[^@]+\.[^@]+", nuevo_email):
-                messages.error(request, "⚠️ El correo no tiene un formato válido.", extra_tags='editar alert-error')
+                messages.error(request, "⚠️ El correo no tiene un formato válido.", extra_tags="editar alert-error")
+
             elif Empleado.objects.filter(email=nuevo_email).exclude(id_empleado=empleado.id_empleado).exists():
-                messages.error(request, "⚠️ Ese correo ya está en uso.", extra_tags='editar alert-error')
+                messages.error(request, "⚠️ Ese correo ya está en uso.", extra_tags="editar alert-error")
+
             elif Empleado.objects.filter(cedula=nueva_cedula).exclude(id_empleado=empleado.id_empleado).exists():
-                messages.error(request, "⚠️ Esa cédula ya está en uso.", extra_tags='editar alert-error')
+                messages.error(request, "⚠️ Esa cédula ya está en uso.", extra_tags="editar alert-error")
+
             else:
-                empleado.nombre_completo = nuevo_nombre
-                empleado.email = nuevo_email
-                empleado.cedula = nueva_cedula
-                empleado.telefono = nuevo_telefono or None
-                empleado.direccion = nueva_direccion or None
-                empleado.fecha_contratacion = nueva_fecha
-                empleado._usuario_email = request.session.get("usuario_email")
-                empleado.save()
+                nueva_fecha_dt = None
+                for fmt in ("%Y-%m-%d", "%d/%m/%Y"):
+                    try:
+                        nueva_fecha_dt = datetime.strptime(nueva_fecha_s, fmt).date()
+                        break
+                    except ValueError:
+                        continue
 
-                messages.success(request, "✏️ Empleado editado correctamente.", extra_tags='editar alert-success')
+                if not nueva_fecha_dt:
+                    messages.error(request, "⚠️ La fecha de contratación no es válida.", extra_tags="editar alert-error")
+                else:
+                    hoy = timezone.localdate()
+                    if nueva_fecha_dt > hoy:
+                        messages.error(request, "⚠️ La fecha de contratación no puede ser futura.", extra_tags="editar alert-error")
+                    else:
+                        empleado.nombre_completo    = nuevo_nombre
+                        empleado.email              = nuevo_email
+                        empleado.cedula             = nueva_cedula
+                        empleado.telefono           = nuevo_telefono or None
+                        empleado.direccion          = nueva_direccion or None
+                        empleado.fecha_contratacion = nueva_fecha_dt
+                        empleado.save()
+                        messages.success(request, "✏️ Empleado editado correctamente.", extra_tags="editar alert-success")
+                        return redirect("empleados")
 
-            # ---------------- CAMBIAR ESTADO (Activo/Inactivo) ----------------
+        # -------- CAMBIAR ESTADO (Activo/Inactivo) --------
         elif action == "cambiar_estado":
             empleado_id = request.POST.get("empleado_id")
             empleado = get_object_or_404(Empleado, id_empleado=empleado_id)
 
-            # Si el form envía 'estado' lo usamos; si no, hacemos toggle
             raw = request.POST.get("estado", request.POST.get("activo"))
             nuevo_estado = _parse_bool(raw, fallback=not empleado.estado)
 
             empleado.estado = nuevo_estado
-            empleado._usuario_email = request.session.get("usuario_email")  # para auditoría (si lo usas igual que clientes)
             empleado.save()
-
             messages.success(
                 request,
                 f"🔁 Estado del empleado actualizado a {'Activo' if nuevo_estado else 'Inactivo'} correctamente",
-                extra_tags='editar alert-success')
-
-            # Redirige siempre para evitar re-envío del form
+                extra_tags="editar alert-success",
+            )
             return redirect("empleados")
 
-
-    return render(request, "empleados/empleados.html", {"empleados": empleados, "page_obj": empleados})
-
-
+    # today => para usar como max en el input date (evita popups y fechas futuras en el front)
+    return render(
+        request,
+        "empleados/empleados.html",
+        {"empleados": empleados, "page_obj": empleados, "today": date.today()},
+    )
 # =========================
 # Horas extras (Admin)
 # =========================

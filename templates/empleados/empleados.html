@@ -1,7 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,94 +9,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    body {
-      background: #f2f3f5;
-      font-family: 'Inter', sans-serif;
-      min-height: 100vh;
-      padding-top: 5rem;
-      color: #1f2937;
-    }
-
-    .card {
-      background: #ffffff;
-      border-radius: 1rem;
-      border: 1px solid #e5e7eb;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-    }
-
-    .alert-error {
-      background-color: rgba(255, 0, 0, 0.15);
-      color: #1e2835;
-      border: 1px solid rgba(255, 0, 0, 0.3);
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 10px;
-      text-align: center;
-      font-size: 14px;
-      font-weight: 500;
-      backdrop-filter: blur(10px);
-    }
-
-    .alert-success {
-      background-color: rgba(0, 128, 0, 0.15);
-      color: #1e2835;
-      border: 1px solid rgba(0, 128, 0, 0.3);
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 10px;
-      text-align: center;
-      font-size: 14px;
-      font-weight: 500;
-      backdrop-filter: blur(10px);
-    }
-
-    .btn {
-      padding: .6rem 1rem;
-      border-radius: .5rem;
-      font-weight: 600;
-      transition: .2s;
-    }
-
-    .btn-primary {
-      background: #2563eb;
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: #099268;
-    }
-
-    .btn-secondary {
-      background: #6b7280;
-      color: white;
-    }
-
-    .btn-secondary:hover {
-      background: #c92a2a;
-    }
-
-    .btn-danger {
-      background: #dc2626;
-      color: white;
-    }
-
-    .btn-danger:hover {
-      background: #b91c1c;
-    }
-
-    .btn-warning {
-      background: #2563eb;
-      color: white;
-    }
-
-    .btn-warning:hover {
-      background: #1e40af;
-    }
+    body { background:#f2f3f5; font-family:'Inter', sans-serif; min-height:100vh; padding-top:5rem; color:#1f2937; }
+    .card { background:#fff; border-radius:1rem; border:1px solid #e5e7eb; box-shadow:0 8px 20px rgba(0,0,0,.06); }
+    .alert-error   { background:rgba(255,0,0,.15);   color:#1e2835; border:1px solid rgba(255,0,0,.3);   border-radius:10px; padding:12px; margin-bottom:10px; text-align:center; font-size:14px; font-weight:500; backdrop-filter:blur(10px); }
+    .alert-success { background:rgba(0,128,0,.15);   color:#1e2835; border:1px solid rgba(0,128,0,.3);   border-radius:10px; padding:12px; margin-bottom:10px; text-align:center; font-size:14px; font-weight:500; backdrop-filter:blur(10px); }
+    .btn { padding:.6rem 1rem; border-radius:.5rem; font-weight:600; transition:.2s; }
+    .btn-primary{ background:#2563eb; color:#fff; } .btn-primary:hover{ background:#1e40af; }
+    .btn-secondary{ background:#6b7280; color:#fff; } .btn-secondary:hover{ background:#4b5563; }
+    .btn-danger{ background:#dc2626; color:#fff; } .btn-danger:hover{ background:#b91c1c; }
+    .btn-warning{ background:#2563eb; color:#fff; } .btn-warning:hover{ background:#1e40af; }
   </style>
 
   {% include "includes/navbar.html" %}
 </head>
-
 <body>
   <div class="max-w-6xl mx-auto px-4">
 
@@ -106,11 +30,11 @@
       <h2 class="text-3xl font-bold mb-6 text-center">Registrar Empleado</h2>
 
       {% if messages %}
-      {% for message in messages %}
-      {% if "crear" in message.tags %}
-      <div class="{{ message.tags }}">{{ message }}</div>
-      {% endif %}
-      {% endfor %}
+        {% for message in messages %}
+          {% if "crear" in message.tags %}
+            <div class="{{ message.tags }}">{{ message }}</div>
+          {% endif %}
+        {% endfor %}
       {% endif %}
 
       <form method="POST" class="space-y-4">
@@ -119,8 +43,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input name="nombre_completo" placeholder="Nombre completo" class="p-3 border border-gray-300 rounded-lg" />
-          <input name="email" type="email" placeholder="Correo electrónico"
-            class="p-3 border border-gray-300 rounded-lg" />
+          <input name="email" type="email" placeholder="Correo electrónico" class="p-3 border border-gray-300 rounded-lg" />
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -132,24 +55,26 @@
 
         <div>
           <label class="text-sm text-gray-700">Fecha de contratación</label>
-          <input type="date" name="fecha_contratacion" class="mt-1 p-3 border border-gray-300 rounded-lg w-full" />
+          <!-- max bloquea futuras; también se valida en backend -->
+          <input id="fecha_contratacion" type="date" name="fecha_contratacion"
+                 max="{{ today|date:'Y-m-d' }}"
+                 class="mt-1 p-3 border border-gray-300 rounded-lg w-full" />
         </div>
 
-        <button class="btn btn-primary bg-green-500 w-full">Registrar</button>
+        <button class="btn btn-primary w-full">Registrar</button>
       </form>
     </div>
-
 
     <!-- TABLA -->
     <div class="card p-8">
       <h2 class="text-3xl font-bold mb-6 text-center">Lista de empleados</h2>
 
       {% if messages %}
-      {% for message in messages %}
-      {% if "editar" in message.tags %}
-      <div class="{{ message.tags }}">{{ message }}</div>
-      {% endif %}
-      {% endfor %}
+        {% for message in messages %}
+          {% if "editar" in message.tags %}
+            <div class="{{ message.tags }}">{{ message }}</div>
+          {% endif %}
+        {% endfor %}
       {% endif %}
 
       <div class="overflow-x-auto">
@@ -175,17 +100,19 @@
 
               <td class="p-3 text-center">
                 {% if empleado.estado %}
-                <span class="bg-green-100 text-green-700 px-3 py-1 rounded text-xs font-semibold">Activo</span>
+                  <span class="bg-green-100 text-green-700 px-3 py-1 rounded text-xs font-semibold">Activo</span>
                 {% else %}
-                <span class="bg-red-100 text-red-700 px-3 py-1 rounded text-xs font-semibold">Inactivo</span>
+                  <span class="bg-red-100 text-red-700 px-3 py-1 rounded text-xs font-semibold">Inactivo</span>
                 {% endif %}
               </td>
 
               <td class="p-3">
                 <div class="flex justify-center gap-2 flex-wrap">
-
-                  <button onclick="abrirModalDesdeDataset(this)" data-id="{{ empleado.id_empleado }}"
-                    data-nombre="{{ empleado.nombre_completo|escapejs }}" data-email="{{ empleado.email|escapejs }}"
+                  <button
+                    onclick="abrirModalDesdeDataset(this)"
+                    data-id="{{ empleado.id_empleado }}"
+                    data-nombre="{{ empleado.nombre_completo|escapejs }}"
+                    data-email="{{ empleado.email|escapejs }}"
                     data-cedula="{{ empleado.cedula|escapejs }}"
                     data-telefono="{{ empleado.telefono|default_if_none:''|escapejs }}"
                     data-direccion="{{ empleado.direccion|default_if_none:''|escapejs }}"
@@ -196,15 +123,12 @@
                     {% csrf_token %}
                     <input type="hidden" name="action" value="cambiar_estado">
                     <input type="hidden" name="empleado_id" value="{{ empleado.id_empleado }}">
-
-                    <button class="btn btn-secondary text-xs 
-           {% if empleado.estado %} bg-red-500 {% else %} bg-green-500 {% endif %}">
+                    <button class="btn btn-secondary text-xs {% if empleado.estado %} bg-red-500 {% else %} bg-green-500 {% endif %}">
                       {% if empleado.estado %} Inactivar {% else %} Activar {% endif %}
                     </button>
                   </form>
 
-                  <a href="{% url 'auditoria_empleado' empleado.id_empleado %}"
-                    class="btn btn-warning bg-blue-500 text-xs">Auditoría</a>
+                  <a href="{% url 'auditoria_empleado' empleado.id_empleado %}" class="btn btn-warning bg-blue-500 text-xs">Auditoría</a>
                 </div>
               </td>
             </tr>
@@ -221,36 +145,27 @@
     <!-- PAGINACIÓN -->
     <div class="flex justify-center mt-6 mb-6">
       <nav class="flex items-center space-x-1">
-
         {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}"
-          class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">
-          « Anterior
-        </a>
+          <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">« Anterior</a>
         {% else %}
-        <span class="px-3 py-1 bg-gray-300 text-gray-500 rounded cursor-not-allowed">« Anterior</span>
+          <span class="px-3 py-1 bg-gray-300 text-gray-500 rounded cursor-not-allowed">« Anterior</span>
         {% endif %}
 
         {% for num in page_obj.paginator.page_range %}
-        {% if num == page_obj.number %}
-        <span class="px-3 py-1 bg-gray-200 text-gray-900 border border-gray-400 rounded">{{ num }}</span>
-        {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %} <a href="?page={{ num }}"
-          class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">{{ num }}</a>
+          {% if num == page_obj.number %}
+            <span class="px-3 py-1 bg-gray-200 text-gray-900 border border-gray-400 rounded">{{ num }}</span>
+          {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+            <a href="?page={{ num }}" class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">{{ num }}</a>
           {% endif %}
-          {% endfor %}
+        {% endfor %}
 
-          {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.next_page_number }}"
-            class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">
-            Siguiente »
-          </a>
-          {% else %}
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">Siguiente »</a>
+        {% else %}
           <span class="px-3 py-1 bg-gray-300 text-gray-500 rounded cursor-not-allowed">Siguiente »</span>
-          {% endif %}
-
+        {% endif %}
       </nav>
     </div>
-
 
     <!-- MODAL EDITAR -->
     <div id="modal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center p-4">
@@ -263,12 +178,13 @@
           <input type="hidden" name="empleado_id" id="id_empleado">
 
           <input id="edit_nombre" name="nombre_completo" class="w-full p-3 border border-gray-300 rounded-lg" />
-          <input id="edit_email" name="email" type="email" class="w-full p-3 border border-gray-300 rounded-lg" />
-          <input id="edit_cedula" name="cedula" class="w-full p-3 border border-gray-300 rounded-lg" />
+          <input id="edit_email"  name="email" type="email" class="w-full p-3 border border-gray-300 rounded-lg" />
+          <input id="edit_cedula"  name="cedula" class="w-full p-3 border border-gray-300 rounded-lg" />
           <input id="edit_telefono" name="telefono" class="w-full p-3 border border-gray-300 rounded-lg" />
           <input id="edit_direccion" name="direccion" class="w-full p-3 border border-gray-300 rounded-lg" />
           <input id="edit_fecha" name="fecha_contratacion" type="date"
-            class="w-full p-3 border border-gray-300 rounded-lg" />
+                 max="{{ today|date:'Y-m-d' }}"
+                 class="w-full p-3 border border-gray-300 rounded-lg" />
 
           <div class="flex justify-end gap-3 pt-3">
             <button type="button" onclick="cerrarModal()" class="btn btn-secondary">Cancelar</button>
@@ -280,10 +196,26 @@
   </div>
 
   <script>
+    // 1) Garantiza 'max' hoy y quita posibles listeners antiguos que disparaban alert()
+    (function () {
+      const today = "{{ today|date:'Y-m-d' }}";
+
+      function resetDateInput(id) {
+        const old = document.getElementById(id);
+        if (!old) return;
+        const clone = old.cloneNode(true);   // elimina listeners antiguos (si los hubiera)
+        old.replaceWith(clone);
+        clone.setAttribute('max', today);
+      }
+
+      resetDateInput('fecha_contratacion');
+      resetDateInput('edit_fecha');
+    })();
+
+    // Modal
     function abrirModalDesdeDataset(btn) {
       document.getElementById('modal').classList.remove('hidden');
       document.getElementById('modal').classList.add('flex');
-
       document.getElementById('id_empleado').value = btn.dataset.id;
       document.getElementById('edit_nombre').value = btn.dataset.nombre;
       document.getElementById('edit_email').value = btn.dataset.email;
@@ -292,14 +224,11 @@
       document.getElementById('edit_direccion').value = btn.dataset.direccion;
       document.getElementById('edit_fecha').value = btn.dataset.fecha;
     }
-
     function cerrarModal() {
       const modal = document.getElementById('modal');
       modal.classList.add('hidden');
       modal.classList.remove('flex');
     }
   </script>
-
 </body>
-
 </html>

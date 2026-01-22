@@ -117,7 +117,7 @@ else:
             'NAME': 'SESSIS',
             'USER': '',
             'PASSWORD': '',
-            'HOST': '',
+            'HOST': 'AKILES08CR\\SQLEXPRESS',
             'PORT': '',
             'OPTIONS': {
                 'driver': 'ODBC Driver 17 for SQL Server',
