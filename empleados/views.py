@@ -94,7 +94,7 @@ def empleados_view(request):
                     if fecha_dt > hoy:
                         messages.error(request, "⚠️ La fecha de contratación no puede ser futura.", extra_tags="crear alert-error")
                     else:
-                        empleado= Empleado.objects.create(
+                        empleado = Empleado.objects.create(
                             nombre_completo=nombre,
                             email=email,
                             cedula=cedula,
@@ -102,10 +102,11 @@ def empleados_view(request):
                             direccion=direccion or None,
                             fecha_contratacion=fecha_dt,
                         )
+                        # Correo del ejecutor para auditoría
                         empleado._usuario_email=request.session.get("usuario_email")
                         empleado.save()
                         messages.success(request, "✅ Empleado creado correctamente.", extra_tags="crear alert-success")
-                        return redirect("empleados")  # evita reenvío y muestra el message
+                        return redirect("empleados")
 
         # -------- EDITAR --------
         elif action == "editar":
