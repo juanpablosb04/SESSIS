@@ -101,9 +101,9 @@ def empleados_view(request):
                             telefono=telefono or None,
                             direccion=direccion or None,
                             fecha_contratacion=fecha_dt,
-                            # si usas signals para auditoría, puedes setear en save():
-                            # _usuario_email=request.session.get("usuario_email")
                         )
+                        empleado._usuario_email=request.session.get("usuario_email")
+                        empleado.save()
                         messages.success(request, "✅ Empleado creado correctamente.", extra_tags="crear alert-success")
                         return redirect("empleados")  # evita reenvío y muestra el message
 
@@ -153,6 +153,8 @@ def empleados_view(request):
                         empleado.telefono           = nuevo_telefono or None
                         empleado.direccion          = nueva_direccion or None
                         empleado.fecha_contratacion = nueva_fecha_dt
+                        
+                        empleado._usuario_email=request.session.get("usuario_email")
                         empleado.save()
                         messages.success(request, "✏️ Empleado editado correctamente.", extra_tags="editar alert-success")
                         return redirect("empleados")
@@ -337,6 +339,9 @@ def ver_asistencia_Empleados(request):
 # =========================
 @role_required(["Administrador"])
 def auditoria_empleado(request, empleado_id):
+    if not request.session.get("usuario_id"):
+        return redirect("login")
+    
     empleado = get_object_or_404(Empleado, id_empleado=empleado_id)
     auditoria = EmpleadosAuditoria.objects.filter(empleado=empleado).order_by("-fecha")
 
@@ -347,9 +352,9 @@ def auditoria_empleado(request, empleado_id):
     return render(
         request,
         "empleados/auditoria_empleado.html",
-        {"empleado": empleado, "auditoria": auditoria, "page_obj": page_obj},
+        {"empleado": empleado,
+          "page_obj": page_obj},
     )
-
 
 @role_required(["Administrador"])
 def auditoria_horas_extras_por_empleado(request, empleado_id):
