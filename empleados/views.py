@@ -94,7 +94,7 @@ def empleados_view(request):
                     if fecha_dt > hoy:
                         messages.error(request, "⚠️ La fecha de contratación no puede ser futura.", extra_tags="crear alert-error")
                     else:
-                        Empleado.objects.create(
+                        empleado= Empleado.objects.create(
                             nombre_completo=nombre,
                             email=email,
                             cedula=cedula,
