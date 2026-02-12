@@ -109,22 +109,7 @@ if USE_RAILWAY:
         }
     }
 
-else:
-    # 🔹 Local (SQL Server)
-    DATABASES = {
-        'default': {
-            'ENGINE': 'mssql',
-            'NAME': 'SESSIS',
-            'USER': '',
-            'PASSWORD': '',
-            'HOST': 'AKILES08CR\\SQLEXPRESS',
-            'PORT': '',
-            'OPTIONS': {
-                'driver': 'ODBC Driver 17 for SQL Server',
-                'trusted_connection': 'yes',
-            },
-        }
-    }
+
 
 # Para Stwart : AKILES08CR\SQLEXPRESS
 
