@@ -100,9 +100,9 @@ if USE_RAILWAY:
             'ENGINE': 'django.db.backends.mysql',
             'NAME': os.getenv("MYSQLDATABASE", "railway"),
             'USER': os.getenv("MYSQLUSER", "root"),
-            'PASSWORD': os.getenv("MYSQLPASSWORD"),
-            'HOST': os.getenv("MYSQLHOST"),  # mysql.railway.internal
-            'PORT': os.getenv("MYSQLPORT", "3306"),
+            'PASSWORD': os.getenv("MYSQLPASSWORD", "pREUIdiXEmFmLcHShTLTrgsnTxUSQVBY"),
+            'HOST': os.getenv("RAILWAY_TCP_PROXY_DOMAIN", "centerbeam.proxy.rlwy.net"),
+            'PORT': os.getenv("RAILWAY_TCP_PROXY_PORT", "14480"),
             'OPTIONS': {
                 'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             },
