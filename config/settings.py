@@ -95,20 +95,20 @@ WSGI_APPLICATION = 'config.wsgi.application'
 USE_RAILWAY = os.getenv("RAILWAY_ENVIRONMENT")
 
 if USE_RAILWAY:
-    # ✅ Usando la DB pública para pruebas desde el contenedor de Railway
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': os.getenv("MYSQLDATABASE", "railway"),
             'USER': os.getenv("MYSQLUSER", "root"),
-            'PASSWORD': os.getenv("MYSQLPASSWORD", "dOkJsdkFBGaAbAZJmUlFhGRgxRViZoPd"),
-            'HOST': os.getenv("RAILWAY_TCP_PROXY_DOMAIN", "nozomi.proxy.rlwy.net"),
-            'PORT': os.getenv("RAILWAY_TCP_PROXY_PORT", "18088"),
+            'PASSWORD': os.getenv("MYSQLPASSWORD"),
+            'HOST': os.getenv("MYSQLHOST"),  # mysql.railway.internal
+            'PORT': os.getenv("MYSQLPORT", "3306"),
             'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",  # ayuda a evitar errores de integridad
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             },
         }
     }
+
 else:
     # 🔹 Local (SQL Server)
     DATABASES = {
