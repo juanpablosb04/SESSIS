@@ -94,20 +94,19 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Detecta si estamos en Railway
 USE_RAILWAY = os.getenv("RAILWAY_ENVIRONMENT")
 
-if USE_RAILWAY:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.getenv("MYSQLDATABASE", "railway"),
-            'USER': os.getenv("MYSQLUSER", "root"),
-            'PASSWORD': os.getenv("MYSQLPASSWORD"),
-            'HOST': os.getenv("MYSQLHOST"),  # mysql.railway.internal
-            'PORT': os.getenv("MYSQLPORT", "3306"),
-            'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            },
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv("MYSQLDATABASE", "railway"),
+        'USER': os.getenv("MYSQLUSER", "root"),
+        'PASSWORD': os.getenv("MYSQLPASSWORD"),
+        'HOST': os.getenv("MYSQLHOST", "mysql.railway.internal"),
+        'PORT': os.getenv("MYSQLPORT", "3306"),
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
+}
 
 
 
