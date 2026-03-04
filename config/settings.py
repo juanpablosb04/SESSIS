@@ -94,7 +94,10 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Detecta si estamos en Railway
 USE_RAILWAY = os.getenv("RAILWAY_ENVIRONMENT")
 
+USE_RAILWAY = os.getenv("RAILWAY_ENVIRONMENT")
+
 if USE_RAILWAY:
+    # Base de datos Railway
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -110,14 +113,14 @@ if USE_RAILWAY:
     }
 
 else:
-    # 🔹 Local (SQL Server)
+    # Base de datos LOCAL (la que estás usando ahora)
     DATABASES = {
         'default': {
             'ENGINE': 'mssql',
             'NAME': 'SESSIS',
             'USER': '',
             'PASSWORD': '',
-            'HOST': 'AKILES08CR\\SQLEXPRESS',
+            'HOST': '',
             'PORT': '',
             'OPTIONS': {
                 'driver': 'ODBC Driver 17 for SQL Server',
@@ -125,6 +128,7 @@ else:
             },
         }
     }
+    
 
 # Para Stwart : AKILES08CR\SQLEXPRESS
 
@@ -207,7 +211,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # ======================
 # Configuración de correo
 # ======================
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True

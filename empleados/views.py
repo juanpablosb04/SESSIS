@@ -429,14 +429,13 @@ def consultar_horas_extras_oficial(request):
         ultimo = registros_qs.first()
         ultima_actualizacion = ultimo.fecha if ultimo else timezone.now().date()
 
-    return render(
+        return render(
         request,
         "empleados/consultarHorasExtras.html",
         {
             "empleado": empleado,
-            "page_obj": page_obj,               # <- se usa en el HTML
-            "registros": page_obj.object_list,  # <- solo los de la página actual
+            "page_obj": page_obj,
             "total_horas": total_horas_aprobadas,
             "ultima_actualizacion": ultima_actualizacion,
         },
-    )
+)
