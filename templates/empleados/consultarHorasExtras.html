@@ -1,0 +1,166 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mis Horas Extras</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      background: #f2f3f5;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding-top: 5rem;
+      color: #1f2937;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 1rem;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
+  </style>
+</head>
+
+<body>
+  {% include "includes/navbar.html" %}
+
+  <div class="max-w-6xl mx-auto px-4 py-8">
+
+    <!-- Título -->
+    <h1 class="text-3xl font-extrabold mb-6 text-center">
+      Mis horas extras
+    </h1>
+
+    <!-- Resumen -->
+    <div class="card p-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-gray-50 rounded-xl px-5 py-4 border border-gray-200">
+          <p class="text-sm text-gray-500">Registros</p>
+          <p class="text-2xl font-bold text-gray-900">{{ page_obj.paginator.count }}</p>
+        </div>
+
+        <div class="bg-gray-50 rounded-xl px-5 py-4 border border-gray-200">
+          <p class="text-sm text-gray-500">Total de horas</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {% if total_horas %}{{ total_horas|floatformat:"-2" }} h{% else %}0 h{% endif %}
+          </p>
+        </div>
+
+        <div class="bg-gray-50 rounded-xl px-5 py-4 border border-gray-200">
+          <p class="text-sm text-gray-500">Última actualización</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {% if ultima_actualizacion %}
+              {{ ultima_actualizacion|date:"d/m/Y" }}
+            {% else %}
+              —
+            {% endif %}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="card p-6">
+      <h2 class="text-2xl font-semibold mb-4 text-center">Detalle de horas</h2>
+
+      <div class="overflow-x-auto">
+        <table class="w-full border border-gray-300 rounded-lg text-sm">
+          <thead class="bg-gray-500 text-white border-b border-gray-300">
+            <tr class="uppercase">
+              <th class="py-3 px-4 text-left">Cédula</th>
+              <th class="py-3 px-4 text-left">Fecha</th>
+              <th class="py-3 px-4 text-left">Horas</th>
+              <th class="py-3 px-4 text-left">Justificación</th>
+              <th class="py-3 px-4 text-left">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in page_obj %}
+              <tr class="border-b border-gray-200">
+                <td class="py-3 px-4">{{ r.empleado.cedula }}</td>
+                <td class="py-3 px-4">{{ r.fecha|date:"d/m/Y" }}</td>
+                <td class="py-3 px-4">{{ r.cantidad_horas|floatformat:"-2" }}</td>
+                <td class="py-3 px-4">{{ r.justificacion|default:"—" }}</td>
+                <td class="py-3 px-4">
+                  {% with e=r.estado|lower %}
+                    {% if e == "aprobado" %}
+                      <span class="inline-flex items-center justify-center w-[95px] px-3 py-[6px] rounded-md bg-green-100 text-green-700 text-xs font-semibold">Aprobado</span>
+                    {% elif e == "rechazado" %}
+                      <span class="inline-flex items-center justify-center w-[95px] px-3 py-[6px] rounded-md bg-red-100 text-red-700 text-xs font-semibold">Rechazado</span>
+                    {% else %}
+                      <span class="inline-flex items-center justify-center w-[95px] px-3 py-[6px] rounded-md bg-yellow-100 text-yellow-700 text-xs font-semibold">Pendiente</span>
+                    {% endif %}
+                  {% endwith %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="5" class="py-6 px-4 text-center text-gray-500">
+                  Aún no tienes horas extras registradas.
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PAGINACIÓN -->
+      {% if page_obj.has_other_pages %}
+      <div class="flex justify-center mt-6 mb-6">
+        <div class="inline-flex space-x-1 text-sm">
+
+          <!-- Anterior -->
+          {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}"
+              class="px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-600">
+              «
+            </a>
+          {% else %}
+            <span class="px-3 py-2 bg-gray-300 text-gray-500 rounded cursor-not-allowed">
+              «
+            </span>
+          {% endif %}
+
+          <!-- Números -->
+          {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}
+              <span class="px-3 py-2 bg-gray-200 text-gray-900 border border-gray-400 rounded">
+                {{ num }}
+              </span>
+            {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+              <a href="?page={{ num }}"
+                class="px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-600">
+                {{ num }}
+              </a>
+            {% endif %}
+          {% endfor %}
+
+          <!-- Siguiente -->
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}"
+              class="px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-600">
+              »
+            </a>
+          {% else %}
+            <span class="px-3 py-2 bg-gray-300 text-gray-500 rounded cursor-not-allowed">
+              »
+            </span>
+          {% endif %}
+
+        </div>
+      </div>
+      {% endif %}
+
+      <p class="mt-4 text-sm text-gray-500 text-center">
+        Vista de solo lectura. Si notas algún error, comunícate con administración.
+      </p>
+    </div>
+  </div>
+</body>
+</html>

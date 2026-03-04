@@ -1,0 +1,214 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ubicaciones Registradas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      background-color: #f2f3f5;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding-top: 5rem;
+    }
+
+    .alert-error {
+      background-color: rgba(255, 0, 0, 0.15);
+      color: #ff2500;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-success {
+      background-color: rgba(0, 128, 0, 0.15);
+      color: #4dff4d;
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+    
+  </style>
+
+  {% include "includes/navbar.html" %}
+
+
+</head>
+
+<body class="text-gray-200">
+
+    <main class="flex flex-col items-center justify-start py-8">
+      <section class="w-full max-w-6xl bg-[#1f2937] backdrop-blur-sm rounded-2xl shadow-lg p-10 border border-gray-700">
+        <h2 class="text-3xl font-bold mb-8 text-white tracking-wide border-b border-gray-600 pb-3 text-center">
+          Ubicaciones Registradas
+        </h2>
+
+        {% if messages %}
+        {% for message in messages %}
+        {% if "editar" in message.tags %}
+        <div class="{{ message.tags }}">{{ message }}</div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+
+        <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {% for ubicacion in ubicaciones %}
+          <div
+            class="group relative bg-gray-700 rounded-xl shadow-xl overflow-hidden cursor-pointer transition-transform duration-300 hover:scale-[1.02]">
+
+            <div class="w-full h-48 bg-gray-600">
+              {% if ubicacion.imagen_url %}
+              <img src="{{ ubicacion.imagen_url }}" alt="Imagen de {{ ubicacion.nombre }}"
+                class="w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-75">
+              {% else %}
+              <div class="w-full h-full flex items-center justify-center text-gray-400 text-lg">
+                Sin imagen
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="p-4">
+                <h3 class="text-xl font-semibold text-white truncate mb-1">{{ ubicacion.nombre }}</h3>
+                <p class="text-gray-400 text-sm truncate">{{ ubicacion.direccion }}</p>
+            </div>
+            
+            <div
+              class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 space-y-3">
+              
+              <button
+                class="w-3/4 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-lg transition transform hover:scale-105"
+                onclick="openEditModal('{{ ubicacion.id_ubicacion }}', '{{ ubicacion.nombre }}', '{{ ubicacion.tipo }}', '{{ ubicacion.direccion }}', '{{ ubicacion.imagen_url }}')">
+                EDITAR
+              </button>
+
+            </div>
+          </div>
+          {% empty %}
+          <div class="lg:col-span-3 col-span-2">
+            <p class="text-gray-400 text-center mt-10">No hay ubicaciones registradas.</p>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- PAGINACIÓN -->
+        <div class="flex justify-center mt-6">
+          <nav class="flex items-center space-x-1 text-sm">
+
+            <!-- PREVIOUS -->
+            {% if ubicaciones.has_previous %}
+              <a href="?page={{ ubicaciones.previous_page_number }}"
+                 class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 border border-gray-300">
+                « Anterior
+              </a>
+            {% else %}
+              <span class="px-3 py-1 bg-gray-100 text-gray-400 rounded border border-gray-200 cursor-not-allowed">
+                « Anterior
+              </span>
+            {% endif %}
+
+            <!-- NÚMEROS -->
+            {% for num in ubicaciones.paginator.page_range %}
+              {% if num == ubicaciones.number %}
+                <span class="px-3 py-1 border border-gray-400 bg-white text-gray-900 rounded">
+                  {{ num }}
+                </span>
+              {% elif num >= ubicaciones.number|add:'-2' and num <= ubicaciones.number|add:'2' %}
+                <a href="?page={{ num }}"
+                   class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 border border-gray-300">
+                  {{ num }}
+                </a>
+              {% endif %}
+            {% endfor %}
+
+            <!-- NEXT -->
+            {% if ubicaciones.has_next %}
+              <a href="?page={{ ubicaciones.next_page_number }}"
+                 class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 border border-gray-300">
+                Siguiente »
+              </a>
+            {% else %}
+              <span class="px-3 py-1 bg-gray-100 text-gray-400 rounded border border-gray-200 cursor-not-allowed">
+                Siguiente »
+              </span>
+            {% endif %}
+
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+        </section>
+    </main>
+
+    <div id="editModal"
+      class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50">
+      <div class="bg-gray-800 rounded-2xl shadow-xl w-full max-w-md p-6 border border-gray-700">
+        <h3 class="text-2xl font-bold text-white mb-5 border-b border-gray-600 pb-2">Editar Ubicación</h3>
+        <form method="POST" id="editForm">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="editar">
+          <input type="hidden" name="ubicacion_id" id="modal_ubicacion_id">
+
+          <label class="block mb-2 text-gray-300">Nombre</label>
+          <input type="text" name="nombre" id="modal_nombre"
+            class="w-full mb-4 p-2 rounded-md bg-gray-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+          <label class="block mb-2 text-gray-300">Tipo</label>
+          <input type="text" name="tipo" id="modal_tipo"
+            class="w-full mb-4 p-2 rounded-md bg-gray-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+          <label class="block mb-2 text-gray-300">Dirección</label>
+          <input type="text" name="direccion" id="modal_direccion"
+            class="w-full mb-4 p-2 rounded-md bg-gray-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+          <label class="block mb-2 text-gray-300">URL Imagen</label>
+          <input type="text" name="imagen_url" id="modal_imagen_url"
+            class="w-full mb-6 p-2 rounded-md bg-gray-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+          <div class="flex justify-end space-x-3">
+            <button type="button"
+              class="bg-gray-600 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded-lg transition"
+              onclick="closeEditModal()">Cancelar</button>
+            <button type="submit"
+              class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+    
+
+
+  <script>
+    function openEditModal(id, nombre, tipo, direccion, imagen_url) {
+      document.getElementById('modal_ubicacion_id').value = id;
+      document.getElementById('modal_nombre').value = nombre;
+      document.getElementById('modal_tipo').value = tipo;
+      document.getElementById('modal_direccion').value = direccion;
+      document.getElementById('modal_imagen_url').value = imagen_url;
+      document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.add('hidden');
+    }
+  </script>
+</body>
+
+</html>

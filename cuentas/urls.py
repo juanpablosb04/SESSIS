@@ -6,4 +6,5 @@ urlpatterns = [
     path('inicio/', views.inicio, name='inicio'),
     path('logout/', views.user_logout, name='logout'),
     path('recuperar/', views.recuperar_password, name='recuperar'),
+    path("actualizar-contrasena/", views.cambiarContrasena, name="cambiar_contrasena"),
 ]

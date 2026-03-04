@@ -1,0 +1,266 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consultar Citas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      /* Estilo de empleados.html */
+      background: #f2f3f5;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding-top: 5rem;
+      color: #1f2937;
+    }
+
+    /* Estilo de la card de empleados.html */
+    .card {
+      background: #ffffff;
+      border-radius: 1rem;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Estilos de Alertas de empleados.html */
+    .alert-error {
+      background-color: rgba(255, 0, 0, 0.15);
+      color: #ff4d4d;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-success {
+      background-color: rgba(0, 128, 0, 0.15);
+      color: #4dff4d;
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    /* Estilos de Botones de empleados.html */
+    .btn {
+      padding: .6rem 1rem;
+      border-radius: .5rem;
+      font-weight: 600;
+      transition: .2s;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #099268;
+    }
+
+    .btn-secondary {
+      background: #6b7280;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #c92a2a;
+    }
+
+    .btn-danger {
+      background: #dc2626;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #b91c1c;
+    }
+
+    .btn-warning {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #1e40af;
+    }
+  </style>
+
+  {% include "includes/navbar.html" %}
+</head>
+
+<body>
+  <div class="max-w-6xl mx-auto px-4">
+
+    <div class="card p-8">
+      <h2 class="text-3xl font-bold mb-6 text-center">Lista de Citas</h2>
+
+      {% if messages %}
+            {% for message in messages %}
+                  <div class="{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+
+      <div class="overflow-x-auto">
+        <table class="w-full border border-gray-300 rounded-lg text-sm text-left">
+          <thead class="bg-gray-500 text-white border-b border-gray-300">
+            <tr class="uppercase">
+              <th class="p-3">Cédula</th>
+              <th class="p-3">Nombre</th>
+              <th class="p-3">Correo</th>
+              <th class="p-3">Teléfono</th>
+              <th class="p-3">Fecha</th>
+              <th class="p-3">Hora inicio</th>
+              <th class="p-3">Hora finalización</th>
+              <th class="p-3">Motivo</th>
+              <th class="p-3">Descripción</th>
+              <th class="p-3 text-center">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for cita in citas %}
+            <tr class="border-b border-gray-200 hover:bg-gray-50" data-id="{{ cita.id_cita }}">
+              <td class="p-3">{{ cita.cliente.cedula }}</td>
+              <td class="p-3 cliente" data-id="{{ cita.cliente.id_cliente }}">{{ cita.cliente.nombre_completo}}</td>
+              <td class="p-3">{{ cita.cliente.email }}</td>
+              <td class="p-3">{{ cita.cliente.telefono }}</td>
+              <td class="p-3 fecha">{{ cita.fecha_cita|date:"Y-m-d" }}</td>
+              <td class="p-3 hora_inicio">{{ cita.hora_inicio }}</td>
+              <td class="p-3 hora_finalizacion">{{ cita.hora_finalizacion }}</td>
+              <td class="p-3 motivo">{{ cita.motivo }}</td>
+              <td class="p-3 descripcion">{{ cita.descripcion }}</td>
+              <td class="p-3 text-center">
+                <button onclick="abrirModal('{{ cita.id_cita }}')" class="btn bg-yellow-500 text-white p-2">
+                  <i class="fas fa-edit"></i> Editar
+                </button>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="10" class="p-4 text-center text-gray-500">No hay citas registradas</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+
+        </table>
+      </div>
+    </div>
+
+
+    <div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center p-4">
+      <div class="card p-6 w-full max-w-lg">
+
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-2xl font-bold">Editar Cita</h3>
+          <button type="button" onclick="cerrarModal()"
+            class="text-gray-700 hover:text-gray-900 text-2xl">&times;</button>
+        </div>
+
+        <form id="formEditar" method="POST" action="{% url 'citas:consultarCitas' %}" class="space-y-3">
+          {% csrf_token %}
+          <input type="hidden" id="edit_id" name="cita_id">
+          <input type="hidden" name="action" value="editar">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-gray-700">Cliente</label>
+              <select id="edit_cliente" name="id_cliente" class="w-full mt-1 p-3 border border-gray-300 rounded-lg"
+                required>
+                {% for cliente in clientes %}
+                <option value="{{ cliente.id_cliente }}">{{ cliente.nombre_completo }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm text-gray-700">Fecha</label>
+              <input type="date" id="edit_fecha" name="fecha_cita"
+                class="w-full mt-1 p-3 border border-gray-300 rounded-lg" required>
+            </div>
+
+            <div>
+              <label class="block text-sm text-gray-700">Hora Inicio</label>
+              <input type="time" id="edit_hora_inicio" name="hora_inicio"
+                class="w-full mt-1 p-3 border border-gray-300 rounded-lg">
+            </div>
+
+            <div>
+              <label class="block text-sm text-gray-700">Hora Finalización</label>
+              <input type="time" id="edit_hora_finalizacion" name="hora_finalizacion"
+                class="w-full mt-1 p-3 border border-gray-300 rounded-lg">
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-sm text-gray-700">Motivo</label>
+              <input type="text" id="edit_motivo" name="motivo"
+                class="w-full mt-1 p-3 border border-gray-300 rounded-lg" required>
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-sm text-gray-700">Descripción</label>
+              <textarea id="edit_descripcion" name="descripcion"
+                class="w-full mt-1 p-3 border border-gray-300 rounded-lg" required></textarea>
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-3 pt-3">
+            <button type="button" onclick="cerrarModal()" class="btn btn-secondary">Cancelar</button>
+            <button type="submit" class="btn btn-primary bg-green-500">Guardar Cambios</button>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function abrirModal(citaId) {
+      const fila = document.querySelector(`tr[data-id="${citaId}"]`);
+      const cliente = fila.querySelector('.cliente').dataset.id;
+      const fecha = fila.querySelector('.fecha').textContent.trim();
+      const inicio = fila.querySelector('.hora_inicio').textContent.trim();
+      const fin = fila.querySelector('.hora_finalizacion').textContent.trim();
+      const motivo = fila.querySelector('.motivo').textContent.trim();
+      const descripcion = fila.querySelector('.descripcion').textContent.trim();
+
+      document.getElementById('edit_id').value = citaId;
+      document.getElementById('edit_cliente').value = cliente;
+      document.getElementById('edit_fecha').value = fecha;
+      document.getElementById('edit_hora_inicio').value = inicio;
+      document.getElementById('edit_hora_finalizacion').value = fin;
+      document.getElementById('edit_motivo').value = motivo;
+      document.getElementById('edit_descripcion').value = descripcion;
+
+      // Usar 'flex' para mostrar el modal, como en empleados.html
+      document.getElementById('modalEditar').classList.remove('hidden');
+      document.getElementById('modalEditar').classList.add('flex');
+    }
+
+    function cerrarModal() {
+      // Usar 'hidden' para ocultar el modal, como en empleados.html
+      const modal = document.getElementById('modalEditar');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  </script>
+
+</body>
+
+</html>

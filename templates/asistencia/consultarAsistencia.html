@@ -1,0 +1,229 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ver Asistencia</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fuente Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      background: #f2f3f5;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      color: #1f2937;
+      padding-top: 4.5rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 1rem;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .alert-error {
+      background-color: rgba(255, 0, 0, 0.15);
+      color: #1e2835;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .alert-success {
+      background-color: rgba(0, 128, 0, 0.15);
+      color: #1e2835;
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .btn {
+      padding: .45rem .9rem;
+      border-radius: .5rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: .2s;
+      white-space: nowrap;
+    }
+
+    .btn-danger {
+      background: #dc2626;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #b91c1c;
+    }
+
+    .btn-warning {
+      background: #eab308;
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #ca8a04;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1e40af;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  {% include "includes/navbar.html" %}
+
+  <div class="max-w-6xl mx-auto px-4 py-10">
+
+    {% if messages %}
+    {% for message in messages %}
+    {% if "editar" in message.tags %}
+    <div class="{{ message.tags }}">{{ message }}</div>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+
+    <!-- CARD PRINCIPAL -->
+    <div class="card p-8">
+      <h2 class="text-3xl font-bold mb-6 text-center">Ver Asistencia</h2>
+
+      <div class="overflow-x-auto">
+        <table class="w-full border border-gray-300 rounded-lg text-sm">
+          <thead class="bg-gray-500 text-white border-b border-gray-300">
+            <tr class="uppercase">
+              <th class="p-3">Fecha</th>
+              <th class="p-3">Nombre</th>
+              <th class="p-3">Hora</th>
+              <th class="p-3">Ubicación</th>
+              <th class="p-3">Observaciones</th>
+              <th class="p-3 text-center">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for a in asistencias %}
+            <tr class="border-b border-gray-200">
+
+              <td class="p-3">{{ a.turno_ingreso|date:"d-m-Y" }}</td>
+
+              <td class="p-3">{{ a.id_empleado.nombre_completo }}</td>
+
+              <td class="p-3">
+                {{ a.turno_ingreso|date:"H:i" }} -
+                {% if a.turno_salida %}
+                {{ a.turno_salida|date:"H:i" }}
+                {% else %}
+                --:--
+                {% endif %}
+              </td>
+
+              <td class="p-3">{{ a.id_ubicacion.nombre }}</td>
+
+              <td class="p-3">{{ a.observaciones|default:"—" }}</td>
+
+              <td class="p-3 min-w-[250px]">
+                <div class="flex flex-nowrap justify-center gap-2">
+
+                  <!-- Botón salida -->
+                  <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="id_asistencia" value="{{ a.id_asistencia }}">
+                    <input type="hidden" name="accion" value="salida">
+                    <button type="submit" class="btn btn-danger">Salida</button>
+                  </form>
+
+                  <!-- Botón editar -->
+                  <button type="button"
+                    onclick="abrirModalEditar('{{ a.id_asistencia }}', '{{ a.observaciones|escapejs }}')"
+                    class="btn btn-warning">
+                    Editar
+                  </button>
+
+                </div>
+              </td>
+            </tr>
+
+            {% empty %}
+            <tr>
+              <td colspan="6" class="p-4 text-center text-gray-500">No hay registros</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="modalEditar" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+      <div class="bg-white text-gray-800 rounded-lg shadow-lg w-96 p-6">
+        <h2 class="text-xl font-bold mb-4">Editar Observaciones</h2>
+        <form id="formEditar" method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="id_asistencia" id="modal_id_asistencia">
+          <input type="hidden" name="accion" value="editar">
+          <textarea name="observaciones" id="modal_observaciones" rows="4"
+            class="w-full border border-gray-300 rounded p-2"></textarea>
+
+          <div class="flex justify-end gap-2 mt-4">
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <button type="button" onclick="cerrarModalEditar()" class="btn btn-danger">Cerrar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+    <!-- Modal de Salida -->
+    <div id="modalSalida" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+      <div class="bg-white text-gray-800 rounded-lg p-6 text-center max-w-sm">
+        <p id="mensajeSalida" class="text-lg font-semibold text-gray-800"></p>
+        <button onclick="cerrarModalSalida()" class="btn btn-primary mt-4">
+          Cerrar
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function abrirModalEditar(id, observaciones) {
+      document.getElementById('modal_id_asistencia').value = id;
+      document.getElementById('modal_observaciones').value = observaciones;
+      document.getElementById('modalEditar').classList.remove('hidden');
+    }
+
+    function cerrarModalEditar() {
+      document.getElementById('modalEditar').classList.add('hidden');
+    }
+
+    function cerrarModalSalida() {
+      document.getElementById('modalSalida').classList.add('hidden');
+    }
+  </script>
+
+</body>
+
+</html>

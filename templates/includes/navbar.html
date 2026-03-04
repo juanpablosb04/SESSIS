@@ -1,47 +1,119 @@
-<link rel="stylesheet" href="/static/navbar.css">
 
-<div class="navbar">
-  <div class="logo"><a href="{% url 'inicio' %}">SES</a></div>
-  <ul class="links">
+<style>
+  .dropdown-menu {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-5px);
+            transition: all 0.2s ease-in-out;
+        }
 
-    {% if request.session.usuario_rol == "Administrador" %}
-      <!-- Opciones para Administrador -->
-      <li class="dropdown">
-        <a href="#">Empleado</a>
-        <ul class="dropdown-menu">
-          <li><a href="{% url 'empleados' %}">Registrar y consultar Empleados</a></li>
-          <li><a href="">Registrar Horas Extras</a></li>
-          <li><a href="">Asistencia de empleados</a></li>
+        .dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        body {
+            padding-top: 4rem;
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f9;
+        }
+</style>
+<nav class="fixed top-0 left-0 w-full bg-primary-dark shadow-xl z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        
+        <div class="logo">
+            <a href="{% url 'inicio' %}" class="flex items-center gap-2 text-2xl font-extrabold text-accent-color hover:text-blue-400 transition duration-300">
+                <span class="text-white">SES</span>
+            </a>
+        </div>
+
+        <ul class="links flex items-center space-x-4 md:space-x-6">
+
+
+            <div class="hidden md:flex items-center space-x-4 md:space-x-6">
+                
+                {% if request.session.usuario_rol == "Administrador" %}
+                
+                <!-- Empleado Dropdown (ADMIN) -->
+                <li class="dropdown group relative">
+                    <a href="#" class="text-gray-300 hover:text-accent-color font-medium transition duration-150 ease-in-out px-3 py-2 rounded-md text-sm">
+                        Empleado
+                    </a>
+                    <ul class="dropdown-menu absolute left-0 w-48 bg-gray-800 rounded-lg shadow-xl py-2 z-20">
+                        <li><a href="{% url 'empleados' %}" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white text-sm transition duration-150">Registrar y consultar Empleados</a></li>
+                        <li><a href="{% url 'horasExtras' %}" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white text-sm transition duration-150">Registrar Horas Extras</a></li>
+                        <li><a href="{% url 'verAsistenciaOficiales' %}" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white text-sm transition duration-150">Asistencia de empleados</a></li>
+                    </ul>
+                </li>
+
+                <li><a href="{% url 'clientes' %}" class="text-gray-300 hover:text-accent-color font-medium transition duration-150 ease-in-out px-3 py-2 rounded-md text-sm">Clientes</a></li>
+
+                <!-- Citas Dropdown (ADMIN) -->
+                <li class="dropdown group relative">
+                    <a href="#" class="text-gray-300 hover:text-accent-color font-medium transition duration-150 ease-in-out px-3 py-2 rounded-md text-sm">
+                        Citas
+                    </a>
+                    <ul class="dropdown-menu absolute left-0 w-48 bg-gray-800 rounded-lg shadow-xl py-2 z-20">
+                        <li><a href="{% url 'citas:registrarCitas' %}" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white text-sm transition duration-150">Registrar cita</a></li>
+                        <li><a href="{% url 'citas:consultarCitas' %}" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white text-sm transition duration-150">Ver citas agendadas</a></li>
+                    </ul>
+                </li>
+
+                <li><a href="{% url 'inventario' %}" class="text-gray-300 hover:text-accent-color font-medium transition duration-150 ease-in-out px-3 py-2 rounded-md text-sm">Inventario</a></li>
+
+                <!-- Ubicaciones Dropdown (ADMIN) -->
+                <li class="dropdown group relative">
+                    <a href="#" class="text-gray-300 hover:text-accent-color font-medium transition duration-150 ease-in-out px-3 py-2 rounded-md text-sm">
+                        Ubicaciones
+                    </a>
+                    <ul class="dropdown-menu absolute left-0 w-48 bg-gray-800 rounded-lg shadow-xl py-2 z-20">
+                        <li><a href="{% url 'registroUbicaciones' %}" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white text-sm transition duration-150">Registrar Ubicación</a></li>
+                        <li><a href="{% url 'consultaUbicaciones' %}" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white text-sm transition duration-150">Consultar Ubicaciones</a></li>
+                    </ul>
+                </li>
+
+                <li><a href="{% url 'reportesIncidentesAdmin' %}" class="text-gray-300 hover:text-accent-color font-medium transition duration-150 ease-in-out px-3 py-2 rounded-md text-sm">Reportes</a></li>
+                <li><a href="{% url 'lista_usuarios' %}" class="text-gray-300 hover:text-accent-color font-medium transition duration-150 ease-in-out px-3 py-2 rounded-md text-sm">Usuarios</a></li>
+                
+                {% endif %}
+
+                {% if request.session.usuario_rol == "Oficial" %}
+                <!-- Opciones para Oficial -->
+                <li class="dropdown group relative">
+                    <a href="#" class="text-gray-300 hover:text-accent-color font-medium transition duration-150 ease-in-out px-3 py-2 rounded-md text-sm">
+                        Empleado
+                    </a>
+                    <ul class="dropdown-menu absolute left-0 w-48 bg-gray-800 rounded-lg shadow-xl py-2 z-20">
+                        <li><a href="{% url 'registrarAsistencia' %}" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white text-sm transition duration-150">Registrar hora de entrada</a></li>
+                        <li><a href="{% url 'consultarAsistencia' %}" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white text-sm transition duration-150">Ver las asistencias</a></li> 
+                    </ul>
+                </li>
+                <li><a href="{% url 'reporteIncidentes' %}" class="text-gray-300 hover:text-accent-color font-medium transition duration-150 ease-in-out px-3 py-2 rounded-md text-sm">Reporte Incidentes</a></li>
+                <li><a href="{% url 'consultarHorasExtras' %}" class="text-gray-300 hover:text-accent-color font-medium transition duration-150 ease-in-out px-3 py-2 rounded-md text-sm">Ver mis Horas extras</a></li>
+                {% endif %}
+
+            </div>
+
         </ul>
-      </li>
-      <li><a href="{% url 'clientes' %}">Clientes</a></li>
-      <li class="dropdown">
-        <a href="#">Citas</a>
-        <ul class="dropdown-menu">
-          <li><a href="">Registrar cita</a></li>
-          <li><a href="">Ver citas agendadas</a></li>
-        </ul>
-      </li>
-      <li><a href="">Inventario</a></li>
-      <li><a href="">Reportes</a></li>
-      <li><a href="{% url 'lista_usuarios' %}">Usuarios</a></li>
-    {% endif %}
 
-    {% if request.session.usuario_rol == "Oficial" %}
-      <!-- Opciones para Oficial -->
-      <li class="dropdown">
-        <a href="#">Empleado</a>
-        <ul class="dropdown-menu">
-          <li><a href="">Registrar hora de entrada</a></li>
-          <li><a href="">Ver las asistencias</a></li>
-        </ul>
-      </li>
-      <li><a href="">Reporte Incidentes</a></li>
-      <li><a href="">Ver mis Horas extras</a></li>
-    {% endif %}
+        <a class="px-4 py-2 bg-accent-color text-white font-semibold text-sm rounded-full shadow-lg hover:bg-blue-500 transition duration-300 ease-in-out transform hover:scale-105" 
+           href="{% url 'logout' %}">
+            Cerrar Sesión
+        </a>
+    </div>
+</nav>
 
-  </ul>
 
-  <a class="boton-elegante" href="{% url 'logout' %}">LogOut</a>
-</div>
-
+<script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-dark': '#1f2937',
+                        'accent-color': '#3b82f6',
+                    }
+                }
+            }
+        }
+    </script>
