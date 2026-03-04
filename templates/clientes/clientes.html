@@ -199,7 +199,7 @@
                       data-id="{{ cliente.id_cliente }}"
                       data-nombre="{{ cliente.nombre_completo|escapejs }}"
                       data-email="{{ cliente.email|escapejs }}"
-                      data-cedula="{{ cliente.cedula|escapejs }}"
+                      data-cedula="{{ cliente.cedula|escapejs}}"
                       data-telefono="{{ cliente.telefono|default_if_none:''|escapejs }}"
                       data-ubicacion="{% if cliente.id_ubicacion %}{{ cliente.id_ubicacion.id_ubicacion }}{% endif %}"
                       onclick="abrirModalEditar(

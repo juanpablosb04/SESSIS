@@ -22,6 +22,12 @@ def _parse_bool(value, fallback):
         return False
     return fallback
 
+def cedula_valida(cedula):
+    cedula = cedula.strip()
+    patron = r"^\d{9}$|^\d{12}$"
+    return re.match(patron, cedula)
+
+
 
 @role_required(["Administrador"])
 def clientes_view(request):
@@ -60,7 +66,12 @@ def clientes_view(request):
                 messages.error(request, "⚠️ Nombre, email y cédula son obligatorios", extra_tags='crear alert-error')
             elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
                 messages.error(request, "⚠️ El correo no tiene un formato válido", extra_tags='crear alert-error')
-                messages.error(request, "⚠️ El correo ya está registrado", extra_tags='crear alert-error')
+            elif not cedula_valida(cedula):
+                messages.error(
+                    request,
+                    "⚠️ La cédula debe contener exactamente 9 o 12 dígitos numéricos.",
+                    extra_tags="crear alert-error"
+                )
             elif Clientes.objects.filter(cedula=cedula).exists():
                 messages.error(request, "⚠️ La cédula ya está registrada", extra_tags='crear alert-error')
             else:
@@ -87,15 +98,32 @@ def clientes_view(request):
                 messages.success(request, "✅ Cliente creado correctamente", extra_tags='crear alert-success')
 
         # ---------------- EDITAR ----------------
+        # ---------------- EDITAR ----------------
         elif action == "editar":
             cliente_id = request.POST.get("cliente_id")
             cliente = get_object_or_404(Clientes, id_cliente=cliente_id)
 
-            nuevo_email = request.POST.get("email")
-            nueva_cedula = request.POST.get("cedula")
-            id_ubicacion = request.POST.get("id_ubicacion")
+            nuevo_nombre = request.POST.get("nombre", "").strip()
+            nuevo_email = request.POST.get("email", "").strip()
+            nueva_cedula = request.POST.get("cedula", "").strip()
+            id_ubicacion = request.POST.get("id_ubicacion", "").strip()
 
-            if (
+            if not nuevo_nombre or not nuevo_email or not nueva_cedula or not id_ubicacion:
+                messages.error(
+                    request,
+                    "⚠️ Nombre, correo, cédula y ubicación son obligatorios.",
+                    extra_tags="editar alert-error"
+                )
+                return redirect("clientes")
+            
+            elif not cedula_valida(nueva_cedula):
+                messages.error(
+                    request,
+                    "⚠️ La cédula debe tener exactamente 9 o 12 dígitos.",
+                    extra_tags="editar alert-error"
+                )
+
+            elif (
                 Clientes.objects.filter(email=nuevo_email)
                 .exclude(id_cliente=cliente.id_cliente)
                 .exists()
@@ -119,7 +147,7 @@ def clientes_view(request):
                             "La ubicación seleccionada no existe. Se guardará sin ubicación.", extra_tags='editar alert-error')
                         ubic = None
 
-                cliente.nombre_completo = request.POST.get("nombre")
+                cliente.nombre_completo = nuevo_nombre
                 cliente.email = nuevo_email
                 cliente.cedula = nueva_cedula
                 cliente.telefono = request.POST.get("telefono")

@@ -41,6 +41,10 @@ def _parse_bool(value, fallback=False):
             return False
     return fallback
 
+def cedula_valida(cedula):
+    cedula = cedula.strip()
+    patron = r"^\d{9}$|^\d{12}$"
+    return re.match(patron, cedula)
 
 # =========================
 # Empleados (CRUD básico)
@@ -67,6 +71,13 @@ def empleados_view(request):
 
             if not nombre or not email or not cedula or not fecha_s:
                 messages.error(request, "⚠️ Nombre, correo, cédula y fecha son obligatorios.", extra_tags="crear alert-error")
+
+            elif not cedula_valida(cedula):
+                messages.error(
+                    request,
+                    "⚠️ La cédula debe contener exactamente 9 o 12 dígitos numéricos.",
+                    extra_tags="crear alert-error"
+                )
 
             elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
                 messages.error(request, "⚠️ El correo no tiene un formato válido.", extra_tags="crear alert-error")
@@ -122,6 +133,14 @@ def empleados_view(request):
 
             if not nuevo_nombre or not nuevo_email or not nueva_cedula or not nueva_fecha_s:
                 messages.error(request, "⚠️ Nombre, correo, cédula y fecha son obligatorios.", extra_tags="editar alert-error")
+
+
+            elif not cedula_valida(nueva_cedula):
+                messages.error(
+                    request,
+                    "⚠️ La cédula debe contener exactamente 9 o 12 dígitos numéricos.",
+                    extra_tags="editar alert-error"
+                )
 
             elif not re.match(r"[^@]+@[^@]+\.[^@]+", nuevo_email):
                 messages.error(request, "⚠️ El correo no tiene un formato válido.", extra_tags="editar alert-error")
