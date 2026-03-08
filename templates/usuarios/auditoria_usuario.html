@@ -1,93 +1,202 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Auditoría - {{ usuario.email }}</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    .fondo {
-      background-image: url("{% static 'Img/clientesFondo.png' %}");
-      background-size: cover;
-      background-position: center;
-      min-height: 100vh;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditoría - {{ usuario.email }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Estilos copiados de auditoria_empleado.html */
+        body {
+            background: #f2f3f5;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            padding-top: 5rem;
+            color: #1f2937;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 1rem;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .btn {
+            padding: .6rem 1rem;
+            border-radius: .5rem;
+            font-weight: 600;
+            transition: .2s;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e40af;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        /* Tags de acción (CREAR, MODIFICAR, ELIMINAR) */
+        .tag {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+            color: white;
+        }
+
+        .tag-green {
+            background: #16a34a;
+        }
+
+        .tag-yellow {
+            background: #f59e0b;
+        }
+
+        .tag-red {
+            background: #dc2626;
+        }
+    </style>
 </head>
-<body class="bg-gray-900 text-gray-200 min-h-screen fondo">
 
-  {% include "includes/navbar.html" %}
+<body>
+    {% include "includes/navbar.html" %}
 
-  <div class="p-8 max-w-7xl mx-auto">
-    <h1 class="text-3xl font-bold mb-4">Auditoría del Usuario</h1>
-    <p class="text-gray-300 mb-6">
-      <span class="font-semibold">Usuario:</span> {{ usuario.email }}
-    </p>
+    <div class="max-w-6xl mx-auto px-4">
 
-    <!-- Tabla de auditoría -->
-    <div class="overflow-x-auto bg-gray-800 rounded-lg shadow-md p-6">
-      <h2 class="text-2xl font-semibold mb-4">Historial de Cambios</h2>
-      <table class="w-full text-left border border-gray-700">
-        <thead class="bg-gray-700 text-gray-200">
-          <tr>
-            <th class="p-2">Fecha</th>
-            <th class="p-2">Acción</th>
-            <th class="p-2">Usuario que realizó</th>
-            <th class="p-2">ID Empleado</th>
-            <th class="p-2">Rol</th>
-            <th class="p-2">Email</th>
-            <th class="p-2">Estado</th>
-          </tr>
-        </thead>
-        <tbody class="text-gray-300">
-          {% for registro in auditoria %}
-          <tr class="border-b border-gray-700">
-            <td class="p-2">{{ registro.fecha|date:"d/m/Y H:i" }}</td>
-            <td class="p-2">
-              {% if registro.accion == "CREAR" %}
-                <span class="bg-green-600 px-2 py-1 rounded text-white">CREAR</span>
-              {% elif registro.accion == "EDITAR" %}
-                <span class="bg-yellow-500 px-2 py-1 rounded text-white">MODIFICAR</span>
-              {% elif registro.accion == "ELIMINAR" %}
-                <span class="bg-red-600 px-2 py-1 rounded text-white">ELIMINAR</span>
-              {% else %}
-                {{ registro.accion }}
-              {% endif %}
-            </td>
-            <td class="p-2">
-              {% if registro.usuario_accion %}
-                {{ registro.usuario_accion.email }}
-              {% else %}
-                <span class="italic text-gray-400">Sistema</span>
-              {% endif %}
-            </td>
-            <td class="p-2">
-              {% if registro.id_empleado %}
-                {{ registro.id_empleado }} <!-- Aquí mostramos solo el ID -->
-              {% endif %}
-            </td>
-            <td class="p-2">{{ registro.id_rol }}</td>
-            <td class="p-2">{{ registro.email }}</td>
-            <td class="p-2">{{ registro.estado }}</td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="7" class="p-4 text-center text-gray-400">
-              No hay registros de auditoría para este usuario.
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+        <div class="card p-8 mb-2">
+            <h1 class="text-3xl font-bold mb-4 text-center">Auditoría del Usuario</h1>
+
+            <p class="text-center text-gray-700 text-lg">
+                <span class="font-semibold">Usuario:</span>
+                {{ usuario.email }}
+            </p>
+        </div>
+
+        <div class="card p-2">
+            <h2 class="text-2xl font-semibold mb-6 text-center">Historial de Cambios</h2>
+
+            <div class="overflow-x-auto">
+                <table class="w-full border border-gray-300 rounded-lg text-sm">
+                    <thead class="bg-gray-500 text-white border-b border-gray-300">
+                        <tr class="uppercase">
+                            <th class="p-3 whitespace-nowrap">Fecha</th>
+                            <th class="p-3 whitespace-nowrap">Acción</th>
+                            <th class="p-3 whitespace-nowrap">Usuario que realizó</th>
+                            <th class="p-3 whitespace-nowrap">Rol</th>
+                            <th class="p-3 whitespace-nowrap">Email</th>
+                            <th class="p-3 whitespace-nowrap">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-700">
+                        {% for registro in auditoria %}
+                        <tr class="border-b border-gray-200">
+                            <td class="p-3 whitespace-nowrap">{{ registro.fecha|date:"d/m/Y H:i" }}</td>
+                            
+                            <td class="p-3 whitespace-nowrap">
+                                {% with ac=registro.accion|upper %}
+                                {% if ac == "CREAR" %}
+                                <span class="tag tag-green">CREAR</span>
+                                
+                                {% elif ac == "EDITAR" %}
+                                <span class="tag tag-yellow">MODIFICAR</span>
+                                
+                                {% elif ac == "ELIMINAR" %}
+                                <span class="tag tag-red">ELIMINAR</span>
+                                
+                                {% else %}
+                                <span class="tag bg-gray-600">{{ registro.accion }}</span>
+                                {% endif %}
+                                {% endwith %}
+                            </td>
+                            
+                            <td class="p-3 whitespace-nowrap">{{ registro.empleado }}</td>
+                            <td class="p-3 whitespace-nowrap">{{ registro.nombre_rol }}</td>
+                            <td class="p-3 whitespace-nowrap">{{ registro.email }}</td>
+                            <td class="p-3 whitespace-nowrap">{{ registro.estado }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="p-4 text-center text-gray-500">
+                                No hay registros de auditoría para este usuario.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+        <!-- PAGINACIÓN -->
+    <div class="flex justify-center mt-6 mb-6">
+      <nav class="flex items-center space-x-1 text-sm">
+
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}"
+            class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">
+            « Anterior
+          </a>
+        {% else %}
+          <span class="px-3 py-1 bg-gray-300 text-gray-500 rounded cursor-not-allowed">
+            « Anterior
+          </span>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if num == page_obj.number %}
+            <span class="px-3 py-1 bg-gray-200 text-gray-900 border border-gray-400 rounded">
+              {{ num }}
+            </span>
+
+          {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+            <a href="?page={{ num }}"
+              class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">
+              {{ num }}
+            </a>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}"
+            class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">
+            Siguiente »
+          </a>
+        {% else %}
+          <span class="px-3 py-1 bg-gray-300 text-gray-500 rounded cursor-not-allowed">
+            Siguiente »
+          </span>
+        {% endif %}
+
+      </nav>
     </div>
 
-    <div class="mt-6">
-      <a href="{% url 'lista_usuarios' %}" 
-         class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-        ⬅ Volver a Usuarios
-      </a>
+      </div>
+
+      
+        </div>
+
+        <div class="mt-6 flex justify-center">
+            <a href="{% url 'lista_usuarios' %}" class="btn btn-primary">
+                ⬅ Volver a Usuarios
+            </a>
+        </div>
     </div>
-  </div>
 </body>
+
 </html>
