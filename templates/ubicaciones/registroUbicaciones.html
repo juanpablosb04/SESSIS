@@ -135,11 +135,16 @@
             class="w-full mt-1 p-3 border border-gray-300 rounded-lg" type="text" required />
         </div>
 
-        <!-- Imagen URL -->
+        <!-- URL de imagen -->
         <div>
           <label class="text-sm text-gray-700">URL de la imagen (opcional)</label>
-          <input name="imagen_url" placeholder="URL de la imagen"
-            class="w-full mt-1 p-3 border border-gray-300 rounded-lg" type="url" />
+          <input 
+            name="imagen_url"
+            placeholder="https://ejemplo.com/imagen.jpg"
+            class="w-full mt-1 p-3 border border-gray-300 rounded-lg"
+            type="url"
+            pattern="https?://.*"
+          />
         </div>
 
         <!-- Botón -->

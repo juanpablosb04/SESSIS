@@ -44,7 +44,7 @@
 
     .alert-success {
       background-color: rgba(0, 128, 0, 0.15);
-      color: #4dff4d;
+      color: #1e2835;
       border: 1px solid rgba(0, 128, 0, 0.3);
       border-radius: 10px;
       padding: 12px;
@@ -110,10 +110,10 @@
       <h2 class="text-3xl font-bold mb-6 text-center">Lista de Citas</h2>
 
       {% if messages %}
-            {% for message in messages %}
-                  <div class="{{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-            {% endif %}
+      {% for message in messages %}
+      <div class="{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+      {% endif %}
 
       <div class="overflow-x-auto">
         <table class="w-full border border-gray-300 rounded-lg text-sm text-left">
@@ -140,8 +140,8 @@
               <td class="p-3">{{ cita.cliente.email }}</td>
               <td class="p-3">{{ cita.cliente.telefono }}</td>
               <td class="p-3 fecha">{{ cita.fecha_cita|date:"Y-m-d" }}</td>
-              <td class="p-3 hora_inicio">{{ cita.hora_inicio }}</td>
-              <td class="p-3 hora_finalizacion">{{ cita.hora_finalizacion }}</td>
+              <td class="p-3 hora_inicio">{{ cita.hora_inicio|time:"H:i" }}</td>
+              <td class="p-3 hora_finalizacion">{{ cita.hora_finalizacion|time:"H:i" }}</td>
               <td class="p-3 motivo">{{ cita.motivo }}</td>
               <td class="p-3 descripcion">{{ cita.descripcion }}</td>
               <td class="p-3 text-center">
@@ -231,6 +231,11 @@
   </div>
 
   <script>
+
+    function formatearHora(hora) {
+      return hora.substring(0,5);
+    }
+
     function abrirModal(citaId) {
       const fila = document.querySelector(`tr[data-id="${citaId}"]`);
       const cliente = fila.querySelector('.cliente').dataset.id;
@@ -243,23 +248,24 @@
       document.getElementById('edit_id').value = citaId;
       document.getElementById('edit_cliente').value = cliente;
       document.getElementById('edit_fecha').value = fecha;
-      document.getElementById('edit_hora_inicio').value = inicio;
-      document.getElementById('edit_hora_finalizacion').value = fin;
+
+      document.getElementById('edit_hora_inicio').value = formatearHora(inicio);
+      document.getElementById('edit_hora_finalizacion').value = formatearHora(fin);
+
       document.getElementById('edit_motivo').value = motivo;
       document.getElementById('edit_descripcion').value = descripcion;
 
-      // Usar 'flex' para mostrar el modal, como en empleados.html
       document.getElementById('modalEditar').classList.remove('hidden');
       document.getElementById('modalEditar').classList.add('flex');
     }
 
     function cerrarModal() {
-      // Usar 'hidden' para ocultar el modal, como en empleados.html
       const modal = document.getElementById('modalEditar');
       modal.classList.add('hidden');
       modal.classList.remove('flex');
     }
-  </script>
+
+</script>
 
 </body>
 

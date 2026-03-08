@@ -177,8 +177,14 @@
             class="w-full mb-4 p-2 rounded-md bg-gray-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
 
           <label class="block mb-2 text-gray-300">URL Imagen</label>
-          <input type="text" name="imagen_url" id="modal_imagen_url"
-            class="w-full mb-6 p-2 rounded-md bg-gray-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input 
+          type="url"
+          name="imagen_url"
+          id="modal_imagen_url"
+          placeholder="https://ejemplo.com/imagen.jpg"
+          pattern="https?://.*"
+          title="Debe ingresar una URL válida que empiece con http:// o https://"
+          class="w-full mb-6 p-2 rounded-md bg-gray-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
 
           <div class="flex justify-end space-x-3">
             <button type="button"
