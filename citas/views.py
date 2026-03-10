@@ -76,6 +76,12 @@ def registrar_citas(request):
                 # Se utiliza el contexto para rellenar los campos que el usuario había enviado (opcional, pero útil)
                 clientes = Clientes.objects.all()
                 return render(request, "citas/registrarCitas.html", {"clientes": clientes, "datos_anteriores": request.POST})
+            
+            # 2. Validación: hora inicio no puede ser mayor o igual a hora final
+            if hora_inicio >= hora_finalizacion:
+                messages.error(request, "Error de horario: La hora de inicio debe ser menor que la hora de finalización.", extra_tags="alert-error")
+                clientes = Clientes.objects.all()
+                return render(request, "citas/registrarCitas.html", {"clientes": clientes, "datos_anteriores": request.POST})
 
             # 2. Validación de Superposición y Horas
             error_superposicion = verificar_superposicion(usuario_id, fecha, hora_inicio, hora_finalizacion)
