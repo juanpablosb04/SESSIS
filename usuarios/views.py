@@ -1,11 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+import re
 from .models import Usuario, AuditoriaUsuario
 from django.core.paginator import Paginator
 from config.decorators import role_required
 from empleados.models import Empleado
 from django.contrib.auth.hashers import make_password
-
 
 # Diccionario de roles
 ROLES = {
@@ -71,6 +71,27 @@ def lista_usuarios(request):
             # Contraseña obligatoria
             if not password:
                 messages.error(request, "❌ La contraseña es obligatoria.", extra_tags='crear alert-error')
+                return redirect("lista_usuarios")
+            
+            # VALIDAR LONGITUD MINIMA DE CONTRASEÑA
+            if len(password) < 8:
+                messages.error(request, "❌ La contraseña debe tener al menos 8 caracteres.", extra_tags='crear alert-error')
+                return redirect("lista_usuarios")
+        
+            if not re.search(r"[A-Z]", password):
+                messages.error(request, "❌ La contraseña debe tener al menos una letra mayúscula.", extra_tags='crear alert-error')
+                return redirect("lista_usuarios")
+
+            if not re.search(r"[a-z]", password):
+                messages.error(request, "❌ La contraseña debe tener al menos una letra minúscula.", extra_tags='crear alert-error')
+                return redirect("lista_usuarios")
+
+            if not re.search(r"\d", password):
+                messages.error(request, "❌ La contraseña debe tener al menos un número.", extra_tags='crear alert-error')
+                return redirect("lista_usuarios")
+
+            if not re.search(r"[!@#$%^&*(),.?{}|<>]", password):
+                messages.error(request, "❌ La contraseña debe tener al menos un carácter especial.", extra_tags='crear alert-error')
                 return redirect("lista_usuarios")
 
             # Email único
