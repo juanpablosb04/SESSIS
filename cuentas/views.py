@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import update_session_auth_hash
 from django.utils import timezone
-from .models import Usuarios
+from cuentas.models import Usuarios
 from citas.models import Cita
 from email.mime.text import MIMEText
 import smtplib
@@ -13,7 +13,11 @@ import random
 import re
 from django.db.models import Q
 from datetime import date
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from django.core.mail import send_mail
+
 
 
 # ======================================================
@@ -113,22 +117,37 @@ def user_logout(request):
 # ======================================================
 def recuperar_password(request):
     if request.method == "POST":
-        email = request.POST.get("username")
+        # .strip() elimina espacios accidentales que el usuario pueda copiar/pegar
+        email_ingresado = request.POST.get("username", "").strip()
 
         try:
-            usuario = Usuarios.objects.get(email=email, estado="activo")
+            # Usamos __iexact para ignorar mayúsculas/minúsculas en el email
+            # Usamos __icontains o __iexact para el estado por seguridad
+            usuario = Usuarios.objects.filter(
+                email__iexact=email_ingresado, 
+                estado__iexact="activo"
+            ).first()
 
-            nueva_contrasena = generar_contrasena()
-            usuario.password = make_password(nueva_contrasena)
-            usuario.save()
+            if usuario:
+                nueva_contrasena = generar_contrasena()
+                usuario.password = make_password(nueva_contrasena)
+                # Aprovechamos tu campo password_temp para obligar al cambio luego
+                usuario.password_temp = True 
+                usuario.save()
 
-            enviar_correo_gmail(email, nueva_contrasena)
+                enviar_correo_gmail(usuario.email, nueva_contrasena)
 
-            messages.success(request, "Te hemos enviado una nueva contraseña.")
-            return redirect("recuperar")
+                messages.success(request, f"Se ha enviado una nueva contraseña a {usuario.email}")
+                return redirect("recuperar")
+            else:
+                # Si no existe el usuario o está inactivo
+                messages.error(request, "El correo no existe o la cuenta no está activa.")
+                return redirect("recuperar")
 
-        except Usuarios.DoesNotExist:
-            messages.error(request, "El correo no existe en el sistema.")
+        except Exception as e:
+            # Esto imprimirá el error real en tu terminal de VS Code
+            print(f"DEBUG: Error en recuperación: {e}")
+            messages.error(request, "Ocurrió un error al procesar la solicitud.")
             return redirect("recuperar")
 
     return render(request, "cuentas/recuperarContrasena.html")
@@ -211,21 +230,27 @@ def generar_contrasena(longitud=8):
 # ENVIAR CORREO GMAIL
 # ======================================================
 def enviar_correo_gmail(destinatario, contrasena_nueva):
-    asunto = "Recuperación de contraseña SESSIS"
-    cuerpo = (
-        f"Hola,\n\n"
-        f"Tu nueva contraseña es: {contrasena_nueva}\n\n"
-        f"Por motivos de seguridad, cambia tu contraseña después de iniciar sesión.\n\n"
-        f"Atentamente,\nEquipo de Soporte SESSIS"
-    )
+    asunto = "Restablecimiento de Contraseña - SESSIS"
+    
+    # Contexto para el HTML
+    context = {'contrasena': contrasena_nueva}
+    
+    # Renderizamos el contenido HTML
+    html_content = render_to_string('emails/recuperacion.html', context)
+    
+    # Versión en texto plano (por si el gestor de correo no soporta HTML)
+    text_content = strip_tags(html_content)
 
     try:
-        send_mail(
+        email = EmailMultiAlternatives(
             subject=asunto,
-            message=cuerpo,
-            from_email=None,  # usa DEFAULT_FROM_EMAIL de settings.py
-            recipient_list=[destinatario],
-            fail_silently=False,
+            body=text_content,
+            from_email=None, # Usa el DEFAULT_FROM_EMAIL de settings.py
+            to=[destinatario],
         )
+        # Adjuntamos el contenido HTML
+        email.attach_alternative(html_content, "text/html")
+        email.send(fail_silently=False)
+        
     except Exception as e:
-        print("Error al enviar el correo:", e)
+        print(f"Error al enviar el correo: {e}")

@@ -10,18 +10,17 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Open sans', sans-serif;
-    }
 
     body {
-      height: 100vh;
+      margin: 0;
+      padding: 0;
+      font-family: 'Open sans', sans-serif;
+      min-height: 100vh;
       background-color: black;
       background-image: url('https://images.unsplash.com/photo-1617940673880-038ac787aa32?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1470');
       background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
     }
 
     @keyframes fade-in-down {
@@ -29,7 +28,6 @@
         opacity: 0;
         transform: translateY(-20px);
       }
-
       100% {
         opacity: 1;
         transform: translateY(0);
@@ -62,14 +60,13 @@
 
   {% include "includes/navbar.html" %}
 
-  <div id="infoInicio" class="flex justify-center">
+  <main class="flex justify-center px-4 pt-[20px]">
     <div id="cuadroInicio"
-      class="h-[auto] w-[1050px] bg-white/10 backdrop-blur-[10px] rounded-[10px] border border-black/25 p-[45px] text-center mt-[95px] overflow-y-auto">
+      class="animate-fade-in-down h-[auto] w-full max-w-[1050px] bg-white/10 backdrop-blur-[10px] rounded-[10px] border border-black/25 p-[45px] text-center mt-[75px] overflow-y-auto mb-10">
 
       <h2 class="text-[30px] font-bold text-[#621729] mb-2">Bienvenido al sistema de SES</h2>
 
-      <h3 class="text-[20px] italic mb-4 text-black">“La seguridad no es solo nuestro trabajo, es nuestra vocación.”
-      </h3>
+      <h3 class="text-[20px] italic mb-4 text-black">“La seguridad no es solo nuestro trabajo, es nuestra vocación.”</h3>
 
       <p class="text-[18px] leading-relaxed text-black">
         En el mundo cambiante de hoy, ser parte de la seguridad privada no significa solo custodiar un lugar, sino
@@ -84,17 +81,17 @@
         Gracias por tu compromiso. Gracias por tu servicio.
       </p>
 
-      <h4 class="text-[100px] text-[#621729]">
+      <h4 class="text-[100px] text-[#621729] mt-6">
         <i class="fa-solid fa-globe"></i>
       </h4>
 
     </div>
-  </div>
+  </main>
 
   {% if mostrar_toast %}
-<div id="toastCitas"
-     class="fixed top-6 right-6 z-50 max-w-sm toast-enter backdrop-blur-lg bg-gradient-to-r from-red-700 to-red-500/90 
-            shadow-xl rounded-xl p-5 border border-white/20 text-white flex gap-4">
+  <div id="toastCitas"
+    class="fixed top-6 right-6 z-50 max-w-sm toast-enter backdrop-blur-lg bg-gradient-to-r from-red-700 to-red-500/90 
+           shadow-xl rounded-xl p-5 border border-white/20 text-white flex gap-4">
 
     <div class="text-3xl">
       <i class="fa-solid fa-calendar-check"></i>
@@ -115,28 +112,29 @@
     <button onclick="cerrarToast()" class="text-white hover:text-gray-200 transition text-xl">
       <i class="fa-solid fa-xmark"></i>
     </button>
-</div>
-{% endif %}
+  </div>
+  {% endif %}
 
+  <script>
+    const toast = document.getElementById("toastCitas");
 
-</body>
-<script>
-  const toast = document.getElementById("toastCitas");
-
-  if (toast) {
+    if (toast) {
       setTimeout(() => {
-          toast.classList.add("toast-show");
+        toast.classList.add("toast-show");
       }, 100);
 
       setTimeout(() => {
-          cerrarToast();
-      }, 4000);
-  }
+        cerrarToast();
+      }, 5000); // Un poco más de tiempo para que se pueda leer
+    }
 
-  function cerrarToast() {
-      toast.classList.add("toast-hide");
-      setTimeout(() => toast.style.display = "none", 400);
-  }
-</script>
+    function cerrarToast() {
+      if (toast) {
+        toast.classList.add("toast-hide");
+        setTimeout(() => toast.style.display = "none", 400);
+      }
+    }
+  </script>
 
+</body>
 </html>

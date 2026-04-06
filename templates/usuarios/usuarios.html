@@ -24,6 +24,7 @@
             border-radius: 1rem;
             border: 1px solid #e5e7eb;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+            margin-top: 25px;
         }
 
         .alert-error {
@@ -182,29 +183,25 @@
                             <td class="p-3">{{ usuario.id_empleado.nombre_completo }}</td>
                             <td class="p-3">
                                 {% for rol in roles %}
-                                {% if rol.0 == usuario.id_rol %}
-                                {{ rol.1 }}
-                                {% endif %}
+                                    {% if rol.0 == usuario.id_rol_id %} {# <--- AGREGAMOS _id AQUÍ #}
+                                        {{ rol.1 }}
+                                    {% endif %}
                                 {% endfor %}
                             </td>
                             <td class="p-3">{{ usuario.email }}</td>
                             <td class="p-3 text-center">
-                                {% if usuario.estado == 'Activo' %}
-                                <span
-                                    class="bg-green-100 text-green-700 px-3 py-1 rounded text-xs font-semibold">Activo</span>
+                                {% if usuario.estado|lower == 'activo' %}
+                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded text-xs font-semibold">Activo</span>
                                 {% else %}
-                                <span
-                                    class="bg-red-100 text-red-700 px-3 py-1 rounded text-xs font-semibold">Inactivo</span>
+                                <span class="bg-red-100 text-red-700 px-3 py-1 rounded text-xs font-semibold">Inactivo</span>
                                 {% endif %}
                             </td>
                             <td class="p-3">
                                 <div class="flex justify-center gap-2">
-                                    <button
-                                        onclick="abrirModalEditar('{{ usuario.id_usuario }}', '{{ usuario.id_empleado.id_empleado }}', '{{ usuario.id_rol }}', '{{ usuario.email }}', '{{ usuario.estado }}')"
-                                        class="btn bg-yellow-500 text-white text-xs">
+                                    <button onclick="abrirModalEditar('{{ usuario.id_usuario }}', '{{ usuario.id_empleado.id_empleado }}', '{{ usuario.id_rol_id }}', '{{ usuario.email }}', '{{ usuario.estado }}')"
+                                            class="btn bg-yellow-500 text-white text-xs">
                                         Editar
                                     </button>
-
                                     <a href="{% url 'auditoria_usuario' usuario.id_usuario %}"
                                         class="btn btn-warning bg-blue-500 text-xs">
                                         Auditoría

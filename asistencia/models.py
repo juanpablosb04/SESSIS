@@ -8,9 +8,9 @@ class Asistencia(models.Model):
     turno_ingreso = models.DateTimeField()
     turno_salida = models.DateTimeField(blank=True, null=True)
     id_ubicacion = models.ForeignKey('ubicaciones.Ubicaciones', on_delete=models.DO_NOTHING, db_column='id_ubicacion')
-    observaciones = models.CharField(max_length=250, db_collation='Modern_Spanish_CI_AS', blank=True, null=True)
+    observaciones = models.CharField(max_length=250, blank=True, null=True)
     estado = models.CharField(max_length=20, default='En curso')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'Asistencia'

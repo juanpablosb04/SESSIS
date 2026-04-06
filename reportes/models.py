@@ -26,4 +26,4 @@ class ReporteIncidente(models.Model):
 
     class Meta:
         db_table = 'ReporteIncidentes'  # quitar 'dbo.'
-        managed = False
+        managed = True

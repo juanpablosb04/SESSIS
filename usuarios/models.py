@@ -1,42 +1,29 @@
 from django.db import models
 from empleados.models import Empleado
+import roles
 
-# Modelo Usuario
-class Usuario(models.Model):
-    id_usuario = models.AutoField(primary_key=True)
-    id_empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE, db_column='id_empleado')
-    id_rol = models.IntegerField()
-    email = models.EmailField(max_length=100)
-    password = models.CharField(max_length=100)
-    estado = models.CharField(max_length=50)
-    password_temp = models.BooleanField(default=True)
-
-    class Meta:
-        db_table = 'Usuarios'
-
-    def __str__(self):
-        return self.email
-
-# Modelo Auditoría
 class AuditoriaUsuario(models.Model):
     id_auditoria = models.AutoField(primary_key=True)
+    
+    # Apuntamos directamente al modelo de la otra APP
     usuario_afectado = models.ForeignKey(
-        Usuario,
+        'cuentas.Usuarios', 
         on_delete=models.SET_NULL,
         null=True,
         related_name='auditoria_afectado'
     )
     usuario_accion = models.ForeignKey(
-        Usuario,
+        'cuentas.Usuarios',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name='auditoria_accion'
     )
+    
     accion = models.CharField(max_length=50)
     fecha = models.DateTimeField(auto_now_add=True)
-    id_empleado = models.IntegerField(null=True)  # Solo guarda el ID, no FK
-    id_rol = models.IntegerField(null=True)      # Solo guarda el ID, no FK
+    id_empleado = models.IntegerField(null=True)
+    id_rol = models.IntegerField(null=True)
     email = models.CharField(max_length=150, null=True)
     estado = models.CharField(max_length=50, null=True)
 
@@ -44,7 +31,7 @@ class AuditoriaUsuario(models.Model):
         db_table = 'USUARIOS_AUDITORIA_TB'
         ordering = ['-fecha']
 
-    # Propiedades para mostrar nombres sin tocar la DB
+    # Propiedades (se mantienen igual, Django las resolverá desde 'cuentas.Usuarios')
     @property
     def empleado(self):
         try:
@@ -54,11 +41,11 @@ class AuditoriaUsuario(models.Model):
 
     @property
     def nombre_rol(self):
+    # Diccionario para traducir el número a texto
         roles = {1: "Administrador", 2: "Oficial"}
-        try:
-            return roles.get(self.usuario_afectado.id_rol, "Desconocido")
-        except:
-            return "Desconocido"
+    
+    # Buscamos directamente el número guardado en la auditoría
+        return roles.get(self.id_rol, "Desconocido")
 
     @property
     def usuario_nombre(self):

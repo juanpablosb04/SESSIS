@@ -5,16 +5,16 @@ from django.db import models
 
 class Empleado(models.Model):
     id_empleado = models.AutoField(primary_key=True)
-    nombre_completo = models.CharField(max_length=200, db_collation='Modern_Spanish_CI_AS')
-    email = models.CharField(unique=True, max_length=150, db_collation='Modern_Spanish_CI_AS')
-    cedula = models.CharField(unique=True, max_length=50, db_collation='Modern_Spanish_CI_AS')
-    telefono = models.CharField(max_length=50, db_collation='Modern_Spanish_CI_AS', blank=True, null=True)
-    direccion = models.CharField(max_length=250, db_collation='Modern_Spanish_CI_AS', blank=True, null=True)
+    nombre_completo = models.CharField(max_length=200)
+    email = models.CharField(unique=True, max_length=150)
+    cedula = models.CharField(unique=True, max_length=50)
+    telefono = models.CharField(max_length=50, blank=True, null=True)
+    direccion = models.CharField(max_length=250, blank=True, null=True)
     fecha_contratacion = models.DateField()
     estado = models.BooleanField(default=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'Empleado'
 
 
@@ -50,7 +50,7 @@ class EmpleadosAuditoria(models.Model):
     fecha_contratacion = models.DateField(null=True, blank=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'Empleados_Auditoria_TB'
 
     def __str__(self):
@@ -78,13 +78,12 @@ class HorasExtras(models.Model):
     justificacion = models.CharField(
         max_length=500,
         blank=True,
-        null=True,
-        db_collation='Modern_Spanish_CI_AS'
+        null=True
     )
-    estado = models.CharField(max_length=20, db_collation='Modern_Spanish_CI_AS')
+    estado = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'HorasExtras'
 
 # === Auditoría de Horas Extras ===
@@ -122,7 +121,7 @@ class HorasExtrasAuditoria(models.Model):
     estado = models.CharField(max_length=50, null=True, blank=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'HorasExtras_Auditoria_TB'
 
     def __str__(self):

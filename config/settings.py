@@ -26,12 +26,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-t+4!5y9qh8ci=nietzy9y8w(5zxa_bayaofve@adq6d=4_m*o0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['sessis-web-f3heaudtgbd0c3g0.canadacentral-01.azurewebsites.net', '127.0.0.1', 'localhost']
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://web-production-c0d4b.up.railway.app",
+    "https://sessis-web-f3heaudtgbd0c3g0.canadacentral-01.azurewebsites.net/",
 ]
 
 
@@ -72,7 +72,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates"],  # 👈 muy importante
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -91,43 +91,19 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# Detecta si estamos en Railway
-USE_RAILWAY = os.getenv("RAILWAY_ENVIRONMENT")
-
-USE_RAILWAY = os.getenv("RAILWAY_ENVIRONMENT")
-
-if USE_RAILWAY:
-    # Base de datos Railway
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.getenv("MYSQLDATABASE", "railway"),
-            'USER': os.getenv("MYSQLUSER", "root"),
-            'PASSWORD': os.getenv("MYSQLPASSWORD", "pREUIdiXEmFmLcHShTLTrgsnTxUSQVBY"),
-            'HOST': os.getenv("RAILWAY_TCP_PROXY_DOMAIN", "centerbeam.proxy.rlwy.net"),
-            'PORT': os.getenv("RAILWAY_TCP_PROXY_PORT", "14480"),
-            'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            },
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'sessisadmin',
+        'PASSWORD': 'SistemaFidelitas2145!',
+        'HOST': 'sessis-db-fidelitas.postgres.database.azure.com',
+        'PORT': '5432',
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
     }
-
-else:
-    # Base de datos LOCAL (la que estás usando ahora)
-    DATABASES = {
-        'default': {
-            'ENGINE': 'mssql',
-            'NAME': 'SESSIS',
-            'USER': '',
-            'PASSWORD': '',
-            'HOST': 'AKILES08CR\SQLEXPRESS',
-            'PORT': '',
-            'OPTIONS': {
-                'driver': 'ODBC Driver 17 for SQL Server',
-                'trusted_connection': 'yes',
-            },
-        }
-    }
+}
     
 
 # Para Stwart : AKILES08CR\SQLEXPRESS
@@ -169,11 +145,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
-# Para que Django sepa dónde buscar tus archivos estáticos globales
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
-
+STATICFILES_DIRS = [BASE_DIR / "static"]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
@@ -218,7 +190,7 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_HOST_USER = 'sistemasessis@gmail.com'
 EMAIL_HOST_PASSWORD = 'fpkl szho vbmk vssi'
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = f"Soporte SESSIS <{EMAIL_HOST_USER}>"
 
 
 

@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 import re
-from .models import Usuario, AuditoriaUsuario
+from cuentas.models import Usuarios as Usuario
+from .models import AuditoriaUsuario
 from django.core.paginator import Paginator
 from config.decorators import role_required
 from empleados.models import Empleado
@@ -107,7 +108,7 @@ def lista_usuarios(request):
             # Crear usuario
             usuario = Usuario.objects.create(
                 id_empleado_id=int(id_empleado),
-                id_rol=int(id_rol),
+                id_rol_id=int(id_rol),
                 email=email,
                 password=make_password(password),   # ← ENCRIPTAR
                 estado=estado,
@@ -119,7 +120,7 @@ def lista_usuarios(request):
                 usuario_accion=usuario_actual,
                 accion="CREAR",
                 id_empleado=usuario.id_empleado.id_empleado,
-                id_rol=usuario.id_rol,
+                id_rol=int(id_rol),
                 email=usuario.email,
                 estado=usuario.estado
             )
@@ -154,7 +155,7 @@ def lista_usuarios(request):
                 return redirect("lista_usuarios")
 
             usuario.id_empleado_id = int(id_empleado)
-            usuario.id_rol = int(id_rol)
+            usuario.id_rol_id = int(id_rol)
             usuario.email = email
 
             # Cambiar contraseña solo si el usuario ingresó una nueva
@@ -169,7 +170,7 @@ def lista_usuarios(request):
                 usuario_accion=usuario_actual,
                 accion="EDITAR",
                 id_empleado=usuario.id_empleado.id_empleado,
-                id_rol=usuario.id_rol,
+                id_rol=int(id_rol),
                 email=usuario.email,
                 estado=usuario.estado
             )

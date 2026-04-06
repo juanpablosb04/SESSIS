@@ -11,6 +11,8 @@ from config.decorators import role_required
 from datetime import datetime , date
 from django.utils import timezone
 from django.db.models import Q
+from datetime import timedelta
+from decimal import Decimal
 from .models import (
     Empleado,
     EmpleadosAuditoria,
@@ -423,7 +425,7 @@ def consultar_horas_extras_oficial(request):
         ultima_actualizacion = timezone.now().date()
         page_obj = []
     else:
-        # Traer TODOS los registros
+        # Traer TODOS los registros para el historial (sin filtrar por fecha para que vean todo)
         registros_qs = (
             HorasExtras.objects
             .select_related("empleado")
@@ -432,14 +434,21 @@ def consultar_horas_extras_oficial(request):
         )
 
         # ---- PAGINACIÓN ----
-        paginator = Paginator(registros_qs, 5)  # 10 registros por página
+        paginator = Paginator(registros_qs, 5)
         page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)
 
-        # Suma solo horas aprobadas
+        hoy = timezone.now().date()
+        fecha_limite = hoy.replace(day=1)
+
+        # Suma solo horas aprobadas dentro del rango de los últimos 31 días
         total_horas_aprobadas = (
             HorasExtras.objects
-            .filter(empleado=empleado, estado__iexact="Aprobado")
+            .filter(
+                empleado=empleado, 
+                estado__iexact="Aprobado",
+                fecha__gte=fecha_limite
+            )
             .aggregate(suma=Sum("cantidad_horas"))
             .get("suma") or Decimal("0")
         )
@@ -448,7 +457,7 @@ def consultar_horas_extras_oficial(request):
         ultimo = registros_qs.first()
         ultima_actualizacion = ultimo.fecha if ultimo else timezone.now().date()
 
-        return render(
+    return render(
         request,
         "empleados/consultarHorasExtras.html",
         {
@@ -456,5 +465,6 @@ def consultar_horas_extras_oficial(request):
             "page_obj": page_obj,
             "total_horas": total_horas_aprobadas,
             "ultima_actualizacion": ultima_actualizacion,
-        },
-)
+            "fecha_corte": fecha_limite, # Opcional: para mostrar desde qué fecha se está sumando
+        }
+    )

@@ -14,7 +14,7 @@ class Cita(models.Model):
 
     class Meta:
         db_table = 'Citas'
-        managed = False
+        managed = True
 
     def __str__(self):
         return f"Cita con {self.cliente} el {self.fecha_cita} a las {self.hora_inicio}"

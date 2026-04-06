@@ -11,22 +11,18 @@ class Clientes(models.Model):
     id_cliente = models.AutoField(primary_key=True)
 
     nombre_completo = models.CharField(
-        max_length=200,
-        db_collation='Modern_Spanish_CI_AS'
+        max_length=200
     )
     email = models.CharField(
         unique=True,
-        max_length=150,
-        db_collation='Modern_Spanish_CI_AS'
+        max_length=150
     )
     cedula = models.CharField(
         unique=True,
-        max_length=50,
-        db_collation='Modern_Spanish_CI_AS'
+        max_length=50
     )
     telefono = models.CharField(
         max_length=50,
-        db_collation='Modern_Spanish_CI_AS',
         blank=True,
         null=True
     )
@@ -44,7 +40,7 @@ class Clientes(models.Model):
     estado = models.BooleanField(db_column='estado', default=True)
 
     class Meta:
-        managed = False                # No crear/alterar la tabla desde Django
+        managed = True                # No crear/alterar la tabla desde Django
         db_table = 'Clientes'          # Nombre exacto en SQL Server
 
     def __str__(self) -> str:
@@ -74,7 +70,7 @@ class ClientesAuditoria(models.Model):
 
     # FK al usuario ejecutor (si existe)
     usuario = models.ForeignKey(
-        Usuarios,
+        'cuentas.Usuarios',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -102,7 +98,7 @@ class ClientesAuditoria(models.Model):
     residencia = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'Clientes_Auditoria_TB'   # tabla de auditoria
 
     def __str__(self) -> str:
