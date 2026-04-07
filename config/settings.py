@@ -95,20 +95,16 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'sessisadmin',
-        'PASSWORD': 'SistemaFidelitas2145!',
-        'HOST': 'sessis-db-fidelitas.postgres.database.azure.com',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
         'PORT': '5432',
         'OPTIONS': {
             'sslmode': 'require',
         },
     }
 }
-    
-
-# Para Stwart : AKILES08CR\SQLEXPRESS
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
