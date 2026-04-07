@@ -96,7 +96,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
-        'USER': 'sessisadmin',
+        'USER': 'sessisadmin@sessis-db-fidelitas',
         'PASSWORD': 'SistemaFidelitas2145!',
         'HOST': 'sessis-db-fidelitas.postgres.database.azure.com',
         'PORT': '5432',
