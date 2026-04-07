@@ -31,9 +31,10 @@ DEBUG = False
 ALLOWED_HOSTS = ['sessis-web-f3heaudtgbd0c3g0.canadacentral-01.azurewebsites.net', '127.0.0.1', 'localhost']
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://sessis-web-f3heaudtgbd0c3g0.canadacentral-01.azurewebsites.net/",
+    "https://sessis-web-f3heaudtgbd0c3g0.canadacentral-01.azurewebsites.net"
 ]
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
