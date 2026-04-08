@@ -73,8 +73,12 @@ def registrar_asistencia_view(request):
 
 @role_required(["Oficial"])
 def asistencias_activas_view(request):
-    usuario_email = request.session.get("usuario_email")
-    empleado = get_object_or_404(Empleado, email=usuario_email)
+    
+    empleado = obtener_empleado_desde_sesion(request)
+
+    if not empleado:
+        messages.error(request, "No se encontró un empleado asociado a tu cuenta.")
+        return redirect("inicio")
 
     asistencias = Asistencia.objects.filter(
         id_empleado=empleado,

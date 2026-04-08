@@ -458,9 +458,13 @@ def consultar_horas_extras_oficial(request):
             .get("suma") or Decimal("0")
         )
 
-        # Última actualización
         ultimo = registros_qs.first()
-        ultima_actualizacion = ultimo.fecha if ultimo else timezone.now().date()
+
+        ultima_actualizacion = (
+            timezone.localdate()
+            if not ultimo
+            else timezone.localtime(ultimo.fecha).date()
+        )
 
     return render(
         request,

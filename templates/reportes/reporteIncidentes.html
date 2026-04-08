@@ -256,7 +256,15 @@
 
     /* FECHA HOY */
     const f = document.getElementById('fecha_evento');
-    if (f && !f.value) f.value = new Date().toISOString().split('T')[0];
+
+    if (f && !f.value) {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+
+      f.value = `${yyyy}-${mm}-${dd}`;
+    }
   </script>
 </body>
 </html>
