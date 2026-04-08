@@ -142,7 +142,7 @@ def _get_empleado_from_request(request):
 
 def _build_filtered_qs_oficiales(request):
 
-    empleado_actual = obtener_empleado_desde_sesion(request)
+    empleado_actual = _get_empleado_from_request(request)
 
     empleado_id  = (request.GET.get("id_empleado") or "").strip()
     fecha_inicio = (request.GET.get("fecha_inicio") or "").strip()
