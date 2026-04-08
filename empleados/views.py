@@ -460,11 +460,11 @@ def consultar_horas_extras_oficial(request):
 
         ultimo = registros_qs.first()
 
-        ultima_actualizacion = (
-            timezone.localdate()
-            if not ultimo
-            else timezone.localtime(ultimo.fecha).date()
-        )
+        if not ultimo:
+            ultima_actualizacion = timezone.localdate()
+        else:
+            # Al ser DateField, no requiere timezone.localtime()
+            ultima_actualizacion = ultimo.fecha
 
     return render(
         request,
@@ -474,6 +474,6 @@ def consultar_horas_extras_oficial(request):
             "page_obj": page_obj,
             "total_horas": total_horas_aprobadas,
             "ultima_actualizacion": ultima_actualizacion,
-            "fecha_corte": fecha_limite, # Opcional: para mostrar desde qué fecha se está sumando
+            "fecha_corte": fecha_limite,
         }
     )
