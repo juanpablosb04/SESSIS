@@ -9,7 +9,8 @@ from django.utils import timezone
 from config.decorators import role_required
 from empleados.models import Empleado
 from .models import ReporteIncidente
-from cuentas.models import Usuario
+from cuentas.models import Usuarios
+from django.db.models import Sum
 
 from django.core.paginator import Paginator
 from datetime import datetime
@@ -25,7 +26,7 @@ def _empleado_actual(request):
     if not email_login:
         return None
     
-    user_obj = Usuario.objects.filter(email=email_login).select_related('id_empleado').first()
+    user_obj = Usuarios.objects.filter(email=email_login).select_related('id_empleado').first()
     return user_obj.id_empleado if user_obj else None
 
 

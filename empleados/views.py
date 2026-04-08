@@ -7,7 +7,7 @@ from django.db.models.functions import Coalesce
 from django.contrib import messages
 from django.core.paginator import Paginator
 from .models import Empleado, EmpleadosAuditoria, Asistencia
-from cuentas.models import Usuario
+from cuentas.models import Usuarios
 from config.decorators import role_required
 from datetime import datetime , date
 from django.utils import timezone
@@ -52,7 +52,7 @@ def cedula_valida(cedula):
 def obtener_empleado_desde_sesion(request):
     email_login = request.session.get("usuario_email")
     # Buscamos al usuario y traemos su empleado asociado (FK)
-    user_obj = Usuario.objects.filter(email=email_login).select_related('id_empleado').first()
+    user_obj = Usuarios.objects.filter(email=email_login).select_related('id_empleado').first()
     return user_obj.id_empleado if user_obj else None
 
 # =========================

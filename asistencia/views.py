@@ -5,7 +5,7 @@ from django.utils import timezone
 from empleados.models import Empleado
 from ubicaciones.models import Ubicaciones
 from .models import Asistencia
-from cuentas.models import Usuario
+from cuentas.models import Usuarios
 from config.decorators import role_required
 from datetime import datetime
 from django.core.paginator import Paginator
@@ -26,7 +26,7 @@ def determinar_turno_actual():
 def obtener_empleado_desde_sesion(request):
     email_login = request.session.get("usuario_email")
     # Buscamos al usuario y traemos su empleado asociado (FK)
-    user_obj = Usuario.objects.filter(email=email_login).select_related('id_empleado').first()
+    user_obj = Usuarios.objects.filter(email=email_login).select_related('id_empleado').first()
     return user_obj.id_empleado if user_obj else None
 
 
