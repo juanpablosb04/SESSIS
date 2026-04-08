@@ -57,21 +57,6 @@ def obtener_empleado_desde_sesion(request):
     user_obj = Usuarios.objects.filter(email=email_login).select_related('id_empleado').first()
     return user_obj.id_empleado if user_obj else None
 
-def _build_filtered_qs_oficiales(request):
-    empleado_actual = obtener_empleado_desde_sesion(request)
-    
-    es_oficial = False
-    rol_usuario = getattr(request.user, "rol", None)
-    if rol_usuario == "Oficial":
-        es_oficial = True
-
-    # El resto de tu lógica de filtros (fechas, ids, etc.)
-    empleado_id  = (request.GET.get("id_empleado") or "").strip()
-    # ... (sigue el código que ya tenías)
-    
-    # Asegúrate de que esta función devuelva los 4 valores al final:
-    # return qs, filtros_ctx, es_oficial, empleado_actual
-
 # =========================
 # Empleados (CRUD básico)
 # =========================

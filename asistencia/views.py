@@ -141,7 +141,8 @@ def _get_empleado_from_request(request):
     return Empleado.objects.filter(email=email).first()
 
 def _build_filtered_qs_oficiales(request):
-    empleado_actual = _get_empleado_from_request(request)
+
+    empleado_actual = obtener_empleado_desde_sesion(request)
 
     empleado_id  = (request.GET.get("id_empleado") or "").strip()
     fecha_inicio = (request.GET.get("fecha_inicio") or "").strip()
@@ -155,11 +156,13 @@ def _build_filtered_qs_oficiales(request):
 
     qs = Asistencia.objects.select_related("id_empleado", "id_ubicacion").all()
 
-   
+    es_oficial = False
     try:
-        es_oficial = (getattr(request.user, "rol", None) == "Oficial")
+        if getattr(request.user, "rol", None) == "Oficial":
+            es_oficial = True
     except:
         pass
+
     if es_oficial and empleado_actual:
         qs = qs.filter(id_empleado=empleado_actual)
 
@@ -208,12 +211,13 @@ def ver_asistencia_oficiales_view(request):
 
     return render(request, "empleados/verAsistenciaOficiales.html", ctx)
 
-@role_required(["Administrador"])
+@role_required(["Administrador"]) 
 def ver_asistencia_oficiales_export(request):
     from openpyxl import Workbook
     from openpyxl.utils import get_column_letter
     from openpyxl.styles import Font, Alignment
 
+    # Llamamos a la función de filtros corregida
     qs, filtros_ctx, _, _ = _build_filtered_qs_oficiales(request)
 
     wb = Workbook()
@@ -231,14 +235,27 @@ def ver_asistencia_oficiales_export(request):
         cell.alignment = center
 
     for a in qs:
-        ing = timezone.localtime(a.turno_ingreso)
-        sal = timezone.localtime(a.turno_salida) if a.turno_salida else None
+        # Usamos try/except por si hay registros con fechas corruptas
+        try:
+            ing = timezone.localtime(a.turno_ingreso)
+            f_ing = ing.strftime("%d/%m/%Y")
+            h_ing = ing.strftime("%H:%M")
+        except:
+            f_ing = "S/F"
+            h_ing = "--:--"
+
+        try:
+            sal = timezone.localtime(a.turno_salida) if a.turno_salida else None
+            h_sal = sal.strftime("%H:%M") if sal else "--:--"
+        except:
+            h_sal = "--:--"
+
         ws.append([
-            ing.strftime("%d/%m/%Y"),
-            f"{getattr(a.id_empleado, 'cedula', a.id_empleado_id)} - {getattr(a.id_empleado, 'nombre_completo', a.id_empleado_id)}",
-            ing.strftime("%H:%M"),
-            sal.strftime("%H:%M") if sal else "--:--",
-            getattr(a.id_ubicacion, "nombre", a.id_ubicacion_id),
+            f_ing,
+            f"{getattr(a.id_empleado, 'cedula', 'N/A')} - {getattr(a.id_empleado, 'nombre_completo', 'N/A')}",
+            h_ing,
+            h_sal,
+            getattr(a.id_ubicacion, "nombre", "N/A"),
             a.observaciones or "",
             a.estado,
         ])
@@ -253,12 +270,8 @@ def ver_asistencia_oficiales_export(request):
         ws.column_dimensions[col_letter].width = min(max_len + 2, 50)
 
     nombre = ["asistencias"]
-    if filtros_ctx.get("fecha_inicio"):
-        nombre.append(f"ini_{filtros_ctx['fecha_inicio']}")
-    if filtros_ctx.get("fecha_fin"):
-        nombre.append(f"fin_{filtros_ctx['fecha_fin']}")
-    if filtros_ctx.get("empleado_id"):
-        nombre.append(f"emp_{filtros_ctx['empleado_id']}")
+    if filtros_ctx.get("fecha_inicio"): nombre.append(f"ini_{filtros_ctx['fecha_inicio']}")
+    if filtros_ctx.get("fecha_fin"): nombre.append(f"fin_{filtros_ctx['fecha_fin']}")
     filename = "_".join(nombre) + ".xlsx"
 
     buffer = BytesIO()
