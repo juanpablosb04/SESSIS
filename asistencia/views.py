@@ -24,8 +24,17 @@ def determinar_turno_actual():
         return "22-06"
 
 def obtener_empleado_desde_sesion(request):
+    """
+    Helper único y robusto para obtener el empleado.
+    Funciona en local y en Azure (Producción).
+    """
     email_login = request.session.get("usuario_email")
-    # Buscamos al usuario y traemos su empleado asociado (FK)
+    if not email_login:
+        return None
+    
+    # Import local para evitar errores de importación circular
+    from cuentas.models import Usuarios
+    
     user_obj = Usuarios.objects.filter(email=email_login).select_related('id_empleado').first()
     return user_obj.id_empleado if user_obj else None
 
@@ -116,12 +125,13 @@ from django.utils import timezone
 from empleados.models import Empleado
 from .models import Asistencia
 from config.decorators import role_required
+from decimal import Decimal
+from django.db.models import Sum
 
 DATE_FORMATS = ("%Y-%m-%d", "%d/%m/%Y")
 
 def parse_date(s: str):
-    if not s:
-        return None
+    if not s: return None
     s = s.strip()
     for fmt in DATE_FORMATS:
         try:
@@ -131,17 +141,12 @@ def parse_date(s: str):
     return None
 
 def make_aware_dt(d, end=False):
-    if not d:
-        return None
+    if not d: return None
     naive = datetime.combine(d, time.max if end else time.min)
     return timezone.make_aware(naive, timezone.get_current_timezone())
 
-def _get_empleado_from_request(request):
-    email = getattr(getattr(request, "user", None), "email", None) or request.session.get("usuario_email")
-    return Empleado.objects.filter(email=email).first()
-
 def _build_filtered_qs_oficiales(request):
-
+    # ✅ Usamos el helper unificado
     empleado_actual = obtener_empleado_desde_sesion(request)
 
     empleado_id  = (request.GET.get("id_empleado") or "").strip()
@@ -150,7 +155,6 @@ def _build_filtered_qs_oficiales(request):
 
     di = parse_date(fecha_inicio)
     df = parse_date(fecha_fin)
-
     di_dt = make_aware_dt(di, end=False) if di else None
     df_dt = make_aware_dt(df, end=True)  if df else None
 
@@ -158,6 +162,7 @@ def _build_filtered_qs_oficiales(request):
 
     es_oficial = False
     try:
+        # Verificamos rol desde el objeto user de Django o la sesión
         if getattr(request.user, "rol", None) == "Oficial":
             es_oficial = True
     except:
@@ -173,14 +178,7 @@ def _build_filtered_qs_oficiales(request):
     if df_dt:
         qs = qs.filter(turno_ingreso__lte=df_dt)
 
-    qs = qs.order_by("-turno_ingreso")
-
-    filtros_ctx = {
-        "empleado_id": empleado_id,
-        "fecha_inicio": fecha_inicio,
-        "fecha_fin": fecha_fin,
-    }
-    return qs, filtros_ctx, es_oficial, empleado_actual
+    return qs.order_by("-turno_ingreso"), {"empleado_id": empleado_id, "fecha_inicio": fecha_inicio, "fecha_fin": fecha_fin}, es_oficial, empleado_actual
 
 @role_required(["Administrador"])
 def ver_asistencia_oficiales_view(request):
@@ -211,13 +209,13 @@ def ver_asistencia_oficiales_view(request):
 
     return render(request, "empleados/verAsistenciaOficiales.html", ctx)
 
-@role_required(["Administrador"]) 
+@role_required(["Administrador"])
 def ver_asistencia_oficiales_export(request):
     from openpyxl import Workbook
     from openpyxl.utils import get_column_letter
     from openpyxl.styles import Font, Alignment
 
-    # Llamamos a la función de filtros corregida
+    # Llamamos a la lógica de filtrado
     qs, filtros_ctx, _, _ = _build_filtered_qs_oficiales(request)
 
     wb = Workbook()
@@ -227,28 +225,22 @@ def ver_asistencia_oficiales_export(request):
     headers = ["Fecha", "Empleado", "Hora Entrada", "Hora Salida", "Ubicación", "Observaciones", "Estado"]
     ws.append(headers)
 
-    bold = Font(bold=True)
-    center = Alignment(horizontal="center")
+    # Estilo de encabezados
     for c in range(1, len(headers) + 1):
         cell = ws.cell(row=1, column=c)
-        cell.font = bold
-        cell.alignment = center
+        cell.font = Font(bold=True)
+        cell.alignment = Alignment(horizontal="center")
 
     for a in qs:
-        # Usamos try/except por si hay registros con fechas corruptas
         try:
             ing = timezone.localtime(a.turno_ingreso)
             f_ing = ing.strftime("%d/%m/%Y")
             h_ing = ing.strftime("%H:%M")
-        except:
-            f_ing = "S/F"
-            h_ing = "--:--"
-
-        try:
+            
             sal = timezone.localtime(a.turno_salida) if a.turno_salida else None
             h_sal = sal.strftime("%H:%M") if sal else "--:--"
         except:
-            h_sal = "--:--"
+            f_ing, h_ing, h_sal = "Error", "--:--", "--:--"
 
         ws.append([
             f_ing,
@@ -260,28 +252,17 @@ def ver_asistencia_oficiales_export(request):
             a.estado,
         ])
 
+    # Auto-ajuste de columnas
     for col in ws.columns:
-        max_len = 0
         col_letter = get_column_letter(col[0].column)
-        for cell in col:
-            v = str(cell.value) if cell.value is not None else ""
-            if len(v) > max_len:
-                max_len = len(v)
-        ws.column_dimensions[col_letter].width = min(max_len + 2, 50)
-
-    nombre = ["asistencias"]
-    if filtros_ctx.get("fecha_inicio"): nombre.append(f"ini_{filtros_ctx['fecha_inicio']}")
-    if filtros_ctx.get("fecha_fin"): nombre.append(f"fin_{filtros_ctx['fecha_fin']}")
-    filename = "_".join(nombre) + ".xlsx"
+        ws.column_dimensions[col_letter].width = 20
 
     buffer = BytesIO()
     wb.save(buffer)
     buffer.seek(0)
 
-    resp = HttpResponse(
-        buffer.getvalue(),
-        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+    filename = f"asistencias_{timezone.now().strftime('%Y%m%d')}.xlsx"
+    resp = HttpResponse(buffer.getvalue(), content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     resp["Content-Disposition"] = f'attachment; filename="{filename}"'
     return resp
 
