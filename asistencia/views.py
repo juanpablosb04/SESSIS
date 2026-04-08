@@ -5,6 +5,7 @@ from django.utils import timezone
 from empleados.models import Empleado
 from ubicaciones.models import Ubicaciones
 from .models import Asistencia
+from cuentas.models import Usuario
 from config.decorators import role_required
 from datetime import datetime
 from django.core.paginator import Paginator
@@ -22,19 +23,27 @@ def determinar_turno_actual():
     else:
         return "22-06"
 
+def obtener_empleado_desde_sesion(request):
+    email_login = request.session.get("usuario_email")
+    # Buscamos al usuario y traemos su empleado asociado (FK)
+    user_obj = Usuario.objects.filter(email=email_login).select_related('id_empleado').first()
+    return user_obj.id_empleado if user_obj else None
+
 
 # Create your views here.
 @role_required(["Oficial"])
 def registrar_asistencia_view(request):
     ubicaciones = Ubicaciones.objects.all().order_by('nombre')
     today = timezone.localdate()
+    empleado = obtener_empleado_desde_sesion(request) # <--- Aquí está bien
+
+    if not empleado:
+        messages.error(request, "Error: Usuario sin empleado vinculado.")
+        return redirect("inicio")
 
     if request.method == "POST":
         id_ubicacion = request.POST.get("id_ubicacion", "").strip()
         observaciones = request.POST.get("observaciones", "").strip()
-
-        usuario_email = request.session.get("usuario_email")
-        empleado = get_object_or_404(Empleado, email=usuario_email)
 
         ubicacion = get_object_or_404(Ubicaciones, id_ubicacion=id_ubicacion)
 

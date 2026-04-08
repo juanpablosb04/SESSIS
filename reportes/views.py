@@ -9,6 +9,7 @@ from django.utils import timezone
 from config.decorators import role_required
 from empleados.models import Empleado
 from .models import ReporteIncidente
+from cuentas.models import Usuario
 
 from django.core.paginator import Paginator
 from datetime import datetime
@@ -17,12 +18,15 @@ from datetime import datetime
 # -------------------- helpers --------------------
 def _empleado_actual(request):
     """
-    Obtiene el empleado asociado al email guardado en sesión.
+    Obtiene el empleado usando la relación del Usuario, 
+    no comparando emails directamente.
     """
-    email = request.session.get("usuario_email")
-    if not email:
+    email_login = request.session.get("usuario_email")
+    if not email_login:
         return None
-    return Empleado.objects.filter(email=email).first()
+    
+    user_obj = Usuario.objects.filter(email=email_login).select_related('id_empleado').first()
+    return user_obj.id_empleado if user_obj else None
 
 
 # -------------------- vistas compartidas --------------------
@@ -55,10 +59,9 @@ def ver_foto_incidente_view(request, id_reporte: int):
 
 @role_required(["Oficial", "Administrador"])
 def reporte_incidentes_view(request):
-    """
-    Registrar incidentes y mostrar listado con paginación.
-    """
+    # Ahora este empleado sí será encontrado correctamente
     empleado = _empleado_actual(request)
+    
     if not empleado:
         messages.error(request, "No se encontró el empleado asociado a la sesión.")
         return redirect("inicio")

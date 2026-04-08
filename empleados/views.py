@@ -7,6 +7,7 @@ from django.db.models.functions import Coalesce
 from django.contrib import messages
 from django.core.paginator import Paginator
 from .models import Empleado, EmpleadosAuditoria, Asistencia
+from cuentas.models import Usuario
 from config.decorators import role_required
 from datetime import datetime , date
 from django.utils import timezone
@@ -47,6 +48,12 @@ def cedula_valida(cedula):
     cedula = cedula.strip()
     patron = r"^\d{9}$|^\d{12}$"
     return re.match(patron, cedula)
+
+def obtener_empleado_desde_sesion(request):
+    email_login = request.session.get("usuario_email")
+    # Buscamos al usuario y traemos su empleado asociado (FK)
+    user_obj = Usuario.objects.filter(email=email_login).select_related('id_empleado').first()
+    return user_obj.id_empleado if user_obj else None
 
 # =========================
 # Empleados (CRUD básico)
@@ -204,6 +211,7 @@ def empleados_view(request):
         "empleados/empleados.html",
         {"empleados": empleados, "page_obj": empleados, "today": date.today()},
     )
+
 # =========================
 # Horas extras (Admin)
 # =========================
@@ -412,14 +420,11 @@ def auditoria_horas_extras_por_empleado(request, empleado_id):
 @role_required(["Oficial"])
 def consultar_horas_extras_oficial(request):
     usuario_email = request.session.get("usuario_email")
-    empleado = Empleado.objects.filter(email=usuario_email).first() if usuario_email else None
+    empleado = obtener_empleado_desde_sesion(request)
 
     if not empleado:
-        messages.warning(
-            request,
-            "No se encontró un empleado asociado a tu cuenta. "
-            "Contacta al administrador para vincular tu usuario con un empleado."
-        )
+        messages.warning(request, "No se encontró un empleado asociado a tu cuenta...")
+        
         registros = []
         total_horas_aprobadas = Decimal("0")
         ultima_actualizacion = timezone.now().date()
