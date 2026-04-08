@@ -6,6 +6,8 @@ from django.db.models import Sum
 from django.db.models.functions import Coalesce
 from django.contrib import messages
 from django.core.paginator import Paginator
+
+from asistencia.views import _get_empleado_from_request
 from .models import Empleado, EmpleadosAuditoria, Asistencia
 from cuentas.models import Usuarios
 from config.decorators import role_required
@@ -54,6 +56,21 @@ def obtener_empleado_desde_sesion(request):
     # Buscamos al usuario y traemos su empleado asociado (FK)
     user_obj = Usuarios.objects.filter(email=email_login).select_related('id_empleado').first()
     return user_obj.id_empleado if user_obj else None
+
+def _build_filtered_qs_oficiales(request):
+    empleado_actual = obtener_empleado_desde_sesion(request)
+    
+    es_oficial = False
+    rol_usuario = getattr(request.user, "rol", None)
+    if rol_usuario == "Oficial":
+        es_oficial = True
+
+    # El resto de tu lógica de filtros (fechas, ids, etc.)
+    empleado_id  = (request.GET.get("id_empleado") or "").strip()
+    # ... (sigue el código que ya tenías)
+    
+    # Asegúrate de que esta función devuelva los 4 valores al final:
+    # return qs, filtros_ctx, es_oficial, empleado_actual
 
 # =========================
 # Empleados (CRUD básico)
@@ -419,18 +436,15 @@ def auditoria_horas_extras_por_empleado(request, empleado_id):
 
 @role_required(["Oficial"])
 def consultar_horas_extras_oficial(request):
-    usuario_email = request.session.get("usuario_email")
     empleado = obtener_empleado_desde_sesion(request)
 
     if not empleado:
         messages.warning(request, "No se encontró un empleado asociado a tu cuenta...")
-        
-        registros = []
+        # Definimos valores por defecto para que el render no falle
         total_horas_aprobadas = Decimal("0")
-        ultima_actualizacion = timezone.now().date()
+        ultima_actualizacion = timezone.localdate()
         page_obj = []
     else:
-        # Traer TODOS los registros para el historial (sin filtrar por fecha para que vean todo)
         registros_qs = (
             HorasExtras.objects
             .select_related("empleado")
@@ -443,11 +457,10 @@ def consultar_horas_extras_oficial(request):
         page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)
 
-        hoy = timezone.now().date()
+        hoy = timezone.localdate()
         fecha_limite = hoy.replace(day=1)
 
-        # Suma solo horas aprobadas dentro del rango de los últimos 31 días
-        total_horas_aprobadas = (
+        res_suma = (
             HorasExtras.objects
             .filter(
                 empleado=empleado, 
@@ -455,15 +468,14 @@ def consultar_horas_extras_oficial(request):
                 fecha__gte=fecha_limite
             )
             .aggregate(suma=Sum("cantidad_horas"))
-            .get("suma") or Decimal("0")
         )
+        total_horas_aprobadas = res_suma.get("suma") or Decimal("0")
 
-        ultimo = registros_qs.first()
-
+        ultimo = registros_qs.first() # <-- Aquí definimos la variable
         if not ultimo:
-            ultima_actualizacion = timezone.localdate()
+            ultima_actualizacion = hoy
         else:
-            # Al ser DateField, no requiere timezone.localtime()
+            # Usamos la fecha del registro más reciente
             ultima_actualizacion = ultimo.fecha
 
     return render(
