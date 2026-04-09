@@ -114,30 +114,25 @@
                                 {% with ac=registro.accion|upper %}
                                 {% if ac == "CREAR" %}
                                 <span class="tag tag-green">CREAR</span>
-                                
                                 {% elif ac == "EDITAR" %}
                                 <span class="tag tag-yellow">MODIFICAR</span>
-                                
                                 {% elif ac == "ELIMINAR" %}
                                 <span class="tag tag-red">ELIMINAR</span>
-                                
                                 {% else %}
                                 <span class="tag bg-gray-600">{{ registro.accion }}</span>
                                 {% endif %}
                                 {% endwith %}
                             </td>
                             
-                            <td class="p-3 whitespace-nowrap">{{ registro.empleado }}</td>
+                            <td class="p-3 whitespace-nowrap">
+                                <span class="font-medium text-blue-700">{{ registro.usuario_nombre }}</span>
+                            </td>
+
                             <td class="p-3 whitespace-nowrap">{{ registro.nombre_rol }}</td>
                             <td class="p-3 whitespace-nowrap">{{ registro.email }}</td>
                             <td class="p-3 whitespace-nowrap">{{ registro.estado }}</td>
                         </tr>
                         {% empty %}
-                        <tr>
-                            <td colspan="6" class="p-4 text-center text-gray-500">
-                                No hay registros de auditoría para este usuario.
-                            </td>
-                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>

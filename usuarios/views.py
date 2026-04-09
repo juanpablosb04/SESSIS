@@ -28,7 +28,9 @@ def lista_usuarios(request):
 
     if request.method == "POST":
         action = request.POST.get("action")
-        usuario_actual = None 
+
+        id_admin = request.session.get("usuario_id")
+        usuario_actual = Usuario.objects.filter(id_usuario=id_admin).first()
 
         # =============================
         # VALIDACIONES GENERALES

@@ -71,6 +71,9 @@ def empleados_view(request):
     if request.method == "POST":
         action = request.POST.get("action")
 
+        id_usuario_sesion = request.session.get("usuario_id")
+        usuario_ejecutor = Usuarios.objects.filter(id_usuario=id_usuario_sesion).first()
+
         # -------- CREAR --------
         if action == "crear":
             nombre    = request.POST.get("nombre_completo", "").strip()
@@ -125,7 +128,8 @@ def empleados_view(request):
                             fecha_contratacion=fecha_dt,
                         )
                         # Correo del ejecutor para auditoría
-                        empleado._usuario_email=request.session.get("usuario_email")
+                        empleado._usuario_obj = usuario_ejecutor  # Pasamos el objeto para la FK
+                        empleado._usuario_email = request.session.get("usuario_email") # Backup en texto
                         empleado.save()
                         messages.success(request, "✅ Empleado creado correctamente.", extra_tags="crear alert-success")
                         return redirect("empleados")
@@ -175,19 +179,24 @@ def empleados_view(request):
                     messages.error(request, "⚠️ La fecha de contratación no es válida.", extra_tags="editar alert-error")
                 else:
                     hoy = timezone.localdate()
-                    if nueva_fecha_dt > hoy:
-                        messages.error(request, "⚠️ La fecha de contratación no puede ser futura.", extra_tags="editar alert-error")
+                    if fecha_dt > hoy:
+                        messages.error(request, "⚠️ La fecha de contratación no puede ser futura.", extra_tags="crear alert-error")
                     else:
-                        empleado.nombre_completo    = nuevo_nombre
-                        empleado.email              = nuevo_email
-                        empleado.cedula             = nueva_cedula
-                        empleado.telefono           = nuevo_telefono or None
-                        empleado.direccion          = nueva_direccion or None
-                        empleado.fecha_contratacion = nueva_fecha_dt
+                        empleado = Empleado(
+                            nombre_completo=nombre,
+                            email=email,
+                            cedula=cedula,
+                            telefono=telefono or None,
+                            direccion=direccion or None,
+                            fecha_contratacion=fecha_dt,
+                        )
                         
-                        empleado._usuario_email=request.session.get("usuario_email")
-                        empleado.save()
-                        messages.success(request, "✏️ Empleado editado correctamente.", extra_tags="editar alert-success")
+                        empleado._usuario_obj = usuario_ejecutor
+                        empleado._usuario_email = request.session.get("usuario_email")
+                        
+                        empleado.save() 
+                        
+                        messages.success(request, "✅ Empleado creado correctamente.", extra_tags="crear alert-success")
                         return redirect("empleados")
 
         # -------- CAMBIAR ESTADO (Activo/Inactivo) --------
@@ -199,6 +208,8 @@ def empleados_view(request):
             nuevo_estado = _parse_bool(raw, fallback=not empleado.estado)
 
             empleado.estado = nuevo_estado
+            empleado._usuario_obj = usuario_ejecutor
+            empleado._usuario_email = request.session.get("usuario_email")
             empleado.save()
             messages.success(
                 request,
