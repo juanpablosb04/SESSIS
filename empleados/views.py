@@ -103,7 +103,7 @@ def empleados_view(request):
                 messages.error(request, "⚠️ La cédula ya está registrada.", extra_tags="crear alert-error")
 
             else:
-                # Parsear fecha y bloquear futuras (admite YYYY-MM-DD y dd/mm/YYYY)
+                # Parsear fecha
                 fecha_dt = None
                 for fmt in ("%Y-%m-%d", "%d/%m/%Y"):
                     try:
@@ -119,7 +119,8 @@ def empleados_view(request):
                     if fecha_dt > hoy:
                         messages.error(request, "⚠️ La fecha de contratación no puede ser futura.", extra_tags="crear alert-error")
                     else:
-                        empleado = Empleado.objects.create(
+                        # ✅ CREAR SIN .create()
+                        empleado = Empleado(
                             nombre_completo=nombre,
                             email=email,
                             cedula=cedula,
@@ -127,10 +128,14 @@ def empleados_view(request):
                             direccion=direccion or None,
                             fecha_contratacion=fecha_dt,
                         )
-                        # Correo del ejecutor para auditoría
-                        empleado._usuario_obj = usuario_ejecutor  # Pasamos el objeto para la FK
-                        empleado._usuario_email = request.session.get("usuario_email") # Backup en texto
+
+                        # ✅ PASAR USUARIO ANTES DE GUARDAR
+                        empleado._usuario_obj = usuario_ejecutor
+                        empleado._usuario_email = request.session.get("usuario_email")
+
+                        # ✅ UN SOLO SAVE
                         empleado.save()
+
                         messages.success(request, "✅ Empleado creado correctamente.", extra_tags="crear alert-success")
                         return redirect("empleados")
 
@@ -148,7 +153,6 @@ def empleados_view(request):
 
             if not nuevo_nombre or not nuevo_email or not nueva_cedula or not nueva_fecha_s:
                 messages.error(request, "⚠️ Nombre, correo, cédula y fecha son obligatorios.", extra_tags="editar alert-error")
-
 
             elif not cedula_valida(nueva_cedula):
                 messages.error(
@@ -179,26 +183,27 @@ def empleados_view(request):
                     messages.error(request, "⚠️ La fecha de contratación no es válida.", extra_tags="editar alert-error")
                 else:
                     hoy = timezone.localdate()
-                    if fecha_dt > hoy:
-                        messages.error(request, "⚠️ La fecha de contratación no puede ser futura.", extra_tags="crear alert-error")
+                    if nueva_fecha_dt > hoy:
+                        messages.error(request, "⚠️ La fecha de contratación no puede ser futura.", extra_tags="editar alert-error")
                     else:
-                        empleado = Empleado(
-                            nombre_completo=nombre,
-                            email=email,
-                            cedula=cedula,
-                            telefono=telefono or None,
-                            direccion=direccion or None,
-                            fecha_contratacion=fecha_dt,
-                        )
-                        
+                        # ✅ ACTUALIZAR EL MISMO OBJETO (NO CREAR UNO NUEVO)
+                        empleado.nombre_completo = nuevo_nombre
+                        empleado.email = nuevo_email
+                        empleado.cedula = nueva_cedula
+                        empleado.telefono = nuevo_telefono or None
+                        empleado.direccion = nueva_direccion or None
+                        empleado.fecha_contratacion = nueva_fecha_dt
+
+                        # ✅ PASAR USUARIO PARA AUDITORÍA
                         empleado._usuario_obj = usuario_ejecutor
                         empleado._usuario_email = request.session.get("usuario_email")
-                        
-                        empleado.save() 
-                        
-                        messages.success(request, "✅ Empleado creado correctamente.", extra_tags="crear alert-success")
-                        return redirect("empleados")
 
+                        # ✅ GUARDAR CAMBIOS
+                        empleado.save()
+
+                        messages.success(request, "✅ Empleado actualizado correctamente.", extra_tags="editar alert-success")
+                        return redirect("empleados")
+                    
         # -------- CAMBIAR ESTADO (Activo/Inactivo) --------
         elif action == "cambiar_estado":
             empleado_id = request.POST.get("empleado_id")
