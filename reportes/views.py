@@ -176,11 +176,14 @@ def reportes_incidentes_admin_view(request):
 
 @role_required(["Administrador"])
 def reportes_incidentes_admin_pdf(request):
-    from datetime import datetime
-    from io import BytesIO
-    from django.http import HttpResponse
-    from django.utils.html import escape
+    """
+    Exporta a PDF la vista ADMIN (con los mismos filtros que la HTML).
 
+    Parámetros GET:
+      - empleado
+      - ini
+      - fin
+    """
     try:
         from reportlab.lib.pagesizes import A4, landscape
         from reportlab.lib import colors
@@ -197,7 +200,7 @@ def reportes_incidentes_admin_pdf(request):
     except Exception:
         return HttpResponse("Falta instalar reportlab: pip install reportlab", status=500)
 
-    # --------- Query ----------
+    # --------- Query con los mismos filtros de la vista HTML ----------
     qs = (
         ReporteIncidente.objects
         .select_related("id_empleado")
@@ -225,7 +228,7 @@ def reportes_incidentes_admin_pdf(request):
         except ValueError:
             pass
 
-    # --------- PDF ----------
+    # --------- Configuración del PDF ----------
     buffer = BytesIO()
     page_size = landscape(A4)
 
@@ -240,6 +243,7 @@ def reportes_incidentes_admin_pdf(request):
 
     styles = getSampleStyleSheet()
 
+    # Estilo para el título
     title_style = ParagraphStyle(
         "TitleCustom",
         parent=styles["Title"],
@@ -249,6 +253,7 @@ def reportes_incidentes_admin_pdf(request):
         spaceAfter=12,
     )
 
+    # Estilo para las celdas
     cell_style = ParagraphStyle(
         "Cell",
         parent=styles["Normal"],
@@ -263,6 +268,7 @@ def reportes_incidentes_admin_pdf(request):
     ]
 
     # --------- Tabla ----------
+    # Encabezados
     data = [["Fecha", "Empleado", "Categoría", "Descripción", "Foto"]]
 
     for r in qs:
@@ -272,56 +278,71 @@ def reportes_incidentes_admin_pdf(request):
         categoria_txt = r.categoria or "-"
         desc_txt = r.descripcion or ""
 
-        empleado_par = Paragraph(escape(empleado_txt), cell_style)
-        categoria_par = Paragraph(escape(categoria_txt), cell_style)
-        desc_par = Paragraph(escape(desc_txt), cell_style)
+        # Usamos Paragraph para que haga wrap automático
+        empleado_par = Paragraph(empleado_txt, cell_style)
+        categoria_par = Paragraph(categoria_txt, cell_style)
+        desc_par = Paragraph(desc_txt, cell_style)
 
-        # --------- Imagen segura (CORREGIDA) ----------
+        # Intentar miniatura foto
         foto_cell = "—"
         if r.foto:
             try:
-                import os
-                # Verificamos que el archivo exista físicamente antes de intentar usarlo
-                if os.path.exists(r.foto.path):
-                    img = Image(r.foto.path, width=60, height=45)
-                    foto_cell = img
-                else:
-                    foto_cell = "Sin archivo"
-            except Exception as e:
-                # Si algo falla, ponemos un texto en lugar de que el PDF de error 500
-                foto_cell = "Error de carga"
+                img = Image(r.foto.path, width=60, height=45)
+                foto_cell = img
+            except Exception:
+                foto_cell = "img"
 
         data.append([fecha, empleado_par, categoria_par, desc_par, foto_cell])
 
-    # --------- Tamaños ----------
+    # --------- Anchos de columnas ----------
     page_width, _ = page_size
     available_width = page_width - doc.leftMargin - doc.rightMargin
 
+    # Proporciones (suman 1.0)
     ratios = [0.10, 0.30, 0.15, 0.35, 0.10]
+
     col_widths = [available_width * r for r in ratios]
 
     table = Table(data, colWidths=col_widths, repeatRows=1)
 
     table.setStyle(TableStyle([
+        # Encabezado
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#374151")),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTSIZE", (0, 0), (-1, 0), 11),
+
+        # Cuerpo
+        ("TEXTCOLOR", (0, 1), (-1, -1), colors.black),
+        ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
+        ("FONTSIZE", (0, 1), (-1, -1), 9),
 
         ("GRID", (0, 0), (-1, -1), 0.25, colors.HexColor("#4b5563")),
-        ("ROWBACKGROUNDS", (0, 1), (-1, -1),
-         [colors.HexColor("#f9fafb"), colors.HexColor("#e5e7eb")]),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [
+            colors.HexColor("#f9fafb"),
+            colors.HexColor("#e5e7eb")
+        ]),
 
+        # Alineaciones
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
-        ("ALIGN", (0, 0), (0, -1), "CENTER"),
-        ("ALIGN", (4, 1), (4, -1), "CENTER"),
+        ("ALIGN", (0, 0), (0, -1), "CENTER"),  # Fecha centrada
+        ("ALIGN", (4, 1), (4, -1), "CENTER"),  # Foto centrada
+
+        # Padding
+        ("TOPPADDING", (0, 0), (-1, -1), 4),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+        ("LEFTPADDING", (0, 0), (-1, -1), 4),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
     ]))
 
     elems.append(table)
+
     doc.build(elems)
 
     pdf = buffer.getvalue()
     buffer.close()
 
-    response = HttpResponse(pdf, content_type="application/pdf")
-    response["Content-Disposition"] = 'attachment; filename="Reportes_Incidentes.pdf"'
-    return response
+    resp = HttpResponse(pdf, content_type="application/pdf")
+    resp["Content-Disposition"] = 'attachment; filename="Reportes_Incidentes.pdf"'
+
+    return resp
