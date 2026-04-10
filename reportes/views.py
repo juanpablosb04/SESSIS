@@ -11,6 +11,7 @@ from empleados.models import Empleado
 from .models import ReporteIncidente
 from cuentas.models import Usuarios
 from django.db.models import Sum
+from django.utils.html import escape
 
 from django.core.paginator import Paginator
 from datetime import datetime
@@ -28,6 +29,9 @@ def _empleado_actual(request):
     
     user_obj = Usuarios.objects.filter(email=email_login).select_related('id_empleado').first()
     return user_obj.id_empleado if user_obj else None
+
+
+    
 
 
 # -------------------- vistas compartidas --------------------
@@ -180,6 +184,11 @@ def reportes_incidentes_admin_pdf(request):
       - ini
       - fin
     """
+
+    desc_par = Paragraph(escape(desc_txt), cell_style)
+    categoria_par = Paragraph(escape(categoria_txt), cell_style)
+    empleado_par = Paragraph(escape(empleado_txt), cell_style)
+    
     try:
         from reportlab.lib.pagesizes import A4, landscape
         from reportlab.lib import colors
@@ -281,8 +290,12 @@ def reportes_incidentes_admin_pdf(request):
         foto_cell = "—"
         if r.foto:
             try:
-                img = Image(r.foto.path, width=60, height=45)  # pequeño thumbnail
-                foto_cell = img
+                from django.core.files.storage import default_storage
+                if default_storage.exists(r.foto.name):
+                    img = Image(default_storage.open(r.foto.name), width=60, height=45)
+                    foto_cell = img
+                else:
+                    foto_cell = "img"
             except Exception:
                 foto_cell = "img"
 
