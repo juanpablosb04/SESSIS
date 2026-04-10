@@ -276,17 +276,20 @@ def reportes_incidentes_admin_pdf(request):
         categoria_par = Paragraph(escape(categoria_txt), cell_style)
         desc_par = Paragraph(escape(desc_txt), cell_style)
 
-        # --------- Imagen segura ----------
+        # --------- Imagen segura (CORREGIDA) ----------
         foto_cell = "—"
         if r.foto:
             try:
-                if hasattr(r.foto, "path"):
+                import os
+                # Verificamos que el archivo exista físicamente antes de intentar usarlo
+                if os.path.exists(r.foto.path):
                     img = Image(r.foto.path, width=60, height=45)
                     foto_cell = img
                 else:
-                    foto_cell = "img"
-            except Exception:
-                foto_cell = "img"
+                    foto_cell = "Sin archivo"
+            except Exception as e:
+                # Si algo falla, ponemos un texto en lugar de que el PDF de error 500
+                foto_cell = "Error de carga"
 
         data.append([fecha, empleado_par, categoria_par, desc_par, foto_cell])
 
