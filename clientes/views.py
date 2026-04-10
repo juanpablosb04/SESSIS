@@ -24,7 +24,7 @@ def _parse_bool(value, fallback):
 
 def cedula_valida(cedula):
     cedula = cedula.strip()
-    patron = r"^\d{9}$|^\d{12}$"
+    patron = r"^\d{9}$|^\d{10}$|^\d{12}$"
     return re.match(patron, cedula)
 
 
@@ -69,7 +69,7 @@ def clientes_view(request):
             elif not cedula_valida(cedula):
                 messages.error(
                     request,
-                    "⚠️ La cédula debe contener exactamente 9 o 12 dígitos numéricos.",
+                    "⚠️ La cédula debe contener exactamente 9 o 12 dígitos numéricos y si es cédula jurídica debe tener 10 dígitos.",
                     extra_tags="crear alert-error"
                 )
             elif Clientes.objects.filter(cedula=cedula).exists():
@@ -119,7 +119,7 @@ def clientes_view(request):
             elif not cedula_valida(nueva_cedula):
                 messages.error(
                     request,
-                    "⚠️ La cédula debe tener exactamente 9 o 12 dígitos.",
+                    "⚠️ La cédula debe contener exactamente 9 o 12 dígitos numéricos y si es cédula jurídica debe tener 10 dígitos.",
                     extra_tags="editar alert-error"
                 )
 
