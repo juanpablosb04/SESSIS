@@ -1,3 +1,5 @@
+import os
+
 """
 Django settings for config project.
 
@@ -24,10 +26,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-t+4!5y9qh8ci=nietzy9y8w(5zxa_bayaofve@adq6d=4_m*o0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['sessis-web-f3heaudtgbd0c3g0.canadacentral-01.azurewebsites.net', '127.0.0.1', 'localhost']
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://sessis-web-f3heaudtgbd0c3g0.canadacentral-01.azurewebsites.net"
+]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
@@ -43,14 +50,20 @@ INSTALLED_APPS = [
     'roles',
     'clientes.apps.ClientesConfig',
     'usuarios',
+    'inventarios',
+    'ubicaciones',
+    'citas',
+    'asistencia',
+    'reportes',
 ]
 
 MIDDLEWARE = [
-   'django.middleware.security.SecurityMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',  # 👈 importante
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -60,7 +73,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates"],  # 👈 muy importante
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -81,21 +94,17 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'mssql',
-        'NAME': 'SESSIS',
-        'USER': '',      # vacío porque usas Trusted_Connection
-        'PASSWORD': '',
-        'HOST': 'AKILES08CR\\SQLEXPRESS',
-        'PORT': '',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': '5432',
         'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
-            'trusted_connection': 'yes',
+            'sslmode': 'require',
         },
     }
 }
-
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -121,7 +130,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Costa_Rica'
 
 USE_I18N = True
 
@@ -132,11 +141,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
-# Para que Django sepa dónde buscar tus archivos estáticos globales
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -162,6 +169,25 @@ LOGIN_REDIRECT_URL = 'inicio'
 # Redirigir al login después de cerrar sesión
 LOGOUT_REDIRECT_URL = 'login'
 
+#Imagenes
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+
+# ======================
+# Configuración de correo
+# ======================
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = 'sistemasessis@gmail.com'
+EMAIL_HOST_PASSWORD = 'fpkl szho vbmk vssi'
+DEFAULT_FROM_EMAIL = f"Soporte SESSIS <{EMAIL_HOST_USER}>"
 
 
 

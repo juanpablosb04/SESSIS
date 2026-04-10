@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        .container { 
+            font-family: 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif; 
+            color: #1f2937; 
+            max-width: 600px; 
+            margin: 20px auto; 
+            border: 1px solid #e5e7eb; 
+            border-radius: 12px; 
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .header { 
+            background-color: #1f2937; 
+            color: #ffffff; 
+            padding: 25px; 
+            text-align: center; 
+        }
+        .header h2 { margin: 0; letter-spacing: 2px; font-size: 24px; }
+        
+        .content { padding: 40px 30px; line-height: 1.6; background-color: #ffffff; }
+        .content p { margin-bottom: 15px; font-size: 16px; }
+        
+        .password-box { 
+            background-color: #f9fafb; 
+            border: 2px dashed #621729; 
+            padding: 20px; 
+            text-align: center; 
+            font-size: 24px; 
+            font-weight: bold; 
+            color: #621729; 
+            letter-spacing: 3px; 
+            margin: 25px 0;
+            border-radius: 8px;
+        }
+        
+        .btn { 
+            display: inline-block; 
+            padding: 12px 25px; 
+            background-color: #1f2937; 
+            color: #ffffff !important; 
+            text-decoration: none; 
+            border-radius: 6px; 
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .footer { 
+            background-color: #f3f4f6; 
+            color: #6b7280; 
+            padding: 20px; 
+            text-align: center; 
+            font-size: 12px; 
+            border-top: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>SESSIS</h2>
+        </div>
+        <div class="content">
+            <p>Estimado usuario,</p>
+            <p>Se ha generado una solicitud de restablecimiento de contraseña para su cuenta en el <strong>Sistema SESSIS</strong>.</p>
+            <p>Su nueva clave de acceso provisional es:</p>
+            
+            <div class="password-box">
+                {{ contrasena }}
+            </div>
+
+            <p style="font-size: 14px; color: #4b5563;">
+                <strong>Importante:</strong> Esta contraseña es temporal. Por protocolos de seguridad, le solicitamos cambiarla inmediatamente después de su primer inicio de sesión.
+            </p>
+            
+        </div>
+        <div class="footer">
+            Este es un correo electrónico generado automáticamente por el departamento de seguridad de SESSIS.<br>
+            Por favor, no responda a este mensaje.
+        </div>
+    </div>
+</body>
+</html>
